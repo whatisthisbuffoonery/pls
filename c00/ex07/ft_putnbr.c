@@ -15,7 +15,6 @@ void	ft_actual_putnbr(long nb)
 {
 	char	b;
 
-	longg = nb;
 	if (nb < 0)
 	{
 		b = 45;
