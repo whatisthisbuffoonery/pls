@@ -37,8 +37,8 @@ void	rush(int x, int y)
 	if (x > 1)
 	{
 		write (1, "o", 1);
-		ft_putchar('\n');
 	}
+	ft_putchar(10);
 	height_r (y - 2, x, '|');
 	if (y > 1)
 	{

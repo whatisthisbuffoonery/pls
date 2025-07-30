@@ -19,10 +19,12 @@ void	ft_putchar(char a)
 void	height_r(int y, int x, char a)
 {
 	int	i;
+	int	k;
 
 	while (y > 0)
 	{
 		i = x;
+		k = x;
 		while (i > 0)
 		{
 			if (i == 1 || i == x)
@@ -35,7 +37,10 @@ void	height_r(int y, int x, char a)
 			}
 			i --;
 		}
-		ft_putchar(10);
+		if (k != 0)
+		{
+			ft_putchar(10);
+		}
 		y --;
 	}
 }

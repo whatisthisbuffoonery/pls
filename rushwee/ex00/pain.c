@@ -28,25 +28,29 @@ int	check_r(char *v)
 
 int	check_d(char *v)
 {
-	if (v[0] == 45)
+	int	i;
+
+	i = 0;
+	while (v[i])
 	{
-		write (1, "no negative dimensions please\n", 30);
-		return (1);
+		if (v[0] == 45)
+		{
+			write (1, "no negative dimensions please\n", 30);
+			return (1);
+		}
+		if (v[0] == 48)
+		{
+			write (1, "please don't start dimensions with 0\n", 37);
+			return (1);
+		}
+		else if (v[0] < 48 || v[0] > 57)
+		{
+			write (1, "please use numbers\n", 19);
+			return (1);
+		}
+		i ++;
 	}
-	if (v[0] == 48)
-	{
-		write (1, "please don't start dimensions with 0\n", 37);
-		return (1);
-	}
-	else if (v[0] < 48 || v[0] > 57)
-	{
-		write (1, "please use numbers\n", 19);
-		return (1);
-	}
-	else
-	{
-		return (0);
-	}
+	return (0);
 }
 
 int	make_d(char *v, int f)
@@ -84,9 +88,9 @@ int	welcome(int c)
 	}
 	if (c == 1)
 	{
-		write (1, "Hi! Input ./a.out with the rush number (0x),", 45);
-		write (1, " followed by the x, then y, dimensions", 38);
-		write (1, " (up to 3 digits: xxx),", 23);
+		write (1, "Hi! Input ./a.out with the rush number (0x),\n", 45);
+		write (1, "followed by the x, then y, dimensions", 38);
+		write (1, " (up to 3 digits: xxx),\n", 23);
 		write (1, " all seperated with single spaces", 33);
 		write (1, "\nmax x: 211, max y: 999\n", 25);
 		return (1);
