@@ -14,23 +14,22 @@
 unsigned int	ft_strlcpy(char *dest, char *src, unsigned int size)
 {
 	int	i;
+	int	a;
 
 	i = 0;
-	while (src[i] && size > 1)
+	a = 0;
+	if (size > 0)
 	{
-		dest[i] = src[i];
-		i ++;
-		size --;
-	}
-	dest[i] = '\0';
-	if (src[i])
-	{
-		while (src[i])
+		while (src[i] && size - 1 > i && size > 0)
 		{
+			dest[i] = src[i];
 			i ++;
 		}
+		dest[i] = '\0';
 	}
-	return (i);
+	while (src[a])
+		a ++;
+	return (a);
 }
 /*
 int	main(void)
