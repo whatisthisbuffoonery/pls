@@ -1,12 +1,23 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   ft_convert_base.c                                  :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: dthoo <dthoo@student.42singapore.sg>       +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2025/08/06 16:59:25 by dthoo             #+#    #+#             */
+/*   Updated: 2025/08/06 17:03:50 by dthoo            ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
 #include <stdlib.h>
 
-int budget_log(int k, int correction);
+int		budget_log(int k, int correction);
 
-char    *flagger(int f, char *base_to, int i, int flag);
+char	*flagger(int f, char *base_to, int i, int flag);
 
 char	*init(int f, int t);
 
-int	base_check(char *base);
+int		base_check(char *base);
 
 int	ft_atoi(char *str, int *i, int flag)
 {
@@ -20,7 +31,7 @@ int	ft_atoi(char *str, int *i, int flag)
 	{
 		if (str[*i] == 45)
 			flag ++;
-			*i += 1;
+		*i += 1;
 	}
 	return (flag);
 }
@@ -93,11 +104,13 @@ char	*ft_convert_base(char *nbr, char *base_from, char *base_to)
 	int		i;
 	int		f;
 	int		flag;
-	
+
 	flag = ft_atoi(nbr, &i, 0);
 	while (base_from[i])
 		i ++;
-	if ((base_check(base_from) || base_check(base_to)) || int_check(unary(nbr, base_from, 0, i), &f))
+	if (base_check(base_from) || base_check(base_to))
+		return (NULL);
+	if (int_check(unary(nbr, base_from, 0, i), &f))
 		return (NULL);
 	i = 0;
 	while (base_to[i])

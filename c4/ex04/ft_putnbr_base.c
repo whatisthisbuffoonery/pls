@@ -6,7 +6,7 @@
 /*   By: dthoo <dthoo@student.42singapore.sg>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/24 20:47:22 by dthoo             #+#    #+#             */
-/*   Updated: 2025/08/01 16:05:42 by dthoo            ###   ########.fr       */
+/*   Updated: 2025/08/06 16:09:57 by dthoo            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 #include <unistd.h>
@@ -34,12 +34,12 @@ void	unary(long a)
 	}
 }
 
-int		check_base(char *base, int i, int k)
+int	check_base(char *base, int i, int k)
 {
 	while (base[i])
 	{
 		k = 0;
-		while(base[k])
+		while (base[k])
 		{
 			if (base[k] == base[i])
 				return (0);
@@ -59,13 +59,13 @@ int		check_base(char *base, int i, int k)
 void	ft_putnbr_base(int nbr, char *base)
 {
 	long	longjohns;
-	int	i;
+	int		i;
 
 	i = 0;
 	if (check_base(base, 0, 0))
 	{
 		while (base[i])
-		i ++;
+			i ++;
 		longjohns = nbr;
 		if (i > 1)
 			ft_actual_putnbr(longjohns, base, i);

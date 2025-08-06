@@ -1,3 +1,14 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   ft_ten_queens_puzzle.c                             :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: dthoo <dthoo@student.42singapore.sg>       +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2025/08/06 16:18:59 by dthoo             #+#    #+#             */
+/*   Updated: 2025/08/06 16:31:07 by dthoo            ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
 #include <unistd.h>
 
 int	horizontal(int arr[10], int i)
@@ -44,18 +55,17 @@ int	check(int arr[10], int i, char a, int *count)
 		write(1, &a, 1);
 		i ++;
 	}
+	write(1, "\n", 1);
 	*count += 1;
 	return (1);
 }
 
-int	recursion(int arr[10], int i, int value, int *count)
+void	recursion(int arr[10], int i, int value, int *count)
 {
-	if (i == 10)
-		return (0);
-	while (value < 10)
+	while (value < 10 && i < 10)
 	{
 		arr[i] = value;
-		if (check(arr), i, 0, count)
+		if (check(arr, i, 0, count))
 			recursion(arr, i + 1, 0, count);
 		value ++;
 	}
@@ -71,7 +81,7 @@ int	ft_ten_queens_puzzle(void)
 	while (count < 10)
 	{
 		arr[count] = -42;
-		i ++;
+		count ++;
 	}
 	count = 0;
 	recursion(arr, 0, 0, &count);

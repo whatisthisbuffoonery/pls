@@ -1,12 +1,12 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   ft_putnbr_base.c                                   :+:      :+:    :+:   */
+/*   ft_atoi_base.c                                     :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: dthoo <dthoo@student.42singapore.sg>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/24 20:47:22 by dthoo             #+#    #+#             */
-/*   Updated: 2025/08/01 16:47:28 by dthoo            ###   ########.fr       */
+/*   Updated: 2025/08/06 16:15:15 by dthoo            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 #include <unistd.h>
@@ -40,7 +40,7 @@ long	actual_atoi(char *str, char *base, int i, int k)
 	while (str[i])
 	{
 		a = 0;
-		while(base[a])
+		while (base[a])
 		{
 			if (str[i] == base[a])
 			{
@@ -57,12 +57,12 @@ long	actual_atoi(char *str, char *base, int i, int k)
 	return (b);
 }
 
-int		check_base(char *base, int *i, int k)
+int	check_base(char *base, int *i, int k)
 {
 	while (base[i])
 	{
 		k = 0;
-		while(base[k])
+		while (base[k])
 		{
 			if (base[k] == base[i])
 				return (1);

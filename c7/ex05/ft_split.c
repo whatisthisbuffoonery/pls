@@ -1,3 +1,16 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   ft_split.c                                         :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: dthoo <dthoo@student.42singapore.sg>       +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2025/08/06 17:14:13 by dthoo             #+#    #+#             */
+/*   Updated: 2025/08/06 17:15:31 by dthoo            ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+#include <stdlib.h>
+
 int	check(char *str, char *charset, int i, int *c_num)
 {
 	int		k;
@@ -5,7 +18,7 @@ int	check(char *str, char *charset, int i, int *c_num)
 	k = 0;
 	while (charset[k])
 	{
-		if ((str[i - 1] = charset[k]) && i != 0)
+		if ((str[i - 1] == charset[k]) && i != 0)
 		{
 			*c_num -= 1;
 			return (1);
@@ -90,7 +103,7 @@ char	**ft_split(char *str, char *charset)
 	int		i;
 	int		c_num;
 	char	**dest;
-	
+
 	i = 0;
 	c = c_init(str, charset, 0, &c_num);
 	while (str[i])
