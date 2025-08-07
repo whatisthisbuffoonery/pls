@@ -1,20 +1,23 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   ft_ultimate_div_mod.c                              :+:      :+:    :+:   */
+/*   ft_abs.h                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: dthoo <dthoo@student.42.fr>                +#+  +:+       +#+        */
+/*   By: dthoo <dthoo@student.42singapore.sg>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2025/07/28 08:39:28 by dthoo             #+#    #+#             */
-/*   Updated: 2025/08/07 18:01:21 by dthoo            ###   ########.fr       */
+/*   Created: 2025/08/07 16:30:12 by dthoo             #+#    #+#             */
+/*   Updated: 2025/08/07 16:40:00 by dthoo            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-void	ft_ultimate_div_mod(int *a, int *b)
-{
-	int	i;
+#ifndef FT_ABS_H
+# define FT_ABS_H
 
-	i = *a / *b;
-	*b = *a % *b;
-	*a = i;
+static inline int	abs(char c)
+{
+	if (c < 0)
+		return (-c);
+	return (c);
 }
+# define ABS abs
+#endif

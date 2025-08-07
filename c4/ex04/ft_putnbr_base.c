@@ -29,7 +29,7 @@ void	unary(long a)
 {
 	while (a < 0)
 	{
-		write(1, '1', 1);
+		write(1, "1", 1);
 		a --;
 	}
 }
@@ -45,14 +45,12 @@ int	check_base(char *base, int i, int k)
 				return (0);
 			k ++;
 		}
-		if (base[i] == 32 || (base[i] > 8 && str < 14))
+		if (base[i] == 32 || (base[i] > 8 && base[i] < 14))
 			return (0);
 		if (base[i] == 43 || base[i] == 45)
 			return (0);
 		i ++;
 	}
-	if (i < 1)
-		return (0);
 	return (1);
 }
 
@@ -62,10 +60,10 @@ void	ft_putnbr_base(int nbr, char *base)
 	int		i;
 
 	i = 0;
-	if (check_base(base, 0, 0))
+	while (base[i])
+		i ++;
+	if (check_base(base, 0, 0) && i > 0)
 	{
-		while (base[i])
-			i ++;
 		longjohns = nbr;
 		if (i > 1)
 			ft_actual_putnbr(longjohns, base, i);

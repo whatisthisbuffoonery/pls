@@ -21,6 +21,8 @@ char	*ft_strcapitalize(char *str)
 		if (str[i] > 96 && str[i] < 123)
 		{
 			str[i] -= 32;
+			if ((str[i - 1] > 47 && str[i - 1] < 58) && i > 0)
+				str[i] += 32;
 		}
 		i ++;
 	}
@@ -30,9 +32,7 @@ char	*ft_strcapitalize(char *str)
 		if ((str[i] > 64 && str[i] < 91) || (str[i] > 96 && str[i] < 123))
 		{
 			if (str[i + 1] > 64 && str[i + 1] < 91)
-			{
 				str[i + 1] += 32;
-			}
 		}
 		i ++;
 	}
@@ -41,8 +41,8 @@ char	*ft_strcapitalize(char *str)
 /*
 int	main(void)
 {
-	char str[49] = "hi, how are you? 42words forty-two; fifty0and+one";
-	int	i;
+	char	str[49] = "hi, how are you? 42words forty-two; fifty0and+one";
+	int		i;
 
 	i = 0;
 	ft_strcapitalize(str);
@@ -51,4 +51,5 @@ int	main(void)
 		write(1, &str[i], 1);
 		i ++;
 	}
-}*/
+}
+*/

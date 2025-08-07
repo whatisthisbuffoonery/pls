@@ -28,9 +28,5 @@ char	*ft_strncpy(char *dest, char *src, unsigned int n)
 		i ++;
 		n --;
 	}
-}
-
-int	main(void)
-{
-	write(1, 'a', 1);
+	return (dest);
 }

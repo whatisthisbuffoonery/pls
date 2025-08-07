@@ -1,20 +1,21 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   ft_ultimate_div_mod.c                              :+:      :+:    :+:   */
+/*   ft.h                                               :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: dthoo <dthoo@student.42.fr>                +#+  +:+       +#+        */
+/*   By: dthoo <dthoo@student.42singapore.sg>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2025/07/28 08:39:28 by dthoo             #+#    #+#             */
-/*   Updated: 2025/08/07 18:01:21 by dthoo            ###   ########.fr       */
+/*   Created: 2025/08/07 11:17:59 by dthoo             #+#    #+#             */
+/*   Updated: 2025/08/07 11:36:46 by dthoo            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-void	ft_ultimate_div_mod(int *a, int *b)
-{
-	int	i;
+#ifndef FT_H
+# define FT_H
 
-	i = *a / *b;
-	*b = *a % *b;
-	*a = i;
-}
+void	ft_putchar(char c);
+void	ft_swap(int *a, int *b);
+void	ft_putstr(char *str);
+int		ft_strlen(char *str);
+int		ft_strcmp(char *s1, char *s2);
+#endif

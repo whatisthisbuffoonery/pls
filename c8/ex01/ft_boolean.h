@@ -1,35 +1,26 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   ft_strlcat.c                                       :+:      :+:    :+:   */
+/*   ft_boolean.h                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: dthoo <dthoo@student.42singapore.sg>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2025/08/07 20:42:20 by dthoo             #+#    #+#             */
-/*   Updated: 2025/08/07 20:42:25 by dthoo            ###   ########.fr       */
+/*   Created: 2025/08/07 11:38:59 by dthoo             #+#    #+#             */
+/*   Updated: 2025/08/07 16:00:54 by dthoo            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-unsigned int	ft_strlcat(char *dest, char *src, unsigned int size)
-{
-	unsigned int	i;
-	unsigned int	a;
-	unsigned int	b;
+#ifndef FT_BOOLEAN_H
+# include <unistd.h>
+# define FT_BOOLEAN_H
+# define EVEN_MSG "I have an even number of arguments."
+# define ODD_MSG "I have an odd number of arguments."
+# define SUCCESS 0
+# define EVEN(nbr) (nbr % 2) == 0
 
-	i = 0;
-	a = 0;
-	b = 0;
-	while (dest[a])
-		a ++;
-	while (src[b])
-		b ++;
-	if (a >= size)
-		return (size + b);
-	while (src[i] && size > a + i + 1)
-	{
-		dest[a + i] = src[i];
-		i ++;
-	}
-	dest[a + i] = '\0';
-	return (a + b);
-}
+typedef enum e_bool
+{
+	FALSE = 0,
+	TRUE = 1
+}	t_bool;
+#endif

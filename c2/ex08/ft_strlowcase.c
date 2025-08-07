@@ -10,6 +10,7 @@
 /*                                                                            */
 /* ************************************************************************** */
 #include <unistd.h>
+
 char	*ft_strlowcase(char *str)
 {
 	int	i;
@@ -25,7 +26,7 @@ char	*ft_strlowcase(char *str)
 	}
 	return (str);
 }
-
+/*
 int	main(void)
 {
 	char	swee[16] = "RETURN TO SENDER";
@@ -42,3 +43,4 @@ int	main(void)
 	}
 	return (0);
 }
+*/

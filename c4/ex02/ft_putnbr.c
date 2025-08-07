@@ -1,35 +1,42 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   ft_strlcat.c                                       :+:      :+:    :+:   */
+/*   ft_putnbr.c                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: dthoo <dthoo@student.42singapore.sg>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2025/08/07 20:42:20 by dthoo             #+#    #+#             */
-/*   Updated: 2025/08/07 20:42:25 by dthoo            ###   ########.fr       */
+/*   Created: 2025/07/24 20:47:22 by dthoo             #+#    #+#             */
+/*   Updated: 2025/07/28 02:02:51 by dthoo            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
+#include <unistd.h>
 
-unsigned int	ft_strlcat(char *dest, char *src, unsigned int size)
+void	ft_actual_putnbr(long nb)
 {
-	unsigned int	i;
-	unsigned int	a;
-	unsigned int	b;
+	char	b;
 
-	i = 0;
-	a = 0;
-	b = 0;
-	while (dest[a])
-		a ++;
-	while (src[b])
-		b ++;
-	if (a >= size)
-		return (size + b);
-	while (src[i] && size > a + i + 1)
+	if (nb < 0)
 	{
-		dest[a + i] = src[i];
-		i ++;
+		b = 45;
+		write(1, &b, 1);
+		nb = 0 - nb;
 	}
-	dest[a + i] = '\0';
-	return (a + b);
+	if (nb >= 10)
+	{
+		ft_actual_putnbr(nb / 10);
+		ft_actual_putnbr(nb % 10);
+	}
+	if (nb < 10)
+	{
+		b = nb + 48;
+		write(1, &b, 1);
+	}
+}
+
+void	ft_putnbr(int nb)
+{
+	long	longjohns;
+
+	longjohns = nb;
+	ft_actual_putnbr(longjohns);
 }

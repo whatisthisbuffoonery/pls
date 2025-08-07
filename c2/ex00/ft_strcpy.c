@@ -10,15 +10,31 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-void	*ft_strcpy(char *dest, char *src)
+char	*ft_strcpy(char *dest, char *src)
 {
 	int	i;
 
 	i = 0;
-	while(src[i])
+	while (src[i])
 	{
 		dest[i] = src[i];
 		i ++;
 	}
 	dest[i] = '\0';
+	return (dest);
+}
+
+#include <unistd.h>
+int	main(void)
+{
+	char	a[20] = "apple";
+	char	*b = "pie";
+	int	i = 0;
+	
+	ft_strcpy(a, b);
+	while (a[i])
+	{
+		write(1, &a[i], 1);
+		i ++;
+	}
 }

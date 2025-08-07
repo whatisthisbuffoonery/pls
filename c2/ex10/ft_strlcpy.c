@@ -13,14 +13,14 @@
 
 unsigned int	ft_strlcpy(char *dest, char *src, unsigned int size)
 {
-	int	i;
-	int	a;
+	unsigned int	i;
+	unsigned int	a;
 
 	i = 0;
 	a = 0;
 	if (size > 0)
 	{
-		while (src[i] && size - 1 > i && size > 0)
+		while (src[i] && size - 1 > i)
 		{
 			dest[i] = src[i];
 			i ++;
@@ -31,6 +31,7 @@ unsigned int	ft_strlcpy(char *dest, char *src, unsigned int size)
 		a ++;
 	return (a);
 }
+
 /*
 int	main(void)
 {
@@ -55,4 +56,5 @@ int	main(void)
 	b = a % 10;
 	b += 48;
 	write (1, &b, 1);
-}*/
+}
+*/

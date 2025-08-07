@@ -11,9 +11,9 @@
 /* ************************************************************************** */
 #include <unistd.h>
 
-void	hex(char b)
+void	hex(unsigned char b)
 {
-	char	a;
+	unsigned char	a;
 
 	a = b / 16;
 	b = b % 16;
@@ -43,24 +43,23 @@ void	ft_putstr_non_printable(char *str)
 	char	a;
 
 	i = 0;
-	while (str[i])
+	while ((unsigned char)str[i])
 	{
-		if (!(str[i] > 31 && str[i] < 127))
+		if (!((unsigned char)str[i] > 31 && (unsigned char)str[i] < 127))
 		{
 			a = 92;
 			write(1, &a, 1);
-			hex(str[i]);
+			hex((unsigned char)str[i]);
 		}
 		else
-		{
 			write(1, &str[i], 1);
-		}
 		i ++;
 	}
 }
-/*
+
+
 int	main(void)
 {
 	char	a[18] = "Hello\nHow are you?";
 	ft_putstr_non_printable(a);
-}*/
+}

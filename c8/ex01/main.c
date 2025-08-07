@@ -1,35 +1,31 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   ft_strlcat.c                                       :+:      :+:    :+:   */
+/*   main.c                                             :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: dthoo <dthoo@student.42singapore.sg>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2025/08/07 20:42:20 by dthoo             #+#    #+#             */
-/*   Updated: 2025/08/07 20:42:25 by dthoo            ###   ########.fr       */
+/*   Created: 2025/08/07 15:55:48 by dthoo             #+#    #+#             */
+/*   Updated: 2025/08/07 15:55:53 by dthoo            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-unsigned int	ft_strlcat(char *dest, char *src, unsigned int size)
+#include "ft_boolean.h"
+void	ft_putstr(char *str)
 {
-	unsigned int	i;
-	unsigned int	a;
-	unsigned int	b;
-
-	i = 0;
-	a = 0;
-	b = 0;
-	while (dest[a])
-		a ++;
-	while (src[b])
-		b ++;
-	if (a >= size)
-		return (size + b);
-	while (src[i] && size > a + i + 1)
-	{
-		dest[a + i] = src[i];
-		i ++;
-	}
-	dest[a + i] = '\0';
-	return (a + b);
+	while (*str)
+		write(1, str++, 1);
+}
+t_bool	ft_is_even(int nbr)
+{
+	return ((EVEN(nbr)) ? TRUE : FALSE);
+}
+int	main(int argc, char **argv)
+{
+	(void)argv;
+	if (ft_is_even(argc - 1) == TRUE)
+		ft_putstr(EVEN_MSG);
+	else
+		ft_putstr(ODD_MSG);
+	return (SUCCESS);
 }
