@@ -1,32 +1,25 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   ft_strncpy.c                                       :+:      :+:    :+:   */
+/*   ft_strcmp.c                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: dthoo <dthoo@student.42singapore.sg>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2025/07/29 21:08:17 by dthoo             #+#    #+#             */
-/*   Updated: 2025/07/29 21:32:11 by dthoo            ###   ########.fr       */
+/*   Created: 2025/07/31 21:56:20 by dthoo             #+#    #+#             */
+/*   Updated: 2025/07/31 22:37:46 by dthoo            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
-#include <unistd.h>
 
-char	*ft_strncpy(char *dest, char *src, unsigned int n)
+int	ft_strcmp(char *s1, char *s2)
 {
-	unsigned int	i;
+	int	i;
 
 	i = 0;
-	while (src[i] && n > 0)
+	while (s1[i] || s2[i])
 	{
-		dest[i] = src[i];
+		if ((unsigned char)s1[i] != (unsigned char)s2[i])
+			return ((unsigned char)s1[i] - (unsigned char)s2[i]);
 		i ++;
-		n --;
 	}
-	while (n > 0)
-	{
-		dest[i] = '\0';
-		i ++;
-		n --;
-	}
-	return (dest);
+	return (0);
 }

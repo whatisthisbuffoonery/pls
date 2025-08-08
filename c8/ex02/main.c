@@ -1,32 +1,20 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   ft_strncpy.c                                       :+:      :+:    :+:   */
+/*   main.c                                             :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: dthoo <dthoo@student.42singapore.sg>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2025/07/29 21:08:17 by dthoo             #+#    #+#             */
-/*   Updated: 2025/07/29 21:32:11 by dthoo            ###   ########.fr       */
+/*   Created: 2025/08/08 15:14:20 by dthoo             #+#    #+#             */
+/*   Updated: 2025/08/08 15:19:39 by dthoo            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
-#include <unistd.h>
 
-char	*ft_strncpy(char *dest, char *src, unsigned int n)
+#include <stdio.h>
+#include "ft_abs.h"
+
+int	main(void)
 {
-	unsigned int	i;
-
-	i = 0;
-	while (src[i] && n > 0)
-	{
-		dest[i] = src[i];
-		i ++;
-		n --;
-	}
-	while (n > 0)
-	{
-		dest[i] = '\0';
-		i ++;
-		n --;
-	}
-	return (dest);
+	int	a = ABS('d');
+	printf("%d", a);
 }

@@ -13,11 +13,11 @@
 #ifndef FT_ABS_H
 # define FT_ABS_H
 
-static inline int	abs(char c)
+int	ft_abs(char c)
 {
 	if (c < 0)
 		return (-c);
 	return (c);
 }
-# define ABS abs
+# define ABS ft_abs
 #endif

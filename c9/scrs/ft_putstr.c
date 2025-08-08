@@ -1,32 +1,25 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   ft_strncpy.c                                       :+:      :+:    :+:   */
+/*   ft_putstr.c                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: dthoo <dthoo@student.42singapore.sg>       +#+  +:+       +#+        */
+/*   By: dthoo <dthoo@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2025/07/29 21:08:17 by dthoo             #+#    #+#             */
-/*   Updated: 2025/07/29 21:32:11 by dthoo            ###   ########.fr       */
+/*   Created: 2025/07/28 08:46:09 by dthoo             #+#    #+#             */
+/*   Updated: 2025/08/07 18:01:21 by dthoo            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
+
 #include <unistd.h>
 
-char	*ft_strncpy(char *dest, char *src, unsigned int n)
+void	ft_putstr(char *str)
 {
-	unsigned int	i;
+	int		i;
 
 	i = 0;
-	while (src[i] && n > 0)
+	while (str[i])
 	{
-		dest[i] = src[i];
+		write(1, &str[i], 1);
 		i ++;
-		n --;
 	}
-	while (n > 0)
-	{
-		dest[i] = '\0';
-		i ++;
-		n --;
-	}
-	return (dest);
 }

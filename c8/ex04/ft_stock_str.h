@@ -1,32 +1,22 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   ft_strncpy.c                                       :+:      :+:    :+:   */
+/*   ft_stock_str.h                                     :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: dthoo <dthoo@student.42singapore.sg>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2025/07/29 21:08:17 by dthoo             #+#    #+#             */
-/*   Updated: 2025/07/29 21:32:11 by dthoo            ###   ########.fr       */
+/*   Created: 2025/08/08 15:31:42 by dthoo             #+#    #+#             */
+/*   Updated: 2025/08/08 15:32:16 by dthoo            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
-#include <unistd.h>
 
-char	*ft_strncpy(char *dest, char *src, unsigned int n)
+#ifndef FT_STOCK_STR_H
+# define FT_STOCK_STR_H
+typedef struct s_stock_str
 {
-	unsigned int	i;
+	int size;
+	char *str;
+	char *copy;
+} t_stock_str;
 
-	i = 0;
-	while (src[i] && n > 0)
-	{
-		dest[i] = src[i];
-		i ++;
-		n --;
-	}
-	while (n > 0)
-	{
-		dest[i] = '\0';
-		i ++;
-		n --;
-	}
-	return (dest);
-}
+#endif

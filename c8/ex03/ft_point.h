@@ -1,32 +1,21 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   ft_strncpy.c                                       :+:      :+:    :+:   */
+/*   ft_point.h                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: dthoo <dthoo@student.42singapore.sg>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2025/07/29 21:08:17 by dthoo             #+#    #+#             */
-/*   Updated: 2025/07/29 21:32:11 by dthoo            ###   ########.fr       */
+/*   Created: 2025/08/08 15:20:40 by dthoo             #+#    #+#             */
+/*   Updated: 2025/08/08 15:25:51 by dthoo            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
-#include <unistd.h>
 
-char	*ft_strncpy(char *dest, char *src, unsigned int n)
-{
-	unsigned int	i;
+#ifndef FT_POINT_H
+# define FT_POINT_H
 
-	i = 0;
-	while (src[i] && n > 0)
-	{
-		dest[i] = src[i];
-		i ++;
-		n --;
-	}
-	while (n > 0)
-	{
-		dest[i] = '\0';
-		i ++;
-		n --;
-	}
-	return (dest);
-}
+typedef struct s_point{
+	int	x;
+	int	y;
+} t_point;
+
+#endif
