@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   ft_str_is_alpha.c                                  :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: dthoo <dthoo@student.42singapore.sg>       +#+  +:+       +#+        */
+/*   By: dthoo <dthoo@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/29 21:58:24 by dthoo             #+#    #+#             */
-/*   Updated: 2025/07/29 22:06:57 by dthoo            ###   ########.fr       */
+/*   Updated: 2025/08/10 07:41:59 by dthoo            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,3 +29,15 @@ int	ft_str_is_alpha(char *str)
 	}
 	return (1);
 }
+
+/*
+#include <unistd.h>
+int	main(void)
+{
+	char	a[20] = "a4pple";
+	int	c = ft_str_is_alpha(a);
+	char	b = c + 48;
+	
+	write(1, &b, 1);
+}
+*/

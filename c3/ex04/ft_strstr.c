@@ -21,20 +21,23 @@ char	*ft_strstr(char *str, char *to_find)
 		return (str);
 	while (str[i])
 	{
-		if (str[i] == to_find[k])
+		i ++;
+		if (str[i - 1] == to_find[k])
+		{
 			k ++;
+			if (!(to_find[k]))
+				return (&str[i - k]);
+		}
 		else
 		{
-			i = i - k + 1;
+			i = i - k;
 			k = 0;
 		}
-		if (!(to_find[k]))
-			return (&str[(i + 1) - k]);
-		i ++;
 	}
 	return (0);
 }
 
+/*
 #include <unistd.h>
 
 int     main(void)
@@ -44,4 +47,4 @@ int     main(void)
         char    *c = ft_strstr(a, b);
         write(1, c, 1);
 }
-
+*/

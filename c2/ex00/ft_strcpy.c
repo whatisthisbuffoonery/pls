@@ -9,7 +9,6 @@
 /*   Updated: 2025/07/29 21:57:07 by dthoo            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
-
 char	*ft_strcpy(char *dest, char *src)
 {
 	int	i;
@@ -24,17 +23,19 @@ char	*ft_strcpy(char *dest, char *src)
 	return (dest);
 }
 
+/*
 #include <unistd.h>
 int	main(void)
 {
 	char	a[20] = "apple";
 	char	*b = "pie";
 	int	i = 0;
+	char	*c = ft_strcpy(a, b);
 	
-	ft_strcpy(a, b);
-	while (a[i])
+	while (c[i])
 	{
-		write(1, &a[i], 1);
+		write(1, &c[i], 1);
 		i ++;
 	}
 }
+*/

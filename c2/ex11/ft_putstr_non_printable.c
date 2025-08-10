@@ -3,12 +3,13 @@
 /*                                                        :::      ::::::::   */
 /*   ft_putstr_non_printable.c                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: dthoo <dthoo@student.42singapore.sg>       +#+  +:+       +#+        */
+/*   By: dthoo <dthoo@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/31 17:53:09 by dthoo             #+#    #+#             */
-/*   Updated: 2025/07/31 20:42:56 by dthoo            ###   ########.fr       */
+/*   Updated: 2025/08/10 07:59:59 by dthoo            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
+
 #include <unistd.h>
 
 void	hex(unsigned char b)
@@ -18,21 +19,13 @@ void	hex(unsigned char b)
 	a = b / 16;
 	b = b % 16;
 	if (a < 10)
-	{
 		a += 48;
-	}
 	else
-	{
 		a += 87;
-	}
 	if (b < 10)
-	{
 		b += 48;
-	}
 	else
-	{
 		b += 87;
-	}
 	write(1, &a, 1);
 	write(1, &b, 1);
 }
@@ -57,9 +50,10 @@ void	ft_putstr_non_printable(char *str)
 	}
 }
 
-
+/*
 int	main(void)
 {
 	char	a[18] = "Hello\nHow are you?";
 	ft_putstr_non_printable(a);
 }
+*/

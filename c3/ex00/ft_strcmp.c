@@ -23,3 +23,35 @@ int	ft_strcmp(char *s1, char *s2)
 	}
 	return (0);
 }
+
+/*
+#include <unistd.h>
+
+int     main(void)
+{
+	char	*a = "appl";
+	char	*b = "applz";
+	int		c = ft_strncmp(a, b);
+	char	d;
+
+	if (c < 0)
+	{
+		write(1, "-", 1);
+		c = 0 - c;
+	}
+	if (c > 99)
+	{
+		d = (c / 100) + 48;
+		write(1, &d, 1);
+		d = ((c / 10) % 10) + 48;
+		write(1, &d, 1);
+	}
+	else if (c > 9)
+	{
+		d = (c / 10) + 48;
+		write(1, &d, 1);
+	}
+	d = (c % 10) + 48;
+	write(1, &d, 1);
+}
+*/

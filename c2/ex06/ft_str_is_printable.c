@@ -25,3 +25,15 @@ int	ft_str_is_printable(char *str)
 	}
 	return (1);
 }
+
+/*
+#include <unistd.h>
+int	main(void)
+{
+	char	a[20] = "a4pp\nle";
+	int	c = ft_str_is_printable(a);
+	char	b = c + 48;
+	
+	write(1, &b, 1);
+}
+*/

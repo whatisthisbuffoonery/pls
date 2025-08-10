@@ -56,5 +56,12 @@ int	main(void)
 	b = a % 10;
 	b += 48;
 	write (1, &b, 1);
+	i = 0;
+	write (1, "\n", 1);
+	while (dest[i])
+	{
+		write(1, &dest[i], 1);
+		i ++;
+	}
 }
 */

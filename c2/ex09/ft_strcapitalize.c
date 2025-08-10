@@ -3,13 +3,12 @@
 /*                                                        :::      ::::::::   */
 /*   ft_strcapitalize.c                                 :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: dthoo <dthoo@student.42singapore.sg>       +#+  +:+       +#+        */
+/*   By: dthoo <dthoo@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/31 15:51:43 by dthoo             #+#    #+#             */
-/*   Updated: 2025/07/31 16:28:31 by dthoo            ###   ########.fr       */
+/*   Updated: 2025/08/10 07:39:41 by dthoo            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
-#include <unistd.h>
 
 char	*ft_strcapitalize(char *str)
 {
@@ -38,6 +37,7 @@ char	*ft_strcapitalize(char *str)
 	}
 	return (str);
 }
+
 /*
 int	main(void)
 {

@@ -25,3 +25,15 @@ int	ft_str_is_uppercase(char *str)
 	}
 	return (1);
 }
+
+/*
+#include <unistd.h>
+int	main(void)
+{
+	char	a[20] = "IYGqsdDUYG";
+	int	c = ft_str_is_uppercase(a);
+	char	b = c + 48;
+	
+	write(1, &b, 1);
+}
+*/

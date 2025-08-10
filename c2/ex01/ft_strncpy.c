@@ -9,8 +9,6 @@
 /*   Updated: 2025/07/29 21:32:11 by dthoo            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
-#include <unistd.h>
-
 char	*ft_strncpy(char *dest, char *src, unsigned int n)
 {
 	unsigned int	i;
@@ -30,3 +28,20 @@ char	*ft_strncpy(char *dest, char *src, unsigned int n)
 	}
 	return (dest);
 }
+
+/*
+#include <unistd.h>
+int	main(void)
+{
+	char	a[20] = "apple";
+	char	*b = "pie";
+	int	i = 0;
+	
+	ft_strncpy(a, b, 4);
+	while (a[i])
+	{
+		write(1, &a[i], 1);
+		i ++;
+	}
+}
+*/

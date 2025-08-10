@@ -27,3 +27,20 @@ char	*ft_strcat(char *dest, char *src)
 	dest[a + i] = '\0';
 	return (dest);
 }
+
+/*
+#include <unistd.h>
+
+int     main(void)
+{
+        char    a[10] = "aaaaa";
+        char    *b = "bbb";
+        char    *c = ft_strcat(a, b);
+        int	i = 0;
+        while (c[i])
+        {
+        	write(1, &c[i], 1);
+        	i ++;
+        }
+}
+*/

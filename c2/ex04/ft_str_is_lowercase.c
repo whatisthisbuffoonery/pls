@@ -9,7 +9,6 @@
 /*   Updated: 2025/07/30 20:38:52 by dthoo            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
-
 int	ft_str_is_lowercase(char *str)
 {
 	int	i;
@@ -25,3 +24,15 @@ int	ft_str_is_lowercase(char *str)
 	}
 	return (1);
 }
+
+/*
+#include <unistd.h>
+int	main(void)
+{
+	char	a[20] = "appQle";
+	int	c = ft_str_is_lowercase(a);
+	char	b = c + 48;
+	
+	write(1, &b, 1);
+}
+*/
