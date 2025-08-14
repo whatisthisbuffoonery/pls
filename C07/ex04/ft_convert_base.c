@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   ft_convert_base.c                                  :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: dthoo <dthoo@student.42singapore.sg>       +#+  +:+       +#+        */
+/*   By: dthoo <dthoo@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/06 16:59:25 by dthoo             #+#    #+#             */
-/*   Updated: 2025/08/06 17:03:50 by dthoo            ###   ########.fr       */
+/*   Updated: 2025/08/14 05:26:19 by dthoo            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -44,29 +44,36 @@ int	int_check(long a, int *f)
 	return (0);
 }
 
-long	base_f(char *nbr, char *base, int k, int i)
+/*
+down at line 71:
+	if (i == 1)
+		a += 1;
+	break ;
+*/
+
+long	base_f(char *nbr, char *base, int b, int i)
 {
 	long	a;
-	int		j;
+	int		k;
+	int		q;
 
 	a = 0;
-	j = 0;
-	while (nbr[j])
+	while (nbr[++b])
 	{
-		k = 0;
-		while (base[k])
+		k = -1;
+		q = 1;
+		while (base[++k])
 		{
-			if (nbr[j] == base[k])
+			if (nbr[b] == base[k])
 			{
 				a *= i;
 				a += k;
-				if (i == 1)
-					a += 1;
+				q = 0;
 				break ;
 			}
-			k ++;
 		}
-		j ++;
+		if (q)
+			break ;
 	}
 	return (a);
 }
@@ -92,6 +99,9 @@ char	*base_t(int f, char *base, int i, int index)
 		t[(index - k) - 1] = swap;
 		k ++;
 	}
+	if (!t[0])
+		t[index++] = '0';
+	t[index] = '\0';
 	return (t);
 }
 
@@ -108,9 +118,9 @@ char	*ft_convert_base(char *nbr, char *base_from, char *base_to)
 	while (base_from[i])
 		i ++;
 	if (base_check(base_from) || base_check(base_to))
-		return (NULL);
-	if (int_check(base_f(nbr, base_from, 0, i), &f))
-		return (NULL);
+		return (0);
+	if (int_check(base_f(nbr, base_from, b - 1, i), &f))
+		return (0);
 	i = 0;
 	while (base_to[i])
 		i ++;
@@ -118,12 +128,14 @@ char	*ft_convert_base(char *nbr, char *base_from, char *base_to)
 }
 
 /*
+#include <unistd.h>
 int	main(void)
 {
-	char	nbr[2] = "5";
+	char	nbr[10] = "10";
 	char	from[11] = "0123456789";
-	char	to[2] = "4";
-
-	ft_convert_base(nbr, from, to);
+	char	to[11] = "0123456789";
+	char *a = ft_convert_base(nbr, from, to);
+	write(1, a, 8);
+	write(1, "\nwhere", 6);
 }
 */

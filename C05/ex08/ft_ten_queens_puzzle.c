@@ -87,3 +87,11 @@ int	ft_ten_queens_puzzle(void)
 	recursion(arr, 0, 0, &count);
 	return (count);
 }
+
+#include <stdio.h>
+int	main(void)
+{
+	int a = ft_ten_queens_puzzle();
+	printf("%d", a);
+}
+

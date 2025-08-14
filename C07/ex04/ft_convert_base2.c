@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   ft_convert_base2.c                                 :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: dthoo <dthoo@student.42singapore.sg>       +#+  +:+       +#+        */
+/*   By: dthoo <dthoo@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/06 16:59:39 by dthoo             #+#    #+#             */
-/*   Updated: 2025/08/06 17:12:28 by dthoo            ###   ########.fr       */
+/*   Updated: 2025/08/14 05:26:22 by dthoo            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -37,7 +37,9 @@ int	base_check(char *base)
 		i ++;
 	}
 	if (i < 2)
+	{
 		return (1);
+	}
 	return (0);
 }
 
@@ -95,7 +97,7 @@ char	*flagger(int f, char *base_to, int i, int flag)
 	k = 1;
 	a = 0;
 	t = base_t(f, base_to, i, 0);
-	if (flag != 0)
+	if (flag % 2 != 0)
 	{
 		actual = budget_log(f, i);
 		actual[0] = 45;

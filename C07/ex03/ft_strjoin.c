@@ -1,3 +1,17 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   ft_strjoin.c                                       :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: dthoo <dthoo@student.42singapore.sg>       +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2025/08/13 15:17:12 by dthoo             #+#    #+#             */
+/*   Updated: 2025/08/13 15:17:19 by dthoo            ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
+#include <stdlib.h>
+
 int	counting_too_hard(char *sep)
 {
 	int	i;
@@ -83,3 +97,13 @@ char	*ft_strjoin(int size, char **strs, char *sep)
 	dest[a] = '\0';
 	return (dest);
 }
+
+/*
+#include <unistd.h>
+int	main(void)
+{
+	char *b[5] = {"1", "2", "3", "4"};
+	char *a = ft_strjoin(4, b, "a");
+	write(1, a, 7);
+}
+*/

@@ -9,6 +9,7 @@
 /*   Updated: 2025/08/06 16:44:09 by dthoo            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
+
 #include <stdlib.h>
 
 int	*ft_range(int min, int max)
@@ -30,3 +31,24 @@ int	*ft_range(int min, int max)
 	}
 	return (arr);
 }
+
+/*
+#include <unistd.h>
+
+int	main(void)
+{
+	int *a = ft_range(1, 6);//no, moulimette did not mark wrong for not
+				//taking '0' as a required output
+				//also also they took (NULL)
+	int i;
+	char b;
+	i = 0;
+	while (a[i])
+	{
+		b = a[i] + 48;
+		write(1, &b, 1);
+		write(1, "\n", 1);
+		i ++;
+	}
+}
+*/

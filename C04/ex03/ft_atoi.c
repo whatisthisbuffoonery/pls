@@ -20,16 +20,16 @@ int	ft_atoi(char *str)
 	flag = 0;
 	while (str[i] == 32 || (str[i] > 8 && str[i] < 14))
 		i ++;
-	while (str[i] == 43 || str[i] == 45)
+	while (str[i] == '-' || str[i] == '+')
 	{
-		if (str[i] == 45)
+		if (str[i] == '-')
 			flag ++;
 		i ++;
-	}
-	while (str[i] > 47 && str[i] < 58)
+	} 
+	while (str[i] >= '0' && str[i] <= '9')
 	{
 		a *= 10;
-		a = a + str[i] - 48;
+		a = a + str[i] - '0';	
 		i ++;
 	}
 	if (flag % 2 == 1)

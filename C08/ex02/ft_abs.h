@@ -5,19 +5,14 @@
 /*                                                    +:+ +:+         +:+     */
 /*   By: dthoo <dthoo@student.42singapore.sg>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2025/08/07 16:30:12 by dthoo             #+#    #+#             */
-/*   Updated: 2025/08/07 16:40:00 by dthoo            ###   ########.fr       */
+/*   Created: 2025/08/14 06:00:21 by dthoo             #+#    #+#             */
+/*   Updated: 2025/08/14 06:00:24 by dthoo            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #ifndef FT_ABS_H
 # define FT_ABS_H
 
-int	ft_abs(char c)
-{
-	if (c < 0)
-		return (-c);
-	return (c);
-}
-# define ABS ft_abs
+# define ABS(Value) (Value * ((Value < 0) * (-1) + (Value > 0)))
+
 #endif

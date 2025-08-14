@@ -9,6 +9,7 @@
 /*   Updated: 2025/08/06 16:58:17 by dthoo            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
+
 #include <stdlib.h>
 
 int	ft_ultimate_range(int **range, int min, int max)
@@ -32,3 +33,25 @@ int	ft_ultimate_range(int **range, int min, int max)
 	}
 	return (i);
 }
+
+/*
+#include <unistd.h>
+
+int	main(void)
+{
+	int *range;
+	int a = ft_ultimate_range(&range, 1, 6);//still no '0'
+	int i;
+	char b;
+	i = 0;
+	while (range[i])
+	{
+		b = range[i] + 48;
+		write(1, &b, 1);
+		write(1, "\n", 1);
+		i ++;
+	}
+	b = a + 48;
+	write(1, &b, 1);
+}
+*/

@@ -10,8 +10,6 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-#include <unistd.h>
-
 unsigned int	ft_strlcat(char *dest, char *src, unsigned int size)
 {
 	unsigned int	i;
@@ -38,6 +36,7 @@ unsigned int	ft_strlcat(char *dest, char *src, unsigned int size)
 }
 
 /*
+#include <unistd.h>
 int	main(void)
 {
 	char	dest[30] = "";

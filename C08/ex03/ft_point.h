@@ -5,17 +5,20 @@
 /*                                                    +:+ +:+         +:+     */
 /*   By: dthoo <dthoo@student.42singapore.sg>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2025/08/08 15:20:40 by dthoo             #+#    #+#             */
-/*   Updated: 2025/08/08 15:25:51 by dthoo            ###   ########.fr       */
+/*   Created: 2025/08/14 06:00:34 by dthoo             #+#    #+#             */
+/*   Updated: 2025/08/14 06:00:36 by dthoo            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #ifndef FT_POINT_H
 # define FT_POINT_H
 
-typedef struct s_point{
+typedef struct	s_point
+{
 	int	x;
 	int	y;
-} t_point;
+}				t_point;
+
+void			set_point(t_point *point);
 
 #endif

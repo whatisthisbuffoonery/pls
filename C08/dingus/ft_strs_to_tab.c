@@ -13,6 +13,8 @@
 #include <stdlib.h>
 #include "ft_stock_str.h"
 
+void	ft_show_tab(struct s_stock_str *par);
+
 t_stock_str	item(char *src)
 {
 	int		i;
@@ -64,7 +66,7 @@ struct s_stock_str	*ft_strs_to_tab(int ac, char **av)
 
 int	main(int c, char **v)
 {
-	t_stock_str *a = ft_strs_to_tab(c, v);
+	t_stock_str *a = ft_strs_to_tab(c - 1, v + 1);//??????
 	ft_show_tab(a);
 }
 	

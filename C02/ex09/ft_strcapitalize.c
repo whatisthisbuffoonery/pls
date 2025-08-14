@@ -18,17 +18,14 @@ char	*ft_strcapitalize(char *str)
 	while (str[i])
 	{
 		if (str[i] > 96 && str[i] < 123)
-		{
 			str[i] -= 32;
-			if ((str[i - 1] > 47 && str[i - 1] < 58) && i > 0)
-				str[i] += 32;
-		}
 		i ++;
 	}
 	i = 0;
 	while (str[i])
 	{
-		if ((str[i] > 64 && str[i] < 91) || (str[i] > 96 && str[i] < 123))
+		if ((str[i] > 64 && str[i] < 91) || (str[i] > 96 && str[i] < 123)
+			|| (str[i] > 47 && str[i] < 58))
 		{
 			if (str[i + 1] > 64 && str[i + 1] < 91)
 				str[i + 1] += 32;
@@ -39,9 +36,10 @@ char	*ft_strcapitalize(char *str)
 }
 
 /*
+#include <unistd.h>
 int	main(void)
 {
-	char	str[49] = "hi, how are you? 42words forty-two; fifty0and+one";
+	char	str[49] = "hi, how are you? 42Words forty-two; fifty0And+one";
 	int		i;
 
 	i = 0;

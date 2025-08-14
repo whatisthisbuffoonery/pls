@@ -3,116 +3,154 @@
 /*                                                        :::      ::::::::   */
 /*   ft_split.c                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: dthoo <dthoo@student.42singapore.sg>       +#+  +:+       +#+        */
+/*   By: dthoo <dthoo@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2025/08/06 17:14:13 by dthoo             #+#    #+#             */
-/*   Updated: 2025/08/06 17:15:31 by dthoo            ###   ########.fr       */
+/*   Created: 2025/08/11 11:23:01 by dthoo             #+#    #+#             */
+/*   Updated: 2025/08/14 05:25:13 by dthoo            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
+
 #include <stdlib.h>
 
-int	check(char *str, char *charset, int i, int *c_num)
+int	*index_2(int *count, char *str, char *charset, int i)
 {
-	int		k;
+	int	k;
+	int	m;
+	int	*index;
 
-	k = 0;
-	while (charset[k])
+	m = 0;
+	index = malloc((*count + 2) * sizeof(int));
+	while (str[++i])
 	{
-		if ((str[i - 1] == charset[k]) && i != 0)
-		{
-			*c_num -= 1;
-			return (1);
-		}
-		k ++;
-	}
-	return (0);
-}
-
-int	*c_init(char *str, char *charset, int i, int *c_num)
-{
-	int		*c;
-	int		k;
-
-	c = malloc(100);
-	while (str[i])
-	{
-		k = 0;
-		while (charset[k])
+		k = -1;
+		while (charset[++k])
 		{
 			if (str[i] == charset[k])
 			{
-				c[*c_num] = i;
-				k = -2;
-				*c_num += 1;
-				if (check(str, charset, i, c_num))
-					c[*c_num] = '\0';
+				index[m++] = i;
+				break ;
 			}
-			k ++;
 		}
-		i ++;
 	}
-	c[*c_num] = '\0';
-	return (c);
+	index[m] = 0;
+	index[m + 1] = 0;
+	return (index);
 }
 
-char	*ink(char *str, int start, int end)
+int	*get_index(char *str, char *charset, int *count)
 {
-	int		k;
-	char	*temp;
-
-	k = 0;
-	temp = malloc(end - start + 1);
-	while (start < end)
-	{
-		temp[k] = str[start];
-		start ++;
-		k ++;
-	}
-	temp[k] = '\0';
-	return (temp);
-}
-
-char	**split(char *str, int *c, char **dest, int flag)
-{
-	int		i;
-	int		k;
+	int	i;
+	int	k;
+	int	*index;
 
 	i = 0;
-	k = 0;
-	if (flag > 0)
+	while (str[i])
 	{
-		dest[k] = ink(str, 0, c[i]);
-		k ++;
-	}
-	while (c[i])
-	{
-		if (c[i] != c[i + 1] - 1)
+		k = -1;
+		while (charset[++k])
 		{
-			dest[k] = ink(str, c[i] + 1, c[i + 1]);
-			k ++;
+			if (str[i] == charset[k])
+			{
+				*count += 1;
+				break ;
+			}
 		}
 		i ++;
 	}
-	dest[k] = NULL;
+	index = index_2(count, str, charset, -1);
+	return (index);
+}
+
+char	*string(int one, int two, char *src)
+{
+	int		i;
+	int		count;
+	char	*dest;
+
+	i = 0;
+	count = two - one;
+	if (one > -1)
+		count ++;
+	dest = malloc(count * sizeof(char));
+	while (++one < two)
+		dest[i++] = src[one];
+	dest[i] = '\0';
 	return (dest);
+}
+
+char	**splice(char **array, char *str, int *index, int len)
+{
+	int	m;
+	int	k;
+	int	i;
+
+	k = 0;
+	i = 0;
+	if (index[0] == 0 && index[0] != index[1] - 1)
+		array[k++] = string(index[0], index[1], str);
+	if (index[0] != 0)
+		array[k++] = string(-1, index[0], str);
+	m = i + 1;
+	while (index[m])
+	{
+		if (index[i] != index[m] - 1)
+			array[k++] = string(index[i], index[m], str);
+		m = ++i + 1;
+	}
+	if (index[i] < len - 1)
+		array[k++] = string(index[i], len, str);
+	array[k] = NULL;
+	return (array);
 }
 
 char	**ft_split(char *str, char *charset)
 {
-	int		*c;
-	int		i;
-	int		c_num;
-	char	**dest;
+	int		*index;
+	char	**array;
+	int		count;
+	int		len;
 
-	i = 0;
-	c = 0;
-	c = c_init(str, charset, 0, &c_num);
-	while (str[i])
-		i ++;
-	dest = malloc((i - c_num) + 1);
-	if (c[0] != 0)
-		i = 1;
+	count = 0;
+	len = 0;
+	while (str[len])
+		len ++;
+	if (len == 0)
+	{
+		array = malloc(sizeof(char *));
+		array[0] = NULL;
+		return (array);
+	}
+	index = get_index(str, charset, &count);
+	array = malloc((count + 2) * sizeof(char *));
+	if (count == 0)
+		array[0] = string(-1, len, str);
 	else
-		i = 0;
-	return (split(str, c, dest, i));
+		array = splice(array, str, index, len);
+	return (array);
 }
+
+/*
+#include <unistd.h>
+#include <stdio.h>
+
+int	main(void)
+{
+	int		i = 0;
+	int		k = 0;
+	char	src[50] = "never       gonna give you up     \0";
+	char	sep[2] = " ";
+	char	**dest;
+	dest = ft_split(src, sep);
+	while (dest[i])
+	{
+		k = 0;
+		while (dest[i][k])
+		{
+			write(1, &dest[i][k], 1);
+			k ++;
+		}
+		write(1, "\n", 1);
+		i ++;
+	}
+}
+*/
