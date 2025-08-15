@@ -100,7 +100,7 @@ char	*base_t(int f, char *base, int i, int index)
 		k ++;
 	}
 	if (!t[0])
-		t[index++] = '0';
+		t[index++] = base[0];
 	t[index] = '\0';
 	return (t);
 }
@@ -119,6 +119,7 @@ char	*ft_convert_base(char *nbr, char *base_from, char *base_to)
 		i ++;
 	if (base_check(base_from) || base_check(base_to))
 		return (0);
+	if (check min)//+s in a base system without 's'
 	if (int_check(base_f(nbr, base_from, b - 1, i), &f))
 		return (0);
 	i = 0;

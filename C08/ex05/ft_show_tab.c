@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   ft_show_tab.c                                      :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: dthoo <dthoo@student.42singapore.sg>       +#+  +:+       +#+        */
+/*   By: dthoo <dthoo@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/14 05:41:27 by dthoo             #+#    #+#             */
-/*   Updated: 2025/08/14 05:41:30 by dthoo            ###   ########.fr       */
+/*   Updated: 2025/08/14 15:45:07 by dthoo            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -52,7 +52,7 @@ void	ft_putnbr(int nb)
 void	ft_show_tab(struct s_stock_str *par)
 {
 	int	i;
-	
+
 	i = 0;
 	while (par[i].str != NULL)
 	{

@@ -3,22 +3,24 @@
 /*                                                        :::      ::::::::   */
 /*   ft_strs_to_tab.c                                   :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: dthoo <dthoo@student.42singapore.sg>       +#+  +:+       +#+        */
+/*   By: dthoo <dthoo@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/13 20:07:02 by dthoo             #+#    #+#             */
-/*   Updated: 2025/08/13 20:07:38 by dthoo            ###   ########.fr       */
+/*   Updated: 2025/08/14 15:43:41 by dthoo            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include <stdlib.h>
 #include "ft_stock_str.h"
 
+void	ft_show_tab(struct s_stock_str *par);
+
 t_stock_str	item(char *src)
 {
-	int		i;
 	t_stock_str	a;
-	char	*dup;
-	
+	int			i;
+	char		*dup;
+
 	i = 0;
 	while (src[i])
 		i ++;
@@ -39,8 +41,8 @@ t_stock_str	item(char *src)
 struct s_stock_str	*ft_strs_to_tab(int ac, char **av)
 {
 	t_stock_str	*t;
-	int		i;
-	
+	int			i;
+
 	i = 0;
 	if (ac < 1)
 	{
@@ -62,10 +64,10 @@ struct s_stock_str	*ft_strs_to_tab(int ac, char **av)
 	return (t);
 }
 
+/*
 int	main(int c, char **v)
 {
-	t_stock_str *a = ft_strs_to_tab(c, v);
+	t_stock_str *a = ft_strs_to_tab(c - 1, v + 1);//??????
 	ft_show_tab(a);
 }
-	
-
+*/	
