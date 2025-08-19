@@ -93,5 +93,6 @@ int	main(void)
 {
 	int a = ft_ten_queens_puzzle();
 	printf("%d", a);
+	printf("%c", '\n');
 }
 

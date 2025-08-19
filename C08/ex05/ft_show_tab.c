@@ -35,7 +35,7 @@ void	ft_actual_putnbr(long nb)
 		write(1, &b, 1);
 		nb = 0 - nb;
 	}
-	if (nb >= 10)
+	if (nb > 9)
 		ft_actual_putnbr(nb / 10);
 	b = (nb % 10) + 48;
 	write(1, &b, 1);
