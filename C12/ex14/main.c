@@ -39,21 +39,19 @@ int	cmp_2(void *a, void *b)
 	return (0);
 }
 
-void	ft_putstr(void *a)
-{
-	char *b = (char *)a;
-	int i = 0;
-
-	while (b[i])
-		write(1, &b[i++], 1);
-	write(1, "\n----\n", 6);
-}
-
 int	ft_strlen(char *a)
 {
 	int i = 0;
 	while (a[i++]);
 	return (i);
+}
+
+void	ft_putstr(void *a)
+{
+	char *b = (char *)a;
+
+	write(1, b, ft_strlen(b));
+	write(1, "\n----\n", 6);
 }
 
 int	main(int c, char **v)

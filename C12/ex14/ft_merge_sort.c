@@ -15,7 +15,7 @@ void	split(t_list *head, t_list **a, t_list **b)
 		k = k->next;
 		i = i->next->next;
 	}
-	if (k)//?????????
+	if (k)
 		*b = k->next;
 	if (*b)
 		k->next = 0;
@@ -43,8 +43,7 @@ t_list	*window_shopping(t_list *a, t_list *b, int (*cmp)(void *, void *))
 		tail = tail->next;
 	}
 	while (a || b)
-	{
-		
+	{		
 		if (a)
 		{
 			tail->next = a;
