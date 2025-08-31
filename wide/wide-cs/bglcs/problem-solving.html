@@ -1,0 +1,670 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <title>Beej's Guide to Learning Computer Science</title>
+  <style>
+    html {
+      color: #1a1a1a;
+      background-color: #fdfdfd;
+    }
+    body {
+      margin: 0 auto;
+      max-width: 36em;
+      padding-left: 50px;
+      padding-right: 50px;
+      padding-top: 50px;
+      padding-bottom: 50px;
+      hyphens: auto;
+      overflow-wrap: break-word;
+      text-rendering: optimizeLegibility;
+      font-kerning: normal;
+    }
+    @media (max-width: 600px) {
+      body {
+        font-size: 0.9em;
+        padding: 12px;
+      }
+      h1 {
+        font-size: 1.8em;
+      }
+    }
+    @media print {
+      html {
+        background-color: white;
+      }
+      body {
+        background-color: transparent;
+        color: black;
+        font-size: 12pt;
+      }
+      p, h2, h3 {
+        orphans: 3;
+        widows: 3;
+      }
+      h2, h3, h4 {
+        page-break-after: avoid;
+      }
+    }
+    p {
+      margin: 1em 0;
+    }
+    a {
+      color: #1a1a1a;
+    }
+    a:visited {
+      color: #1a1a1a;
+    }
+    img {
+      max-width: 100%;
+    }
+    svg {
+      height: auto;
+      max-width: 100%;
+    }
+    h1, h2, h3, h4, h5, h6 {
+      margin-top: 1.4em;
+    }
+    h5, h6 {
+      font-size: 1em;
+      font-style: italic;
+    }
+    h6 {
+      font-weight: normal;
+    }
+    ol, ul {
+      padding-left: 1.7em;
+      margin-top: 1em;
+    }
+    li > ol, li > ul {
+      margin-top: 0;
+    }
+    blockquote {
+      margin: 1em 0 1em 1.7em;
+      padding-left: 1em;
+      border-left: 2px solid #e6e6e6;
+      color: #606060;
+    }
+    code {
+      font-family: Menlo, Monaco, Consolas, 'Lucida Console', monospace;
+      font-size: 85%;
+      margin: 0;
+      hyphens: manual;
+    }
+    pre {
+      margin: 1em 0;
+      overflow: auto;
+    }
+    pre code {
+      padding: 0;
+      overflow: visible;
+      overflow-wrap: normal;
+    }
+    .sourceCode {
+     background-color: transparent;
+     overflow: visible;
+    }
+    hr {
+      border: none;
+      border-top: 1px solid #1a1a1a;
+      height: 1px;
+      margin: 1em 0;
+    }
+    table {
+      margin: 1em 0;
+      border-collapse: collapse;
+      width: 100%;
+      overflow-x: auto;
+      display: block;
+      font-variant-numeric: lining-nums tabular-nums;
+    }
+    table caption {
+      margin-bottom: 0.75em;
+    }
+    tbody {
+      margin-top: 0.5em;
+      border-top: 1px solid #1a1a1a;
+      border-bottom: 1px solid #1a1a1a;
+    }
+    th {
+      border-top: 1px solid #1a1a1a;
+      padding: 0.25em 0.5em 0.25em 0.5em;
+    }
+    td {
+      padding: 0.125em 0.5em 0.25em 0.5em;
+    }
+    header {
+      margin-bottom: 4em;
+      text-align: center;
+    }
+    #TOC li {
+      list-style: none;
+    }
+    #TOC ul {
+      padding-left: 1.3em;
+    }
+    #TOC > ul {
+      padding-left: 0;
+    }
+    #TOC a:not(:hover) {
+      text-decoration: none;
+    }
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+    /* CSS for syntax highlighting */
+    html { -webkit-text-size-adjust: 100%; }
+    pre > code.sourceCode { white-space: pre; position: relative; }
+    pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+    pre > code.sourceCode > span:empty { height: 1.2em; }
+    .sourceCode { overflow: visible; }
+    code.sourceCode > span { color: inherit; text-decoration: inherit; }
+    div.sourceCode { margin: 1em 0; }
+    pre.sourceCode { margin: 0; }
+    @media screen {
+    div.sourceCode { overflow: auto; }
+    }
+    @media print {
+    pre > code.sourceCode { white-space: pre-wrap; }
+    pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+    }
+    pre.numberSource code
+      { counter-reset: source-line 0; }
+    pre.numberSource code > span
+      { position: relative; left: -4em; counter-increment: source-line; }
+    pre.numberSource code > span > a:first-child::before
+      { content: counter(source-line);
+        position: relative; left: -1em; text-align: right; vertical-align: baseline;
+        border: none; display: inline-block;
+        -webkit-touch-callout: none; -webkit-user-select: none;
+        -khtml-user-select: none; -moz-user-select: none;
+        -ms-user-select: none; user-select: none;
+        padding: 0 4px; width: 4em;
+        color: #aaaaaa;
+      }
+    pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+    div.sourceCode
+      {   }
+    @media screen {
+    pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+    }
+    code span.al { color: #ff0000; font-weight: bold; } /* Alert */
+    code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+    code span.at { color: #7d9029; } /* Attribute */
+    code span.bn { color: #40a070; } /* BaseN */
+    code span.bu { color: #008000; } /* BuiltIn */
+    code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+    code span.ch { color: #4070a0; } /* Char */
+    code span.cn { color: #880000; } /* Constant */
+    code span.co { color: #60a0b0; font-style: italic; } /* Comment */
+    code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+    code span.do { color: #ba2121; font-style: italic; } /* Documentation */
+    code span.dt { color: #902000; } /* DataType */
+    code span.dv { color: #40a070; } /* DecVal */
+    code span.er { color: #ff0000; font-weight: bold; } /* Error */
+    code span.ex { } /* Extension */
+    code span.fl { color: #40a070; } /* Float */
+    code span.fu { color: #06287e; } /* Function */
+    code span.im { color: #008000; font-weight: bold; } /* Import */
+    code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+    code span.kw { color: #007020; font-weight: bold; } /* Keyword */
+    code span.op { color: #666666; } /* Operator */
+    code span.ot { color: #007020; } /* Other */
+    code span.pp { color: #bc7a00; } /* Preprocessor */
+    code span.sc { color: #4070a0; } /* SpecialChar */
+    code span.ss { color: #bb6688; } /* SpecialString */
+    code span.st { color: #4070a0; } /* String */
+    code span.va { color: #19177c; } /* Variable */
+    code span.vs { color: #4070a0; } /* VerbatimString */
+    code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+  </style>
+  <!-- BG custom styling -->
+  <style type="text/css">
+  /* Fix for line numbers not visible */
+  pre.numberSource code > span {
+      left: -1em;
+  }
+  pre.numberSource {
+      margin-left: initial;
+  }
+
+  /* Put some space after the section numbers */
+  span.toc-section-number::after {
+      content: "\a0\a0\a0";  /* non-breaking whitespace */
+  }
+
+  /* Hide underlines on code number links */
+  pre > code.sourceCode > span > a:first-child::before {
+      text-decoration: none;
+  }
+
+  /* Color the source blocks */
+  div.sourceCode {
+      background-color: #f0f0f0;
+  }
+
+  /* Fix iOS big text rendering issue */
+  pre > code.sourceCode > span {
+      display: initial;
+  }
+
+
+  /* Color the inline code */
+  code:not(.sourceCode) {
+      background: #f0f0f0;
+      padding-left: 0.2em;
+      padding-right: 0.2em;
+      border-radius: 0.2em;
+  }
+
+  pre.sourceCode {
+      border: 1px solid #ccc;
+      padding: 0.5em;
+      border-radius: 0.2em;
+  }
+
+  /* Keep code tags from wrapping in tables */
+  tbody code {
+      white-space: nowrap;
+  }
+
+  /* Prevent hyphenation and hyphen breaks in code*/
+  code {
+      word-break: keep-all;
+  }
+
+  td {
+      vertical-align: top;
+  }
+
+  body {
+      font-size: 12pt;
+      max-width: 43em;
+      font-family: sans-serif;
+  }
+
+  html {
+      background: #f9f9f9;
+  }
+
+  figure > embed {
+      max-width: 100%;
+  }
+
+  figure {
+      text-align: center;
+      margin-top: 2em;
+      margin-bottom: 2em;
+  }
+
+  figcaption {
+      font-size: 0.9em;
+      font-style: italic;
+      margin-top: 0.6em;
+  }
+
+  body {
+      counter-reset: figure-counter-major;
+      counter-reset: figure-counter-minor;
+  }
+
+  figure {
+      counter-increment: figure-counter-minor;
+  }
+
+  figcaption::before {
+      content: "Figure " counter(figure-counter-major) "." counter(figure-counter-minor) ": ";
+  }
+
+  blockquote {
+      border-left: 2px solid #bbb;
+      color: #444;
+  }
+
+  /* Contents */
+
+  nav[role="doc-toc"] > ul > li {
+    font-weight: bold;
+    margin-top: 1.2em;
+  }
+
+  nav[role="doc-toc"] > ul > li:first {
+    font-weight: bold;
+    margin-top: initial;
+  }
+
+  nav[role="doc-toc"] > ul > li > ul {
+    font-weight: normal;
+    margin-top: 0.3em;
+  }
+
+  /*
+  In multipage, we need to reset the figure counter to the chapter
+  number. Luckily, this is in the <h1 data-number> attribute. Unluckily,
+  there is no way to get this in a general way.
+
+  This doesn't work:
+
+    h1[data-number] {
+      counter-set: figure-counter-major attr(data-number);
+    }
+
+  Nor this:
+
+    h1[data-number] {
+      --figure-counter-major-value: attr(data-number);
+      counter-set: figure-counter-major var(--figure-counter-major-value);
+    }
+
+  So, dumbly, we have a bunch of rules for all these sections, up to the
+  maximum possible section.
+
+  Here's a program to generate them:
+
+    for (let i = 1; i < 100; i++)
+        console.log(`h1[data-number="${i}"]{counter-set:figure-counter-major ${i};counter-reset:figure-counter-minor;}`);
+
+  Note to self: never write a book with more than 99 frickin' chapters.
+  */
+
+  h1[data-number="1"]{counter-set:figure-counter-major 1;counter-reset:figure-counter-minor;}
+  h1[data-number="2"]{counter-set:figure-counter-major 2;counter-reset:figure-counter-minor;}
+  h1[data-number="3"]{counter-set:figure-counter-major 3;counter-reset:figure-counter-minor;}
+  h1[data-number="4"]{counter-set:figure-counter-major 4;counter-reset:figure-counter-minor;}
+  h1[data-number="5"]{counter-set:figure-counter-major 5;counter-reset:figure-counter-minor;}
+  h1[data-number="6"]{counter-set:figure-counter-major 6;counter-reset:figure-counter-minor;}
+  h1[data-number="7"]{counter-set:figure-counter-major 7;counter-reset:figure-counter-minor;}
+  h1[data-number="8"]{counter-set:figure-counter-major 8;counter-reset:figure-counter-minor;}
+  h1[data-number="9"]{counter-set:figure-counter-major 9;counter-reset:figure-counter-minor;}
+  h1[data-number="10"]{counter-set:figure-counter-major 10;counter-reset:figure-counter-minor;}
+  h1[data-number="11"]{counter-set:figure-counter-major 11;counter-reset:figure-counter-minor;}
+  h1[data-number="12"]{counter-set:figure-counter-major 12;counter-reset:figure-counter-minor;}
+  h1[data-number="13"]{counter-set:figure-counter-major 13;counter-reset:figure-counter-minor;}
+  h1[data-number="14"]{counter-set:figure-counter-major 14;counter-reset:figure-counter-minor;}
+  h1[data-number="15"]{counter-set:figure-counter-major 15;counter-reset:figure-counter-minor;}
+  h1[data-number="16"]{counter-set:figure-counter-major 16;counter-reset:figure-counter-minor;}
+  h1[data-number="17"]{counter-set:figure-counter-major 17;counter-reset:figure-counter-minor;}
+  h1[data-number="18"]{counter-set:figure-counter-major 18;counter-reset:figure-counter-minor;}
+  h1[data-number="19"]{counter-set:figure-counter-major 19;counter-reset:figure-counter-minor;}
+  h1[data-number="20"]{counter-set:figure-counter-major 20;counter-reset:figure-counter-minor;}
+  h1[data-number="21"]{counter-set:figure-counter-major 21;counter-reset:figure-counter-minor;}
+  h1[data-number="22"]{counter-set:figure-counter-major 22;counter-reset:figure-counter-minor;}
+  h1[data-number="23"]{counter-set:figure-counter-major 23;counter-reset:figure-counter-minor;}
+  h1[data-number="24"]{counter-set:figure-counter-major 24;counter-reset:figure-counter-minor;}
+  h1[data-number="25"]{counter-set:figure-counter-major 25;counter-reset:figure-counter-minor;}
+  h1[data-number="26"]{counter-set:figure-counter-major 26;counter-reset:figure-counter-minor;}
+  h1[data-number="27"]{counter-set:figure-counter-major 27;counter-reset:figure-counter-minor;}
+  h1[data-number="28"]{counter-set:figure-counter-major 28;counter-reset:figure-counter-minor;}
+  h1[data-number="29"]{counter-set:figure-counter-major 29;counter-reset:figure-counter-minor;}
+  h1[data-number="30"]{counter-set:figure-counter-major 30;counter-reset:figure-counter-minor;}
+  h1[data-number="31"]{counter-set:figure-counter-major 31;counter-reset:figure-counter-minor;}
+  h1[data-number="32"]{counter-set:figure-counter-major 32;counter-reset:figure-counter-minor;}
+  h1[data-number="33"]{counter-set:figure-counter-major 33;counter-reset:figure-counter-minor;}
+  h1[data-number="34"]{counter-set:figure-counter-major 34;counter-reset:figure-counter-minor;}
+  h1[data-number="35"]{counter-set:figure-counter-major 35;counter-reset:figure-counter-minor;}
+  h1[data-number="36"]{counter-set:figure-counter-major 36;counter-reset:figure-counter-minor;}
+  h1[data-number="37"]{counter-set:figure-counter-major 37;counter-reset:figure-counter-minor;}
+  h1[data-number="38"]{counter-set:figure-counter-major 38;counter-reset:figure-counter-minor;}
+  h1[data-number="39"]{counter-set:figure-counter-major 39;counter-reset:figure-counter-minor;}
+  h1[data-number="40"]{counter-set:figure-counter-major 40;counter-reset:figure-counter-minor;}
+  h1[data-number="41"]{counter-set:figure-counter-major 41;counter-reset:figure-counter-minor;}
+  h1[data-number="42"]{counter-set:figure-counter-major 42;counter-reset:figure-counter-minor;}
+  h1[data-number="43"]{counter-set:figure-counter-major 43;counter-reset:figure-counter-minor;}
+  h1[data-number="44"]{counter-set:figure-counter-major 44;counter-reset:figure-counter-minor;}
+  h1[data-number="45"]{counter-set:figure-counter-major 45;counter-reset:figure-counter-minor;}
+  h1[data-number="46"]{counter-set:figure-counter-major 46;counter-reset:figure-counter-minor;}
+  h1[data-number="47"]{counter-set:figure-counter-major 47;counter-reset:figure-counter-minor;}
+  h1[data-number="48"]{counter-set:figure-counter-major 48;counter-reset:figure-counter-minor;}
+  h1[data-number="49"]{counter-set:figure-counter-major 49;counter-reset:figure-counter-minor;}
+  h1[data-number="50"]{counter-set:figure-counter-major 50;counter-reset:figure-counter-minor;}
+  h1[data-number="51"]{counter-set:figure-counter-major 51;counter-reset:figure-counter-minor;}
+  h1[data-number="52"]{counter-set:figure-counter-major 52;counter-reset:figure-counter-minor;}
+  h1[data-number="53"]{counter-set:figure-counter-major 53;counter-reset:figure-counter-minor;}
+  h1[data-number="54"]{counter-set:figure-counter-major 54;counter-reset:figure-counter-minor;}
+  h1[data-number="55"]{counter-set:figure-counter-major 55;counter-reset:figure-counter-minor;}
+  h1[data-number="56"]{counter-set:figure-counter-major 56;counter-reset:figure-counter-minor;}
+  h1[data-number="57"]{counter-set:figure-counter-major 57;counter-reset:figure-counter-minor;}
+  h1[data-number="58"]{counter-set:figure-counter-major 58;counter-reset:figure-counter-minor;}
+  h1[data-number="59"]{counter-set:figure-counter-major 59;counter-reset:figure-counter-minor;}
+  h1[data-number="60"]{counter-set:figure-counter-major 60;counter-reset:figure-counter-minor;}
+  h1[data-number="61"]{counter-set:figure-counter-major 61;counter-reset:figure-counter-minor;}
+  h1[data-number="62"]{counter-set:figure-counter-major 62;counter-reset:figure-counter-minor;}
+  h1[data-number="63"]{counter-set:figure-counter-major 63;counter-reset:figure-counter-minor;}
+  h1[data-number="64"]{counter-set:figure-counter-major 64;counter-reset:figure-counter-minor;}
+  h1[data-number="65"]{counter-set:figure-counter-major 65;counter-reset:figure-counter-minor;}
+  h1[data-number="66"]{counter-set:figure-counter-major 66;counter-reset:figure-counter-minor;}
+  h1[data-number="67"]{counter-set:figure-counter-major 67;counter-reset:figure-counter-minor;}
+  h1[data-number="68"]{counter-set:figure-counter-major 68;counter-reset:figure-counter-minor;}
+  h1[data-number="69"]{counter-set:figure-counter-major 69;counter-reset:figure-counter-minor;}
+  h1[data-number="70"]{counter-set:figure-counter-major 70;counter-reset:figure-counter-minor;}
+  h1[data-number="71"]{counter-set:figure-counter-major 71;counter-reset:figure-counter-minor;}
+  h1[data-number="72"]{counter-set:figure-counter-major 72;counter-reset:figure-counter-minor;}
+  h1[data-number="73"]{counter-set:figure-counter-major 73;counter-reset:figure-counter-minor;}
+  h1[data-number="74"]{counter-set:figure-counter-major 74;counter-reset:figure-counter-minor;}
+  h1[data-number="75"]{counter-set:figure-counter-major 75;counter-reset:figure-counter-minor;}
+  h1[data-number="76"]{counter-set:figure-counter-major 76;counter-reset:figure-counter-minor;}
+  h1[data-number="77"]{counter-set:figure-counter-major 77;counter-reset:figure-counter-minor;}
+  h1[data-number="78"]{counter-set:figure-counter-major 78;counter-reset:figure-counter-minor;}
+  h1[data-number="79"]{counter-set:figure-counter-major 79;counter-reset:figure-counter-minor;}
+  h1[data-number="80"]{counter-set:figure-counter-major 80;counter-reset:figure-counter-minor;}
+  h1[data-number="81"]{counter-set:figure-counter-major 81;counter-reset:figure-counter-minor;}
+  h1[data-number="82"]{counter-set:figure-counter-major 82;counter-reset:figure-counter-minor;}
+  h1[data-number="83"]{counter-set:figure-counter-major 83;counter-reset:figure-counter-minor;}
+  h1[data-number="84"]{counter-set:figure-counter-major 84;counter-reset:figure-counter-minor;}
+  h1[data-number="85"]{counter-set:figure-counter-major 85;counter-reset:figure-counter-minor;}
+  h1[data-number="86"]{counter-set:figure-counter-major 86;counter-reset:figure-counter-minor;}
+  h1[data-number="87"]{counter-set:figure-counter-major 87;counter-reset:figure-counter-minor;}
+  h1[data-number="88"]{counter-set:figure-counter-major 88;counter-reset:figure-counter-minor;}
+  h1[data-number="89"]{counter-set:figure-counter-major 89;counter-reset:figure-counter-minor;}
+  h1[data-number="90"]{counter-set:figure-counter-major 90;counter-reset:figure-counter-minor;}
+  h1[data-number="91"]{counter-set:figure-counter-major 91;counter-reset:figure-counter-minor;}
+  h1[data-number="92"]{counter-set:figure-counter-major 92;counter-reset:figure-counter-minor;}
+  h1[data-number="93"]{counter-set:figure-counter-major 93;counter-reset:figure-counter-minor;}
+  h1[data-number="94"]{counter-set:figure-counter-major 94;counter-reset:figure-counter-minor;}
+  h1[data-number="95"]{counter-set:figure-counter-major 95;counter-reset:figure-counter-minor;}
+  h1[data-number="96"]{counter-set:figure-counter-major 96;counter-reset:figure-counter-minor;}
+  h1[data-number="97"]{counter-set:figure-counter-major 97;counter-reset:figure-counter-minor;}
+  h1[data-number="98"]{counter-set:figure-counter-major 98;counter-reset:figure-counter-minor;}
+  h1[data-number="99"]{counter-set:figure-counter-major 99;counter-reset:figure-counter-minor;}
+
+
+  </style>
+  <!-- BG custom styling for the wide body variant -->
+  <!-- Gets appended after bg-css.html -->
+
+  <style type="text/css">
+  body {
+      max-width: inherit;
+  }
+  </style>
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
+</head>
+<body>
+<div style="text-align:center"><span><a href="growth-mindset.html" rel="prev">Prev</a> | </span><a href="index.html">Contents</a><span> | <a href="breaking-down-problems.html" rel="next">Next</a></span></div><hr>
+<h1 data-number="4" id="problem-solving"><span class="header-section-number">4</span> Problem Solving</h1>
+<p></p>
+<p>This is an idea completely stolen from the book <a href="https://en.wikipedia.org/wiki/How_to_Solve_It"><em>How to Solve It</em></a><a href="use-of-ai.html#fn14" class="footnote-ref" id="fnref14" role="doc-noteref"><sup>14</sup></a> by George Pólya. It’s a book about attacking math problems. And since computer science is just math under the hood, it completely applies!</p>
+<p>Actually it doesn’t completely apply, and I just said that because it sounded so good. But it can be bent into shape pretty easily. And I recommend reading the book.</p>
+<p>So what is it? It’s short and pretty easy to memorize:</p>
+<p></p>
+<ol type="1">
+<li><strong>Understand</strong> the problem</li>
+<li><strong>Plan</strong> how you’re going to solve it</li>
+<li><strong>Code</strong> up the solution</li>
+<li><strong>Reflect</strong> on what you could do better</li>
+</ol>
+<p>That’s it.</p>
+<p>And if you think about it, that’s really just a four-step process for solving just about any problem at all. Is your living-room light not working? You can solve it with these steps.</p>
+<blockquote>
+<p><em>“Math ain’t about numbers. If you think math is about numbers, you probably think that Shakespeare is all about words. You probably think that dancing is all about shoes. You probably think that music is all about notes. Math ain’t about numbers. Math is about logic, it’s about beauty, it’s about connections, it’s about how you get from one place to another.”</em></p>
+<p>—Cliff Stoll</p>
+</blockquote>
+<p>Programming ain’t about writing code. <strong>Steps 1, 2, and 4 do not involve coding</strong><a href="use-of-ai.html#fn15" class="footnote-ref" id="fnref15" role="doc-noteref"><sup>15</sup></a>. These steps are all in your head and on paper. I would argue that <strong><em>solving programming problems does not involve a computer</em></strong>. That seems clearly nonsensical, but that’s where the action actually is! Especially in step 2, coming up with a <em>Plan</em>. That’s the hard part. That’s why you get paid the big bucks. Anyone can type a program in once the problem has been solved.</p>
+<p>Step 3, <em>Coding</em> it up, is simply writing the solution down. The hard work isn’t writing the solution down; the hard work is coming up with it in the first place!</p>
+<p>Also, you’re unlikely to progress linearly through these steps. You’ll probably have to pop back and revisit earlier steps from time to time, but hopefully your overall progress is in the forward direction.</p>
+<p>Finally, as a student, you must resist the urge to look up the answers. The goal here is for you to exercise your problem-solving muscles (because no one will hire you as a dev without those skills). Virtually every problem any instructor will come up with has been extensively covered on the Internet or can be solved by AI. Remember that getting the correct answer isn’t the point; the point is to practice problem-solving so that you can get an answer to any problem that’s thrown at you.<a href="use-of-ai.html#fn16" class="footnote-ref" id="fnref16" role="doc-noteref"><sup>16</sup></a></p>
+<p>Let’s explore the steps.</p>
+<h2 data-number="4.1" id="understanding-the-problem"><span class="header-section-number">4.1</span> Understanding the Problem</h2>
+<p></p>
+<p>Everyone, students included, loves to skip the <em>Understanding</em> step. Wise instructors will add a quiz to be turned in before coding starts that verifies you understand the problem<a href="use-of-ai.html#fn17" class="footnote-ref" id="fnref17" role="doc-noteref"><sup>17</sup></a>. But you need to pressure yourself to do this step first, regardless.</p>
+<p>Logically, if you don’t understand the problem fully, none of the rest of the steps matter. You could come up with the best plan and code it up perfectly, but if you didn’t understand the problem to begin with, you’ve just coded up the perfect solution to the wrong problem!<a href="use-of-ai.html#fn18" class="footnote-ref" id="fnref18" role="doc-noteref"><sup>18</sup></a></p>
+<p>And that’s a waste of your employer’s time and money, at best. Or, if you’re still a student, a waste of time you could have spent studying for that discrete math exam that’s coming up. Or whatever.</p>
+<p>So don’t skimp on this one—it’s fundamentally important.</p>
+<p>What should you do? Here are some ideas.</p>
+<ul>
+<li>Read the problem slowly and methodically. These descriptions tend to be concise and error-prone. They’re not easy to read, so don’t even try to speed through them. Reread sentences as many times as it takes to understand what they mean.</li>
+<li>Take notes. Especially note inconsistencies, omissions, errors, and outstanding questions.</li>
+<li>Rewrite the problem in your own words. This is a very effective technique that helps you find gaps in your understanding.</li>
+<li>Research as necessary.</li>
+<li>Ask clarifying questions<a href="use-of-ai.html#fn19" class="footnote-ref" id="fnref19" role="doc-noteref"><sup>19</sup></a>.</li>
+</ul>
+<p><strong><em>You’re done with this step when you can teach someone else what the problem is.</em></strong> (You don’t need to teach the solution—just the problem.)</p>
+<p>It’s very, <em>very</em> hard to write a complete description of a problem, and the ones you’ll get at work or even in school will certainly be wanting. Don’t believe me? Write down the rules of tic-tac-toe (“noughts and crosses” if that’s what you call it) and I can guarantee I’ll find something you didn’t write down<a href="use-of-ai.html#fn20" class="footnote-ref" id="fnref20" role="doc-noteref"><sup>20</sup></a>.</p>
+<p>Because of this, you’ll very likely have to ask clarifying questions.</p>
+<blockquote>
+<p><strong>Anecdote time!</strong> I was on a project where I was writing the front-end of a system and someone else was writing the back-end. There was a very specific document describing the exact interaction between the two.</p>
+<p>One of the interactions involved the transmission of the result of a computation. There was an example in the doc that gave the answer, in hex, to the math. It was something like:</p>
+<blockquote>
+<p>Given the inputs <code>"abc"</code> and <code>"xyz"</code>, the result will be the number <code>f319c2c6dcfb</code>.</p>
+</blockquote>
+<p>I coded it up (it was easy since the algorithm pseudocode was given), and it computed the answer correctly. I added the code to transmit the 6-byte number to the server and that was it.</p>
+<p>Except the person writing the server wrote me and said that I was sending garbage.</p>
+<p>We had some back and forth, and it turned out they thought the spec meant I’d send a string with those hex digits in it, and I thought the spec meant that I’d send the raw bytes of the result. The spec was no help—it was ambiguous and neither of us caught it.</p>
+<p>The easiest thing was for me to convert the number to string and send it, so I added that line of code and the problem went away. But we could have caught it earlier with more careful examination of the spec.</p>
+</blockquote>
+<p></p>
+<h2 data-number="4.2" id="coming-up-with-a-plan"><span class="header-section-number">4.2</span> Coming Up with a Plan</h2>
+<p></p>
+<blockquote>
+<p><em>“Programming is the art of telling another human being what one wants the computer to do.”</em></p>
+<p>—Donald Knuth</p>
+</blockquote>
+<p>Time to start coding? <strong>NO!</strong> Not yet, eager beaver!<a href="use-of-ai.html#fn21" class="footnote-ref" id="fnref21" role="doc-noteref"><sup>21</sup></a></p>
+<p>This step, coming up with a plan, is where programming actually happens. Like I said before, this is what makes the job hard, and is why it pays well. To be a halfway decent dev, you need to excel at coming up with solid plan.</p>
+<p>First you must <em>Understand</em> the problem well enough to teach it to someone. Or at least you <em>think</em> you do. You might learn more later. But understanding the problem isn’t the same as knowing how to solve it.</p>
+<p>If the problem is really simple and familiar, you might come up with a plan almost instantly. Experienced devs faced with familiar tasks don’t need to spend long planning once they’ve fully understood the problem.</p>
+<p>But experienced devs faced with unfamiliar tasks <em>do</em> need to spend time at it. It doesn’t matter how good you are—if you haven’t seen the problem, you’re going to need to plan the solution.</p>
+<p>Literal pencil and paper can be useful for this step. Here are some things to think about.</p>
+<ul>
+<li><p>How will data flow through the system and be transformed, from the known input to the desired output?</p></li>
+<li><p>During those transformations, what are the subsystems that will perform each step?</p></li>
+<li><p>What technologies will you need to perform these steps?</p></li>
+<li><p>What are the known unknowns?</p></li>
+</ul>
+<p>One big thing to notice is that we’re talking about breaking down a problem into its subcomponents. How to do this isn’t always obvious, though the more experience you get, the easier it becomes.</p>
+<p>A trick you can use is to think, “This project would be easy if only the input data were in <em>this</em> form.” Then see if you can come up with some code that converts the data into that form. We’ll go into more detail in a later chapter.</p>
+<p>Another benefit of breaking up the project into smaller parts is that it can naturally suggest a way to break up your code into smaller functions or classes. This makes your code more maintainable and readable.</p>
+<p>You’ll have to do some research during this phase to learn what tools you have at your disposal. Expect to do that.</p>
+<p>It’s <em>really</em> common during the planning phase to realize that you’ve failed to understand the problem fully. When this happens, drop back to the <em>Understanding</em> phase to get clarity, then jump back to planning.</p>
+<p><strong><em>You know you’re done with planning when you can simulate the run on paper and in your head and you’re confident it works. And you can write high-level pseudocode.</em></strong> Bounce your plan off a few rubber ducks<a href="use-of-ai.html#fn22" class="footnote-ref" id="fnref22" role="doc-noteref"><sup>22</sup></a> to see if it holds water.</p>
+<p></p>
+<h2 data-number="4.3" id="coding-up-a-solution"><span class="header-section-number">4.3</span> Coding Up a Solution</h2>
+<p></p>
+<p>This is the easy part! You have to translate your pseudocode plans into code.</p>
+<p>If you’ve understood the problem and come up with a solid plan, the code will work. Maybe even on the first try, if you’re very lucky<a href="use-of-ai.html#fn23" class="footnote-ref" id="fnref23" role="doc-noteref"><sup>23</sup></a>.</p>
+<p>If you <em>didn’t</em> understand the problem and didn’t come up with a plan, then this is not the easy part. You will see no end to trouble, and might fail to complete the project. <em>That’s</em> how important understanding and planning is!</p>
+<p>Of course, we’re only human and we’ll mistype things and make dumb errors, but that’s <em>way</em> easier to debug than if you have a bad plan, or worse, bad understanding of the problem. Yikes!</p>
+<p>The hard parts of coding it up are:</p>
+<ul>
+<li>Knowing the language syntax.</li>
+<li>Knowing what libraries are available.</li>
+<li>Not making trivial mistakes.</li>
+<li>Following the plan exactly.</li>
+</ul>
+<p>We’ll talk about how to learn languages later, and the second two bullet points can be addressed by being more careful, using something like <a href="https://en.wikipedia.org/wiki/Pair_programming">pair programming</a><a href="use-of-ai.html#fn24" class="footnote-ref" id="fnref24" role="doc-noteref"><sup>24</sup></a>, or leaning on AI.</p>
+<p>While you’re coding, you might find a place where your plan doesn’t work. This happens quite a bit. When it happens, drop back to the planning phase, fix the plan, and then come back up to the coding phase to implement it.</p>
+<p>Again, this phase is supposed to be relatively easy. If you’re having trouble trying to get it to work beyond just fixing your syntax errors (i.e. there’s something more structural amiss), your understanding or your plan is likely flawed. You should drop back to the planning phase to fix it, and maybe back to the understanding phase, if required.</p>
+<p><strong><em>You’re done with this phase when the code works and passes all your tests.</em></strong></p>
+<p></p>
+<h2 data-number="4.4" id="reflect-on-improvements"><span class="header-section-number">4.4</span> Reflect on Improvements</h2>
+<p></p>
+<blockquote>
+<p>“Coding is a craft. Take pride in your work.”</p>
+<p>—Yours Truly</p>
+</blockquote>
+<p>Last and definitely not least, look back and cast a critical eye on what you’ve done. Yes, it works and passes all the tests. But is it as elegant as it could be? Is it as readable and maintainable as it could be? Are there are places where the code is fragile and might fail on unexpected inputs?</p>
+<p>No matter what your skill level is, there is always room for improvement. And one of the top ways we learn is to look back on the crappy code we wrote and see how we could have made it better.</p>
+<p>Code reviews are fantastic if you can coax someone into taking the time to do it for you. They will make suggestions for things you can improve, and you can fix them now and remember them for next time. And you might disagree and not make those fixes; that’s okay, too.</p>
+<p>Again, we can leverage AI to help with this. Once you’ve solved a problem and have it working, ask the AI for suggestions for improvement<a href="use-of-ai.html#fn25" class="footnote-ref" id="fnref25" role="doc-noteref"><sup>25</sup></a> and see if there are any worth following. This technique is effective on small pieces of code, not large projects, but that makes it a great assistant for undergrad work.</p>
+<blockquote>
+<p><strong>But, very importantly for undergrads, you need to solve the problem first</strong>, and only then ask the AI to help you improve it. Your goal in school training (just like in gym training) is to get a workout with feedback, not have someone else do the work for you.</p>
+</blockquote>
+<p>Code can be bad in a number of ways. It can be buggy. It can be inefficient. It can have bad formatting. And it can simply be unreadable. Remember that in order for your code to be maintainable, it needs to be easily understandable by other humans. Make it look sharp. The compiler might be happy with unreadable code, but humans shouldn’t tolerate it.</p>
+<p><strong><em>You’re done with this phase never.</em></strong> Well, practically you’re done with it when you give up and decide you’ve learned enough about improving the code. But you’re probably not going to find the <em>Ultimate Solution to the Problem Ever</em> because you’re still building your skills throughout your life.</p>
+<p>That said, this phase is where a <strong>lot</strong> of learning happens. This is where you can effectively build your stats with relatively low effort. And it’s your loss if you don’t spend just a few minutes after a project to take advantage of it.</p>
+<p>At work, this takes the form of a <em>post-mortem</em>, where the people involved in the completed project look back and study what went right and wrong.</p>
+<p></p>
+<h2 data-number="4.5" id="think-like-a-villain"><span class="header-section-number">4.5</span> Think Like a Villain</h2>
+<p></p>
+<p>When solving problems, I want you to think like a villain; that is, think like someone who is going to abuse the system that you’re designing and building.</p>
+<p>A real square root function, for example, could be well tested. Give it some perfect squares, some non-perfect squares, some fractions, etc. Works perfectly. You wouldn’t pass in negative numbers, right? That would be silly. But you know who would? A villain!</p>
+<blockquote>
+<p><strong>I once visited an online shop that allowed you to order negative amounts of product.</strong> The checkout page said they were going to credit my account by tens of thousands of dollars.</p>
+<p>I never had the guts to check out, though, since I didn’t want to be on the hook for shipping all that product to them.</p>
+<p>Plus, I’m not a real villain… I was just thinking like one!</p>
+</blockquote>
+<p>Expect the unexpected in terms of data that your code will receive. Expect malicious actors to feed in data in an attempt to gain unauthorized access or manipulate the system in undesirable ways. Test for that stuff in your code.</p>
+<p>This applies to all phases from understanding to reflection.</p>
+<blockquote>
+<p><strong>Someone I knew in college worked for the army</strong> looking at plans for things like tanks that had not yet gone into production. His job was to think like a villain and ask questions like, “How are you going to get a wrench between those pipes to tighten that bolt?”</p>
+</blockquote>
+<p>Thinking like a villain can not only catch problems you might not have otherwise considered, but it will lead you to a deeper understanding of the project that will produce more durable and maintainable code.</p>
+<p></p>
+<h2 data-number="4.6" id="use-in-interviews"><span class="header-section-number">4.6</span> Use in Interviews</h2>
+<p></p>
+<p>The four-step process from this chapter is exactly what you should use on interview coding challenges.</p>
+<p>See, these interview problems are quite insidious. They don’t have obvious answers at all.</p>
+<p>And why not? Is it because you haven’t studied enough? <strong>No.</strong> That’s not it at all. No matter how much you study, interviewers will come up with a question that doesn’t have an obvious answer to you, the sadistic devils.</p>
+<p>And why would they do that? Do they want you to fail? Not at all. <em>They want to see you apply your problem-solving skills</em>.</p>
+<blockquote>
+<p><strong>This isn’t universal, incidentally.</strong> There are a million interviewing styles, and some of them really do just want to see how many correct answers you get. But I would argue they aren’t interviewing optimally. And further, I’d argue that the only way to get correct answers is to apply the problem-solving steps, so you might as well do it in every case.</p>
+</blockquote>
+<p>It’s natural when you’re under the stress of the interview and are presented with an initially-impossible problem that you seize up like a deer in the headlights. All your knowledge suddenly vanishes in a cloud of mist and you know you’ll never get this job now ever and—</p>
+<p><strong><em>DON’T PANIC.</em></strong> Say to yourself these words: “The only thing that matters now is <em>understanding the problem</em>.” Forget the solution. That’s not important. Coding it? Not important. Just focus on step one: understand the problem.</p>
+<p>There are two main reasons for this. One is that the interviewer is hoping you’ll start there. (And that should be reason enough.) But the other is by starting with understanding the problem, your brain will kick back into gear and automatically start thinking up strategies for solving the problem… and that’s step two of the problem-solving framework! You’re already on your way.</p>
+<p>Try to think (you villain) of anything ambiguous in the problem description. Ask questions to clarify those things. What are the limits on the input? What are the limits on output? What do you do in error conditions? Maybe suggest an example input and output and verify that you have it right with the interviewer.</p>
+<p>This tells the interviewer that you give attention to detail, an important trait to have. And it also tells them you start a project by making considered, deliberate choices.</p>
+<p>And get this: for many interviewers, seeing you effectively attack a problem in a systematic way is actually more important than you getting the correct answer. And on the flip side, not showing your problem-solving skills when giving an answer might sink you, even if the answer is correct!</p>
+<blockquote>
+<p><strong>When I interviewed at Activision</strong>, there were two questions I did not get right. But I hammered my way through them aloud as best I could, showing how I’d attack problems. I got the job.</p>
+<p>(The blown questions were: “What is the fastest way to reverse the bits in a byte?” and “Optimize this computation that builds a grid of distances between all soccer players on a field.”)</p>
+</blockquote>
+<p>So go through the whole process with the interviewer. And don’t forget the final reflect step! What would you do better? How could the solution be improved? What features could be added in the future? Interviewers love that stuff, and you love keeping interviewers happy, right?</p>
+<p></p>
+<h2 data-number="4.7" id="cost-per-phase"><span class="header-section-number">4.7</span> Cost per Phase</h2>
+<p></p>
+<p>One note related to the problem-solving framework is that <em>the cost of changes to the software increases exponentially the farther you are in development</em>.</p>
+<p>When you’re at the <em>Understanding</em> phase, changes are really cheap. They’re free. You haven’t even come up with a plan yet, and you’re just spitballing.</p>
+<p>Then when you get to the <em>Plan</em> phase, changes are still pretty cheap. Not free—if you need to make a change, it might influence other parts of the plan, and those will need to be replanned, or maybe more understanding becomes necessary.</p>
+<p>Next, getting to the <em>Coding</em> phase, now changes are starting to be painful. Maybe a change involves throwing away and redoing code for thousands or millions of dollars in developer costs. Companies make changes like this on the fly all the time, though. They just do the cost-benefit analysis and decide if it’s worth it.</p>
+<p>Finally, after the code ships, now changes are <em>really</em> expensive. Not only do we have to re-plan, reprogram, rebuild, retest, and reship a bunch of code, but our customers hate the fact that we’re requiring updates, and so we have all kinds of hidden secondary costs associated with the change.</p>
+<p>From a student perspective, you don’t worry so much about how much money your software project is going to cost your company. You’re more worried that you’ll have enough time to complete it (along with everything else—don’t your teachers know you have more than one class?) with a decent grade.</p>
+<p>So what you need to do is focus your attention on <em>Understand</em> and <em>Plan</em> where changes are cheap <em>in terms of time</em>. This will get you the best results quickly and efficiently (and hopefully by the due date) with the least programming pain.</p>
+<h2 data-number="4.8" id="chapter-reflection-2"><span class="header-section-number">4.8</span> Chapter Reflection</h2>
+<ul>
+<li><p>What are the four stages of problem solving?</p></li>
+<li><p>Which of the stages involve sitting at the keyboard writing code?</p></li>
+<li><p>How can you make the <em>Coding</em> phase more difficult than it needs to be?</p></li>
+<li><p>What are the effects of an uncaught mistake made in the <em>Understanding</em> phase?</p></li>
+<li><p>For each of the phases, how do you know when you’ve completed it?</p></li>
+<li><p>What happens if you skip the <em>Reflect</em> phase?</p></li>
+<li><p>What does Beej mean by “think like a villain”?</p></li>
+</ul>
+<p></p>
+<p></p>
+<!-- BG_NEW_CHAPTER -->
+<hr><div style="text-align:center"><span><a href="growth-mindset.html" rel="prev">Prev</a> | </span><a href="index.html">Contents</a><span> | <a href="breaking-down-problems.html" rel="next">Next</a></span></div></body>
+</html>

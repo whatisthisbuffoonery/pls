@@ -1,0 +1,899 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <title>Beej's Guide to Git</title>
+  <style>
+    html {
+      color: #1a1a1a;
+      background-color: #fdfdfd;
+    }
+    body {
+      margin: 0 auto;
+      max-width: 36em;
+      padding-left: 50px;
+      padding-right: 50px;
+      padding-top: 50px;
+      padding-bottom: 50px;
+      hyphens: auto;
+      overflow-wrap: break-word;
+      text-rendering: optimizeLegibility;
+      font-kerning: normal;
+    }
+    @media (max-width: 600px) {
+      body {
+        font-size: 0.9em;
+        padding: 12px;
+      }
+      h1 {
+        font-size: 1.8em;
+      }
+    }
+    @media print {
+      html {
+        background-color: white;
+      }
+      body {
+        background-color: transparent;
+        color: black;
+        font-size: 12pt;
+      }
+      p, h2, h3 {
+        orphans: 3;
+        widows: 3;
+      }
+      h2, h3, h4 {
+        page-break-after: avoid;
+      }
+    }
+    p {
+      margin: 1em 0;
+    }
+    a {
+      color: #1a1a1a;
+    }
+    a:visited {
+      color: #1a1a1a;
+    }
+    img {
+      max-width: 100%;
+    }
+    svg {
+      height: auto;
+      max-width: 100%;
+    }
+    h1, h2, h3, h4, h5, h6 {
+      margin-top: 1.4em;
+    }
+    h5, h6 {
+      font-size: 1em;
+      font-style: italic;
+    }
+    h6 {
+      font-weight: normal;
+    }
+    ol, ul {
+      padding-left: 1.7em;
+      margin-top: 1em;
+    }
+    li > ol, li > ul {
+      margin-top: 0;
+    }
+    blockquote {
+      margin: 1em 0 1em 1.7em;
+      padding-left: 1em;
+      border-left: 2px solid #e6e6e6;
+      color: #606060;
+    }
+    code {
+      font-family: Menlo, Monaco, Consolas, 'Lucida Console', monospace;
+      font-size: 85%;
+      margin: 0;
+      hyphens: manual;
+    }
+    pre {
+      margin: 1em 0;
+      overflow: auto;
+    }
+    pre code {
+      padding: 0;
+      overflow: visible;
+      overflow-wrap: normal;
+    }
+    .sourceCode {
+     background-color: transparent;
+     overflow: visible;
+    }
+    hr {
+      background-color: #1a1a1a;
+      border: none;
+      height: 1px;
+      margin: 1em 0;
+    }
+    table {
+      margin: 1em 0;
+      border-collapse: collapse;
+      width: 100%;
+      overflow-x: auto;
+      display: block;
+      font-variant-numeric: lining-nums tabular-nums;
+    }
+    table caption {
+      margin-bottom: 0.75em;
+    }
+    tbody {
+      margin-top: 0.5em;
+      border-top: 1px solid #1a1a1a;
+      border-bottom: 1px solid #1a1a1a;
+    }
+    th {
+      border-top: 1px solid #1a1a1a;
+      padding: 0.25em 0.5em 0.25em 0.5em;
+    }
+    td {
+      padding: 0.125em 0.5em 0.25em 0.5em;
+    }
+    header {
+      margin-bottom: 4em;
+      text-align: center;
+    }
+    #TOC li {
+      list-style: none;
+    }
+    #TOC ul {
+      padding-left: 1.3em;
+    }
+    #TOC > ul {
+      padding-left: 0;
+    }
+    #TOC a:not(:hover) {
+      text-decoration: none;
+    }
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+    /* CSS for syntax highlighting */
+    html { -webkit-text-size-adjust: 100%; }
+    pre > code.sourceCode { white-space: pre; position: relative; }
+    pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+    pre > code.sourceCode > span:empty { height: 1.2em; }
+    .sourceCode { overflow: visible; }
+    code.sourceCode > span { color: inherit; text-decoration: inherit; }
+    div.sourceCode { margin: 1em 0; }
+    pre.sourceCode { margin: 0; }
+    @media screen {
+    div.sourceCode { overflow: auto; }
+    }
+    @media print {
+    pre > code.sourceCode { white-space: pre-wrap; }
+    pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+    }
+    pre.numberSource code
+      { counter-reset: source-line 0; }
+    pre.numberSource code > span
+      { position: relative; left: -4em; counter-increment: source-line; }
+    pre.numberSource code > span > a:first-child::before
+      { content: counter(source-line);
+        position: relative; left: -1em; text-align: right; vertical-align: baseline;
+        border: none; display: inline-block;
+        -webkit-touch-callout: none; -webkit-user-select: none;
+        -khtml-user-select: none; -moz-user-select: none;
+        -ms-user-select: none; user-select: none;
+        padding: 0 4px; width: 4em;
+        color: #aaaaaa;
+      }
+    pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+    div.sourceCode
+      {   }
+    @media screen {
+    pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+    }
+    code span.al { color: #ff0000; font-weight: bold; } /* Alert */
+    code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+    code span.at { color: #7d9029; } /* Attribute */
+    code span.bn { color: #40a070; } /* BaseN */
+    code span.bu { color: #008000; } /* BuiltIn */
+    code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+    code span.ch { color: #4070a0; } /* Char */
+    code span.cn { color: #880000; } /* Constant */
+    code span.co { color: #60a0b0; font-style: italic; } /* Comment */
+    code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+    code span.do { color: #ba2121; font-style: italic; } /* Documentation */
+    code span.dt { color: #902000; } /* DataType */
+    code span.dv { color: #40a070; } /* DecVal */
+    code span.er { color: #ff0000; font-weight: bold; } /* Error */
+    code span.ex { } /* Extension */
+    code span.fl { color: #40a070; } /* Float */
+    code span.fu { color: #06287e; } /* Function */
+    code span.im { color: #008000; font-weight: bold; } /* Import */
+    code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+    code span.kw { color: #007020; font-weight: bold; } /* Keyword */
+    code span.op { color: #666666; } /* Operator */
+    code span.ot { color: #007020; } /* Other */
+    code span.pp { color: #bc7a00; } /* Preprocessor */
+    code span.sc { color: #4070a0; } /* SpecialChar */
+    code span.ss { color: #bb6688; } /* SpecialString */
+    code span.st { color: #4070a0; } /* String */
+    code span.va { color: #19177c; } /* Variable */
+    code span.vs { color: #4070a0; } /* VerbatimString */
+    code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+  </style>
+  <!-- BG custom styling -->
+  <style type="text/css">
+  /* Fix for line numbers not visible */
+  pre.numberSource code > span {
+      left: -1em;
+  }
+  pre.numberSource {
+      margin-left: initial;
+  }
+
+  /* Put some space after the section numbers */
+  span.toc-section-number::after {
+      content: "\a0\a0\a0";  /* non-breaking whitespace */
+  }
+
+  /* Hide underlines on code number links */
+  pre > code.sourceCode > span > a:first-child::before {
+      text-decoration: none;
+  }
+
+  /* Color the source blocks */
+  div.sourceCode {
+      background-color: #f0f0f0;
+  }
+
+  /* Fix iOS big text rendering issue */
+  pre > code.sourceCode > span {
+      display: initial;
+  }
+
+
+  /* Color the inline code */
+  code:not(.sourceCode) {
+      background: #f0f0f0;
+      padding-left: 0.2em;
+      padding-right: 0.2em;
+      border-radius: 0.2em;
+  }
+
+  pre.sourceCode {
+      border: 1px solid #ccc;
+      padding: 0.5em;
+      border-radius: 0.2em;
+  }
+
+  /* Keep code tags from wrapping in tables */
+  tbody code {
+      white-space: nowrap;
+  }
+
+  /* Prevent hyphenation and hyphen breaks in code*/
+  code {
+      word-break: keep-all;
+  }
+
+  td {
+      vertical-align: top;
+  }
+
+  body {
+      font-size: 12pt;
+      max-width: 43em;
+      font-family: sans-serif;
+  }
+
+  html {
+      background: #f9f9f9;
+  }
+
+  figure > embed {
+      max-width: 100%;
+  }
+
+  figure {
+      text-align: center;
+      margin-top: 2em;
+      margin-bottom: 2em;
+  }
+
+  figcaption {
+      font-size: 0.9em;
+      font-style: italic;
+      margin-top: 0.6em;
+  }
+
+  body {
+      counter-reset: figure-counter-major;
+      counter-reset: figure-counter-minor;
+  }
+
+  figure {
+      counter-increment: figure-counter-minor;
+  }
+
+  figcaption::before {
+      content: "Figure " counter(figure-counter-major) "." counter(figure-counter-minor) ": ";
+  }
+
+  blockquote {
+      border-left: 2px solid #bbb;
+      color: #444;
+  }
+
+  /* Contents */
+
+  nav[role="doc-toc"] > ul > li {
+    font-weight: bold;
+    margin-top: 1.2em;
+  }
+
+  nav[role="doc-toc"] > ul > li:first {
+    font-weight: bold;
+    margin-top: initial;
+  }
+
+  nav[role="doc-toc"] > ul > li > ul {
+    font-weight: normal;
+    margin-top: 0.3em;
+  }
+
+  /*
+  In multipage, we need to reset the figure counter to the chapter
+  number. Luckily, this is in the <h1 data-number> attribute. Unluckily,
+  there is no way to get this in a general way.
+
+  This doesn't work:
+
+    h1[data-number] {
+      counter-set: figure-counter-major attr(data-number);
+    }
+
+  Nor this:
+
+    h1[data-number] {
+      --figure-counter-major-value: attr(data-number);
+      counter-set: figure-counter-major var(--figure-counter-major-value);
+    }
+
+  So, dumbly, we have a bunch of rules for all these sections, up to the
+  maximum possible section.
+
+  Here's a program to generate them:
+
+    for (let i = 1; i < 100; i++)
+        console.log(`h1[data-number="${i}"]{counter-set:figure-counter-major ${i};counter-reset:figure-counter-minor;}`);
+
+  Note to self: never write a book with more than 99 frickin' chapters.
+  */
+
+  h1[data-number="1"]{counter-set:figure-counter-major 1;counter-reset:figure-counter-minor;}
+  h1[data-number="2"]{counter-set:figure-counter-major 2;counter-reset:figure-counter-minor;}
+  h1[data-number="3"]{counter-set:figure-counter-major 3;counter-reset:figure-counter-minor;}
+  h1[data-number="4"]{counter-set:figure-counter-major 4;counter-reset:figure-counter-minor;}
+  h1[data-number="5"]{counter-set:figure-counter-major 5;counter-reset:figure-counter-minor;}
+  h1[data-number="6"]{counter-set:figure-counter-major 6;counter-reset:figure-counter-minor;}
+  h1[data-number="7"]{counter-set:figure-counter-major 7;counter-reset:figure-counter-minor;}
+  h1[data-number="8"]{counter-set:figure-counter-major 8;counter-reset:figure-counter-minor;}
+  h1[data-number="9"]{counter-set:figure-counter-major 9;counter-reset:figure-counter-minor;}
+  h1[data-number="10"]{counter-set:figure-counter-major 10;counter-reset:figure-counter-minor;}
+  h1[data-number="11"]{counter-set:figure-counter-major 11;counter-reset:figure-counter-minor;}
+  h1[data-number="12"]{counter-set:figure-counter-major 12;counter-reset:figure-counter-minor;}
+  h1[data-number="13"]{counter-set:figure-counter-major 13;counter-reset:figure-counter-minor;}
+  h1[data-number="14"]{counter-set:figure-counter-major 14;counter-reset:figure-counter-minor;}
+  h1[data-number="15"]{counter-set:figure-counter-major 15;counter-reset:figure-counter-minor;}
+  h1[data-number="16"]{counter-set:figure-counter-major 16;counter-reset:figure-counter-minor;}
+  h1[data-number="17"]{counter-set:figure-counter-major 17;counter-reset:figure-counter-minor;}
+  h1[data-number="18"]{counter-set:figure-counter-major 18;counter-reset:figure-counter-minor;}
+  h1[data-number="19"]{counter-set:figure-counter-major 19;counter-reset:figure-counter-minor;}
+  h1[data-number="20"]{counter-set:figure-counter-major 20;counter-reset:figure-counter-minor;}
+  h1[data-number="21"]{counter-set:figure-counter-major 21;counter-reset:figure-counter-minor;}
+  h1[data-number="22"]{counter-set:figure-counter-major 22;counter-reset:figure-counter-minor;}
+  h1[data-number="23"]{counter-set:figure-counter-major 23;counter-reset:figure-counter-minor;}
+  h1[data-number="24"]{counter-set:figure-counter-major 24;counter-reset:figure-counter-minor;}
+  h1[data-number="25"]{counter-set:figure-counter-major 25;counter-reset:figure-counter-minor;}
+  h1[data-number="26"]{counter-set:figure-counter-major 26;counter-reset:figure-counter-minor;}
+  h1[data-number="27"]{counter-set:figure-counter-major 27;counter-reset:figure-counter-minor;}
+  h1[data-number="28"]{counter-set:figure-counter-major 28;counter-reset:figure-counter-minor;}
+  h1[data-number="29"]{counter-set:figure-counter-major 29;counter-reset:figure-counter-minor;}
+  h1[data-number="30"]{counter-set:figure-counter-major 30;counter-reset:figure-counter-minor;}
+  h1[data-number="31"]{counter-set:figure-counter-major 31;counter-reset:figure-counter-minor;}
+  h1[data-number="32"]{counter-set:figure-counter-major 32;counter-reset:figure-counter-minor;}
+  h1[data-number="33"]{counter-set:figure-counter-major 33;counter-reset:figure-counter-minor;}
+  h1[data-number="34"]{counter-set:figure-counter-major 34;counter-reset:figure-counter-minor;}
+  h1[data-number="35"]{counter-set:figure-counter-major 35;counter-reset:figure-counter-minor;}
+  h1[data-number="36"]{counter-set:figure-counter-major 36;counter-reset:figure-counter-minor;}
+  h1[data-number="37"]{counter-set:figure-counter-major 37;counter-reset:figure-counter-minor;}
+  h1[data-number="38"]{counter-set:figure-counter-major 38;counter-reset:figure-counter-minor;}
+  h1[data-number="39"]{counter-set:figure-counter-major 39;counter-reset:figure-counter-minor;}
+  h1[data-number="40"]{counter-set:figure-counter-major 40;counter-reset:figure-counter-minor;}
+  h1[data-number="41"]{counter-set:figure-counter-major 41;counter-reset:figure-counter-minor;}
+  h1[data-number="42"]{counter-set:figure-counter-major 42;counter-reset:figure-counter-minor;}
+  h1[data-number="43"]{counter-set:figure-counter-major 43;counter-reset:figure-counter-minor;}
+  h1[data-number="44"]{counter-set:figure-counter-major 44;counter-reset:figure-counter-minor;}
+  h1[data-number="45"]{counter-set:figure-counter-major 45;counter-reset:figure-counter-minor;}
+  h1[data-number="46"]{counter-set:figure-counter-major 46;counter-reset:figure-counter-minor;}
+  h1[data-number="47"]{counter-set:figure-counter-major 47;counter-reset:figure-counter-minor;}
+  h1[data-number="48"]{counter-set:figure-counter-major 48;counter-reset:figure-counter-minor;}
+  h1[data-number="49"]{counter-set:figure-counter-major 49;counter-reset:figure-counter-minor;}
+  h1[data-number="50"]{counter-set:figure-counter-major 50;counter-reset:figure-counter-minor;}
+  h1[data-number="51"]{counter-set:figure-counter-major 51;counter-reset:figure-counter-minor;}
+  h1[data-number="52"]{counter-set:figure-counter-major 52;counter-reset:figure-counter-minor;}
+  h1[data-number="53"]{counter-set:figure-counter-major 53;counter-reset:figure-counter-minor;}
+  h1[data-number="54"]{counter-set:figure-counter-major 54;counter-reset:figure-counter-minor;}
+  h1[data-number="55"]{counter-set:figure-counter-major 55;counter-reset:figure-counter-minor;}
+  h1[data-number="56"]{counter-set:figure-counter-major 56;counter-reset:figure-counter-minor;}
+  h1[data-number="57"]{counter-set:figure-counter-major 57;counter-reset:figure-counter-minor;}
+  h1[data-number="58"]{counter-set:figure-counter-major 58;counter-reset:figure-counter-minor;}
+  h1[data-number="59"]{counter-set:figure-counter-major 59;counter-reset:figure-counter-minor;}
+  h1[data-number="60"]{counter-set:figure-counter-major 60;counter-reset:figure-counter-minor;}
+  h1[data-number="61"]{counter-set:figure-counter-major 61;counter-reset:figure-counter-minor;}
+  h1[data-number="62"]{counter-set:figure-counter-major 62;counter-reset:figure-counter-minor;}
+  h1[data-number="63"]{counter-set:figure-counter-major 63;counter-reset:figure-counter-minor;}
+  h1[data-number="64"]{counter-set:figure-counter-major 64;counter-reset:figure-counter-minor;}
+  h1[data-number="65"]{counter-set:figure-counter-major 65;counter-reset:figure-counter-minor;}
+  h1[data-number="66"]{counter-set:figure-counter-major 66;counter-reset:figure-counter-minor;}
+  h1[data-number="67"]{counter-set:figure-counter-major 67;counter-reset:figure-counter-minor;}
+  h1[data-number="68"]{counter-set:figure-counter-major 68;counter-reset:figure-counter-minor;}
+  h1[data-number="69"]{counter-set:figure-counter-major 69;counter-reset:figure-counter-minor;}
+  h1[data-number="70"]{counter-set:figure-counter-major 70;counter-reset:figure-counter-minor;}
+  h1[data-number="71"]{counter-set:figure-counter-major 71;counter-reset:figure-counter-minor;}
+  h1[data-number="72"]{counter-set:figure-counter-major 72;counter-reset:figure-counter-minor;}
+  h1[data-number="73"]{counter-set:figure-counter-major 73;counter-reset:figure-counter-minor;}
+  h1[data-number="74"]{counter-set:figure-counter-major 74;counter-reset:figure-counter-minor;}
+  h1[data-number="75"]{counter-set:figure-counter-major 75;counter-reset:figure-counter-minor;}
+  h1[data-number="76"]{counter-set:figure-counter-major 76;counter-reset:figure-counter-minor;}
+  h1[data-number="77"]{counter-set:figure-counter-major 77;counter-reset:figure-counter-minor;}
+  h1[data-number="78"]{counter-set:figure-counter-major 78;counter-reset:figure-counter-minor;}
+  h1[data-number="79"]{counter-set:figure-counter-major 79;counter-reset:figure-counter-minor;}
+  h1[data-number="80"]{counter-set:figure-counter-major 80;counter-reset:figure-counter-minor;}
+  h1[data-number="81"]{counter-set:figure-counter-major 81;counter-reset:figure-counter-minor;}
+  h1[data-number="82"]{counter-set:figure-counter-major 82;counter-reset:figure-counter-minor;}
+  h1[data-number="83"]{counter-set:figure-counter-major 83;counter-reset:figure-counter-minor;}
+  h1[data-number="84"]{counter-set:figure-counter-major 84;counter-reset:figure-counter-minor;}
+  h1[data-number="85"]{counter-set:figure-counter-major 85;counter-reset:figure-counter-minor;}
+  h1[data-number="86"]{counter-set:figure-counter-major 86;counter-reset:figure-counter-minor;}
+  h1[data-number="87"]{counter-set:figure-counter-major 87;counter-reset:figure-counter-minor;}
+  h1[data-number="88"]{counter-set:figure-counter-major 88;counter-reset:figure-counter-minor;}
+  h1[data-number="89"]{counter-set:figure-counter-major 89;counter-reset:figure-counter-minor;}
+  h1[data-number="90"]{counter-set:figure-counter-major 90;counter-reset:figure-counter-minor;}
+  h1[data-number="91"]{counter-set:figure-counter-major 91;counter-reset:figure-counter-minor;}
+  h1[data-number="92"]{counter-set:figure-counter-major 92;counter-reset:figure-counter-minor;}
+  h1[data-number="93"]{counter-set:figure-counter-major 93;counter-reset:figure-counter-minor;}
+  h1[data-number="94"]{counter-set:figure-counter-major 94;counter-reset:figure-counter-minor;}
+  h1[data-number="95"]{counter-set:figure-counter-major 95;counter-reset:figure-counter-minor;}
+  h1[data-number="96"]{counter-set:figure-counter-major 96;counter-reset:figure-counter-minor;}
+  h1[data-number="97"]{counter-set:figure-counter-major 97;counter-reset:figure-counter-minor;}
+  h1[data-number="98"]{counter-set:figure-counter-major 98;counter-reset:figure-counter-minor;}
+  h1[data-number="99"]{counter-set:figure-counter-major 99;counter-reset:figure-counter-minor;}
+
+
+  </style>
+  <!-- BG custom styling for the wide body variant -->
+  <!-- Gets appended after bg-css.html -->
+
+  <style type="text/css">
+  body {
+      max-width: inherit;
+  }
+  </style>
+</head>
+<body>
+<div style="text-align:center"><span><a href="the-git-log-and-head.html" rel="prev">Prev</a> | </span><a href="index.html">Contents</a><span> | <a href="merge.html" rel="next">Next</a></span></div><hr>
+<h1 data-number="5" id="branches-and-fast-forward-merges"><span class="header-section-number">5</span> Branches and Fast-Forward Merges</h1>
+<h2 data-number="5.1" id="what-is-a-branch"><span class="header-section-number">5.1</span> What is a Branch?</h2>
+<p></p>
+<p>Normally you think of writing code as a linear sequence of changes. You start with an empty file, add some things, test them, add some more, test some more, and eventually the code is complete.</p>
+<figure>
+<embed src="img_030_010.svg" title="[A simple commit graph.]" />
+<figcaption aria-hidden="true">A simple commit graph.</figcaption>
+</figure>
+<!--
+``` {.default}
+    (1)---(2)---(3)---(4)---(5)
+```
+-->
+<p>In Git we might think of this as a sequence of commits. Let’s look at a graph (Figure 5.1) where I’ve numbered commits 1-5. There, <code>(1)</code> was the first commit we made on the repo, <code>(2)</code> is some changes we made on top of <code>(1)</code>, and <code>(3)</code> is some changes we made on top of <code>(2)</code>, etc.</p>
+<p>Git always keeps track of the parent commit for any particular commit, e.g. it knows the parent commit of <code>(3)</code> is <code>(2)</code> in the above graph. In this graph, the parent relationship is indicated by an arrow. “The parent of commit 3 is commit 2”, etc. It’s a little confusing because clearly commit 3 came <em>after</em> commit 2 in terms of time, but the arrow points to the parent, which is the opposite of the nodes’ temporal relationship.</p>
+<p>A <em>branch</em> is like a name tag stuck on one <strong>specific</strong> commit. You can move the name tag around with various Git operations.</p>
+<p>We’re assuming the default branch is called <code>main</code>. If you haven’t done so already, configure your default branch as shown in the <a href="git-basics.html#initial-setup">Git Basics</a> chapter.</p>
+<figure>
+<embed src="img_030_020.svg" title="[The main branch on a commit.]" />
+<figcaption aria-hidden="true">The main branch on a commit.</figcaption>
+</figure>
+<!--
+``` {.default}
+                           [main]
+                             |
+                             v
+    (1)---(2)---(3)---(4)---(5)
+```
+-->
+<p>So to make it a little more complete, we can show that branch in Figure 5.2. There’s our <code>main</code> branch attached to the commit labeled <code>(5)</code>.</p>
+<blockquote>
+<p><strong>It’s tempting to think of the whole sequence of commits as “the branch”, but this author recommends against it.</strong> Better to keep in mind that the branch is just a name tag for a single commit, and that we can move that name tag around.</p>
+</blockquote>
+<p>But Git offers something more powerful, allowing you (or collaborators) to pursue multiple branches simultaneously.</p>
+<figure>
+<embed src="img_030_030.svg" title="[Lots of branches.]" />
+<figcaption aria-hidden="true">Lots of branches.</figcaption>
+</figure>
+<!--
+``` {.default}
+               [main]
+                 |
+                 v    [somebranch]
+    (1)---(2)---(8)      |
+            \            v
+            (3)---(5)---(7)
+              \
+              (4)---(6)
+                     ^
+                     |
+              [anotherbranch]
+```
+-->
+<p>So there might be multiple collaborators working on the project at the same time.</p>
+<p>And then, when you’re ready, you can <em>merge</em> those branches back together. In Figure 5.4, we’ve merged commit 6 and 7 into a new commit, commit 9. Commit 9 contains the changes of both commits 7 and 6.</p>
+<figure>
+<embed src="img_030_040.svg" title="[After merging somebranch and anotherbranch.]" />
+<figcaption aria-hidden="true">After merging <code>somebranch</code> and <code>anotherbranch</code>.</figcaption>
+</figure>
+<!--
+``` {.default}
+               [main]
+                 |
+                 v      [somebranch|anotherbranch]
+    (1)---(2)---(8)            |
+            \                  v
+            (3)---(5)---(7)---(9)
+              \               /
+              (4)-----------(6)
+```
+-->
+<p>In that case, <code>somebranch</code> and <code>anotherbranch</code> both point to the same commit. There’s no problem with this.</p>
+<blockquote>
+<p><strong>I’m actually oversimplifying this a little.</strong> When you merge a branch into another, really only the branch you’re merging <em>into</em> moves, not both of them. So to get the two branches to point to the same commit, you’d have to do two merges: <code>somebranch</code> into <code>anotherbranch</code> and then <code>anotherbranch</code> into <code>somebranch</code>. (Or the other way around.) And <em>then</em> they’d point to the same commit.</p>
+</blockquote>
+<p>And then we can keep merging if we want, until all the branches are pointing at the same commit (Figure 5.5).</p>
+<figure>
+<embed src="img_030_050.svg" title="[After merging all branches.]" />
+<figcaption aria-hidden="true">After merging all branches.</figcaption>
+</figure>
+<!--
+``` {.default}
+                     [main|somebranch|anotherbranch]
+                                 |
+                                 v
+    (1)---(2)---(8)-------------(10)
+            \                   /
+            (3)---(5)---(7)---(9)
+              \               /
+              (4)-----------(6)
+```
+-->
+<p>And maybe after all this we decide to delete <code>somebranch</code> and <code>anotherbranch</code>; we can do this safely because they’re fully merged, and can do this without affecting <code>main</code> or any commits (Figure 5.6).</p>
+<figure>
+<embed src="img_030_060.svg" title="[After deleting merged branches.]" />
+<figcaption aria-hidden="true">After deleting merged branches.</figcaption>
+</figure>
+<!--
+``` {.default}
+                               [main]
+                                 |
+                                 v
+    (1)---(2)---(8)-------------(10)
+            \                   /
+            (3)---(5)---(7)---(9)
+              \               /
+              (4)-----------(6)
+```
+-->
+<p>This chapter is all about getting good with branching and partially good with merging.</p>
+<p>If you like interactive tutorials, Peter Cottle has put together a great website called <a href="https://learngitbranching.js.org/">Learn Git Branching</a><a href="quick-reference.html#fn18" class="footnote-ref" id="fnref18" role="doc-noteref"><sup>18</sup></a>. I highly recommend it before, during, and/or after reading this chapter.</p>
+<h2 data-number="5.2" id="a-quick-note-about-git-pull"><span class="header-section-number">5.2</span> A Quick Note about <code>git pull</code></h2>
+<p></p>
+<p>When you do a pull, it actually does two things: (a) <em>fetch</em> all the changes from the remote repo and (b) <em>merge</em> those changes.</p>
+<p>If two or more people are committing to the same branch, eventually <code>git pull</code> is going to have to merge. And it turns out there are a few ways it can do this.</p>
+<p>For now, we’re going to tell <code>git pull</code> to always classically merge divergent branches, and you can do that with this one-time command:</p>
+<div class="sourceCode" id="cb60"><pre class="sourceCode default"><code class="sourceCode default"><span id="cb60-1"><a href="branches-and-fast-forward-merges.html#cb60-1" aria-hidden="true" tabindex="-1"></a>$ git config set --global pull.rebase false</span></code></pre></div>
+<p>If you don’t do that, Git will pop up an error message complaining about it the first time it has to merge on a pull. And you’ll have to do it then. (Leave the word <code>set</code> out of that command if it fails on older Gits.)</p>
+<p>When we talk about <a href="rebase.html#rebase">rebasing</a> later, this will make more sense.</p>
+<h2 data-number="5.3" id="head-and-branches"><span class="header-section-number">5.3</span> <code>HEAD</code> and Branches</h2>
+<p></p>
+<p>We said earlier that <code>HEAD</code> refers to a specific commit, namely the commit you’re looking at right now in your unmodified working tree.</p>
+<p>And we also said that was a bit of a lie.</p>
+<p></p>
+<p>In normal usage, <code>HEAD</code> points to a branch, not to a commit. Only in detached head state does <code>HEAD</code> point directly to a commit (i.e. when it’s detached from all branches).</p>
+<p>If we look at Figure 5.7, we see <code>HEAD</code> is pointing to a branch as per normal.</p>
+<figure>
+<embed src="img_030_070.svg" title="[HEAD pointing to a branch.]" />
+<figcaption aria-hidden="true"><code>HEAD</code> pointing to a branch.</figcaption>
+</figure>
+<!--
+``` {.default}
+                     [main]<--HEAD
+                       |
+                       v
+    (1)---(2)---(3)---(4)
+```
+-->
+<p>But if we check out an earlier commit that doesn’t have a branch, we end up in detached head state, and it looks like Figure 5.8.</p>
+<figure>
+<embed src="img_030_080.svg" title="[HEAD pointing to a commit.]" />
+<figcaption aria-hidden="true"><code>HEAD</code> pointing to a commit.</figcaption>
+</figure>
+<!--
+``` {.default}
+               HEAD   [main]
+                 |     |
+                 v     v
+    (1)---(2)---(3)---(4)
+```
+-->
+<p>So far, we’ve been making commits on the <code>main</code> branch without really even thinking about branching. Recalling that the <code>main</code> branch is just a label for a specific commit, how does the <code>main</code> branch know to “follow” our <code>HEAD</code> from commit to commit?</p>
+<p>It does it like this: the branch that <code>HEAD</code> points to follows the current commit. That is, when you make a commit, the branch <code>HEAD</code> points to moves along to that next commit.</p>
+<p>If we were here back at Figure 5.7, when <code>HEAD</code> was pointing to the <code>main</code> branch, we could make one more commit and get us to Figure 5.9.</p>
+<figure>
+<embed src="img_030_090.svg" title="[HEAD moving with a branch.]" />
+<figcaption aria-hidden="true"><code>HEAD</code> moving with a branch.</figcaption>
+</figure>
+<!--
+``` {.default}
+                           [main]<--HEAD
+                             |
+                             v
+    (1)---(2)---(3)---(4)---(5)
+```
+-->
+<p>Contrast that to detached head state, back in Figure 5.8. If we were there, a new commit would get us to Figure 5.10, leaving <code>main</code> alone.</p>
+<figure>
+<embed src="img_030_100.svg" title="[A commit with detached HEAD.]" />
+<figcaption aria-hidden="true">A commit with detached <code>HEAD</code>.</figcaption>
+</figure>
+<!--
+``` {.default}
+                      [main]
+                       |
+                       v
+    (1)---(2)---(3)---(4)
+                  \
+                  (5)
+                   ^
+                   |
+                  HEAD
+```
+-->
+<p>At this point, there’s nothing stopping you from creating a new branch at the same commit as <code>HEAD</code>, if you want to do that. Or maybe you are just messing around and decide to switch back to <code>main</code> later, abandoning the commits you’ve made in detached <code>HEAD</code> state.</p>
+<p></p>
+<p>Now that we have the abstract theory stuff laid out, let’s talk specifics.</p>
+<h2 data-number="5.4" id="listing-all-your-branches"><span class="header-section-number">5.4</span> Listing All Your Branches</h2>
+<p></p>
+<p>Before we start, let’s see how to list branches.</p>
+<div class="sourceCode" id="cb61"><pre class="sourceCode default"><code class="sourceCode default"><span id="cb61-1"><a href="branches-and-fast-forward-merges.html#cb61-1" aria-hidden="true" tabindex="-1"></a>$ git branch</span>
+<span id="cb61-2"><a href="branches-and-fast-forward-merges.html#cb61-2" aria-hidden="true" tabindex="-1"></a>  * main</span></code></pre></div>
+<p>This is telling you there’s one branch, and you have it checked out (the <code>*</code> lets you know that).</p>
+<p>If I make a new branch called <code>foobranch</code> and switch to that, I’ll see this:</p>
+<div class="sourceCode" id="cb62"><pre class="sourceCode default"><code class="sourceCode default"><span id="cb62-1"><a href="branches-and-fast-forward-merges.html#cb62-1" aria-hidden="true" tabindex="-1"></a>% git branch</span>
+<span id="cb62-2"><a href="branches-and-fast-forward-merges.html#cb62-2" aria-hidden="true" tabindex="-1"></a>  * foobranch</span>
+<span id="cb62-3"><a href="branches-and-fast-forward-merges.html#cb62-3" aria-hidden="true" tabindex="-1"></a>    main</span></code></pre></div>
+<p>If I then detach the <code>HEAD</code>, I end up here:</p>
+<div class="sourceCode" id="cb63"><pre class="sourceCode default"><code class="sourceCode default"><span id="cb63-1"><a href="branches-and-fast-forward-merges.html#cb63-1" aria-hidden="true" tabindex="-1"></a>% git branch              </span>
+<span id="cb63-2"><a href="branches-and-fast-forward-merges.html#cb63-2" aria-hidden="true" tabindex="-1"></a>  * (HEAD detached at 10b6242)</span>
+<span id="cb63-3"><a href="branches-and-fast-forward-merges.html#cb63-3" aria-hidden="true" tabindex="-1"></a>    foobranch</span>
+<span id="cb63-4"><a href="branches-and-fast-forward-merges.html#cb63-4" aria-hidden="true" tabindex="-1"></a>    main</span></code></pre></div>
+<p>But you can always see what branch you’re on with <code>git branch</code> or <code>git status</code>.</p>
+<p></p>
+<h2 data-number="5.5" id="creating-a-branch"><span class="header-section-number">5.5</span> Creating a Branch</h2>
+<p></p>
+<p>When you make the first commit to a new repo, the <code>main</code> branch is automatically created for you at that commit.</p>
+<p>But what about new branches we want to make?</p>
+<blockquote>
+<p><strong>Why make a branch?</strong> A common case is that you want to work on your own commits without impacting the work of others. (In this case you’re really just putting off the work until you merge your branch with theirs, but it’s a good workflow.)</p>
+<p>Another case is that you want to mess around with some changes but you’re not sure if they’ll work. If they end up not working, you can just delete the branch. If they do work, you can merge your changes back into the non-messing-around branch.</p>
+</blockquote>
+<p>The most common way to make new branches is this:</p>
+<ol type="1">
+<li><p>Switch to the commit or branch from which you want to make the new branch.</p></li>
+<li><p>Make the new branch there and switch <code>HEAD</code> to point to the new branch.</p></li>
+</ol>
+<p>Let’s try it. Let’s branch off <code>main</code>.</p>
+<p>You might already have <code>main</code> checked out (i.e. <code>HEAD</code> points to <code>main</code>), but let’s do it again to be safe, and then we’ll create a branch with <code>git switch</code>:</p>
+<div class="sourceCode" id="cb64"><pre class="sourceCode default"><code class="sourceCode default"><span id="cb64-1"><a href="branches-and-fast-forward-merges.html#cb64-1" aria-hidden="true" tabindex="-1"></a>$ git switch main</span>
+<span id="cb64-2"><a href="branches-and-fast-forward-merges.html#cb64-2" aria-hidden="true" tabindex="-1"></a>$ git switch -c newbranch</span></code></pre></div>
+<p>Normally you can just switch to another branch (i.e. have <code>HEAD</code> point to that branch) with <code>git switch branchname</code>. But if the branch doesn’t exist, you need to use the <code>-c</code> switch to create the branch before switching to it.</p>
+<blockquote>
+<p><strong>Make sure all your local changes are committed before switching branches!</strong> If you <code>git status</code> it should say “working tree clean” before you switch. Later we’ll learn about another option when we talk about <a href="stash.html#stash">stashing</a>.</p>
+</blockquote>
+<p>So after checking out <code>main</code>, we have Figure 5.11.</p>
+<figure>
+<embed src="img_030_070.svg" title="[HEAD pointing to main.]" />
+<figcaption aria-hidden="true"><code>HEAD</code> pointing to <code>main</code>.</figcaption>
+</figure>
+<!--
+``` {.default}
+                      [main]<--HEAD
+                       |
+                       v
+    (1)---(2)---(3)---(4)
+```
+-->
+<p>And then with <code>git switch -c newbranch</code>, we create and switch to <code>newbranch</code>, and that gets us to Figure 5.12.</p>
+<figure>
+<embed src="img_030_110.svg" title="[HEAD pointing to newbranch.]" />
+<figcaption aria-hidden="true"><code>HEAD</code> pointing to <code>newbranch</code>.</figcaption>
+</figure>
+<!--
+``` {.default}
+                      [main]
+                       |
+                       v
+    (1)---(2)---(3)---(4)
+                       ^
+                       |
+                   [newbranch]<--HEAD
+```
+-->
+<p>That’s not super exciting, since we’re still looking at the same commit, but let’s see what happens when we make some new commits on this new branch.</p>
+<blockquote>
+<p><strong>The branches we’re making here exist only on your local clone</strong>; they’re not automagically propagated back to wherever you cloned the repo from.</p>
+<p>The upshot is that if you accidentally (or deliberately) delete your local repo, when you <code>git clone</code> again, all your local branches will be gone (along with any commits that aren’t part of <code>main</code> or any other branches pushed to the server).</p>
+<p>There is a way to set up that connection where your local branches are uploaded when you push, called <a href="remote-tracking-branch.html#remote-tracking-branch"><em>remote-tracking branches</em></a>. <code>main</code> is connected to a remote tracking branch (usually called <code>origin/main</code>) which is why <code>git push</code> from <code>main</code> works while <code>git push</code> from <code>newbranch</code>, which is not by default connected to a remote tracking branch, gives an error. But we’ll talk about all this later.</p>
+</blockquote>
+<p></p>
+<h2 data-number="5.6" id="make-some-commits-on-a-branch"><span class="header-section-number">5.6</span> Make Some Commits on a Branch</h2>
+<p>This is not really that different than what we were doing with our commits before. Before we made a branch, we had <code>HEAD</code> pointing to branch <code>main</code>, and we were making commits on <code>main</code>.</p>
+<p>Now we have <code>HEAD</code> pointing to <code>newbranch</code> and our commits will go there, instead.</p>
+<p>Right after creating <code>newbranch</code>, we had the situation in Figure 5.12. Now let’s edit something in the working tree and make a new commit. With that, we’ll have the scenario in Figure 5.13.</p>
+<figure>
+<embed src="img_030_120.svg" title="[Adding a new commit to newbranch.]" />
+<figcaption aria-hidden="true">Adding a new commit to <code>newbranch</code>.</figcaption>
+</figure>
+<!--
+``` {.default}
+                      [main]
+                       |
+                       v
+    (1)---(2)---(3)---(4)
+                       ^
+                       |
+                   [newbranch]<--HEAD
+```
+
+``` {.default}
+                      [main]
+                       |
+                       v
+    (1)---(2)---(3)---(4)---(5)
+                             ^
+                             |
+                         [newbranch]<--HEAD
+```
+-->
+<p>Right? Let’s make another commit and get to Figure 5.14.</p>
+<figure>
+<embed src="img_030_130.svg" title="[Adding another commit to newbranch.]" />
+<figcaption aria-hidden="true">Adding another commit to <code>newbranch</code>.</figcaption>
+</figure>
+<!--
+``` {.default}
+                      [main]
+                       |
+                       v
+    (1)---(2)---(3)---(4)---(5)---(6)
+                                   ^
+                                   |
+                               [newbranch]<--HEAD
+```
+-->
+<p>We can see that <code>newbranch</code> and <code>main</code> are pointing at different commits.</p>
+<blockquote>
+<p><strong>If we wanted to see the state of the repo from <code>main</code>’s perspective, what would we have to do?</strong> We’d have to <code>git switch main</code> to look at that branch.</p>
+</blockquote>
+<p>Now for another question. Let’s say we’ve decided that we’re happy with the changes on <code>newbranch</code>, and we want to merge them into the code in the <code>main</code> branch. How would we do that?</p>
+<h2 data-number="5.7" id="merging-fast-forward"><span class="header-section-number">5.7</span> Merging: Fast-Forward</h2>
+<p> </p>
+<p>Bringing two branches back into sync is called <em>merging</em>.</p>
+<p>The branch you’re on is the branch you’re bringing other changes <em>into</em>. That is, if you’re on Branch A, and you tell git to “merge Branch B”, Branch B’s changes will be applied onto Branch A. (Branch B remains unchanged in this scenario.)</p>
+<p>But in this section we’re going to be talking about a specific kind of merge: the <em>fast-forward</em>. This occurs when the branch you’re merging from is a direct descendant of the branch you’re merging into.</p>
+<p>Let’s say we have <code>newbranch</code> checked out, like from the previous example in Figure 5.14.</p>
+<!--
+``` {.default}
+                      [main]
+                       |
+                       v
+    (1)---(2)---(3)---(4)---(5)---(6)
+                                   ^
+                                   |
+                               [newbranch]<--HEAD
+```
+-->
+<p>I decide I want to merge <code>main</code>’s changes into <code>newbranch</code>, so (again, with <code>newbranch</code> currently checked out):</p>
+<div class="sourceCode" id="cb65"><pre class="sourceCode default"><code class="sourceCode default"><span id="cb65-1"><a href="branches-and-fast-forward-merges.html#cb65-1" aria-hidden="true" tabindex="-1"></a>$ git merge main</span>
+<span id="cb65-2"><a href="branches-and-fast-forward-merges.html#cb65-2" aria-hidden="true" tabindex="-1"></a>  Already up to date.</span></code></pre></div>
+<p>Nothing happened? What’s that mean? Well, if we look at the commit graph, above, all of <code>main</code>’s changes are already in <code>newbranch</code>, since <code>newbranch</code> is a direct ancestor.</p>
+<p>Git is saying, “Hey, you already have all the commits up to <code>main</code> in your branch, so there’s nothing for me to do.”</p>
+<p>But let’s reverse it. Let’s check out <code>main</code> and then merge <code>newbranch</code> into it.</p>
+<div class="sourceCode" id="cb66"><pre class="sourceCode default"><code class="sourceCode default"><span id="cb66-1"><a href="branches-and-fast-forward-merges.html#cb66-1" aria-hidden="true" tabindex="-1"></a>$ git switch main</span></code></pre></div>
+<p>Now we’ve moved <code>HEAD</code> to track <code>main</code>, as shown in Figure 5.15.</p>
+<figure>
+<embed src="img_030_140.svg" title="[Checking out `main` again.]" />
+<figcaption aria-hidden="true">Checking out <code>main</code> again.</figcaption>
+</figure>
+<!--
+``` {.default}
+                      [main]<--HEAD
+                       |
+                       v
+    (1)---(2)---(3)---(4)---(5)---(6)
+                                   ^
+                                   |
+                               [newbranch]
+```
+-->
+<p>And <code>newbranch</code> is <strong>not</strong> a direct ancestor of <code>main</code> (it’s a descendant). So <code>newbranch</code>’s changes are <strong>not</strong> yet in <code>main</code>.</p>
+<p>So let’s merge them in and see what happens (your output may vary depending on what files are included in the merge):</p>
+<div class="sourceCode" id="cb67"><pre class="sourceCode default"><code class="sourceCode default"><span id="cb67-1"><a href="branches-and-fast-forward-merges.html#cb67-1" aria-hidden="true" tabindex="-1"></a>$ git merge newbranch</span>
+<span id="cb67-2"><a href="branches-and-fast-forward-merges.html#cb67-2" aria-hidden="true" tabindex="-1"></a>  Updating 087a53d..cef68a8</span>
+<span id="cb67-3"><a href="branches-and-fast-forward-merges.html#cb67-3" aria-hidden="true" tabindex="-1"></a>  Fast-forward</span>
+<span id="cb67-4"><a href="branches-and-fast-forward-merges.html#cb67-4" aria-hidden="true" tabindex="-1"></a>   foo.py | 4 +++-</span>
+<span id="cb67-5"><a href="branches-and-fast-forward-merges.html#cb67-5" aria-hidden="true" tabindex="-1"></a>   1 file changed, 3 insertions(+), 1 deletion(-)</span></code></pre></div>
+<p>And now we’re at Figure 5.16.</p>
+<figure>
+<embed src="img_030_150.svg" title="[After merging newbranch into main.]" />
+<figcaption aria-hidden="true">After merging <code>newbranch</code> into <code>main</code>.</figcaption>
+</figure>
+<!--
+``` {.default}
+                                 [main]<--HEAD
+                                   |
+                                   v
+    (1)---(2)---(3)---(4)---(5)---(6)
+                                   ^
+                                   |
+                               [newbranch]
+```
+-->
+<p>Wait a second—didn’t we say to merge <code>newbranch</code> into <code>main</code>, like take those changes and fold them into the <code>main</code> branch? Why did <code>main</code> move, then?</p>
+<p>We did say that! But let’s stop and think about how this can happen in the special case where the branch you’re merging <em>into</em> is a direct ancestor of the branch you’re merging <em>from</em>.</p>
+<p>It used to be that <code>main</code> didn’t have commits <code>(5)</code> or <code>(6)</code> in the graph, above. But <code>newbranch</code> has already done the work of adding <code>(5)</code> and <code>(6)</code>!</p>
+<p>The easiest way to get those commits “into” <code>main</code> is to simply <em>fast-forward</em> <code>main</code> up to <code>newbranch</code>’s commit!</p>
+<p>Again, this only works when the branch you’re merging into is a direct ancestor of the branch you’re merging from.</p>
+<p>That said, you certainly can merge branches that are not directly related like that, e.g. branches that share a common ancestor but have both since diverged.</p>
+<p>Git will automatically fast-forward if it can. Otherwise it does a “real” merge. And while fast-forward merges can never lead to <em>merge conflicts</em>, regular merges certainly can.</p>
+<p>But that’s another story well get into in the <a href="merge.html#merge">Merging and Conflicts</a> chapter.</p>
+<p> </p>
+<h2 data-number="5.8" id="deleting-a-branch"><span class="header-section-number">5.8</span> Deleting a Branch</h2>
+<p></p>
+<p>If you’re done merging your branch, it’s easy to delete it. <strong>Importantly, this doesn’t delete any commits; it just deletes the branch “label” so you can’t use it any longer</strong>. You can still use all the commits.</p>
+<p>Let’s say we’ve finished the work on our <code>topic1</code> branch and we want to merge it into <code>main</code>. No problem:</p>
+<div class="sourceCode" id="cb68"><pre class="sourceCode default"><code class="sourceCode default"><span id="cb68-1"><a href="branches-and-fast-forward-merges.html#cb68-1" aria-hidden="true" tabindex="-1"></a>$ git commit -m &quot;finished with topic1&quot;   # on topic1 branch</span>
+<span id="cb68-2"><a href="branches-and-fast-forward-merges.html#cb68-2" aria-hidden="true" tabindex="-1"></a>$ git switch main</span>
+<span id="cb68-3"><a href="branches-and-fast-forward-merges.html#cb68-3" aria-hidden="true" tabindex="-1"></a>$ git merge topic1                       # merge topic1 into main</span></code></pre></div>
+<p>At this point, assuming a completed merge, we can delete the <code>topic1</code> branch:</p>
+<div class="sourceCode" id="cb69"><pre class="sourceCode default"><code class="sourceCode default"><span id="cb69-1"><a href="branches-and-fast-forward-merges.html#cb69-1" aria-hidden="true" tabindex="-1"></a>$ git branch -d topic1</span>
+<span id="cb69-2"><a href="branches-and-fast-forward-merges.html#cb69-2" aria-hidden="true" tabindex="-1"></a>  Deleted branch topic1 (was 3be2ad2).</span></code></pre></div>
+<p>Done!</p>
+<blockquote>
+<p><strong>A <em>topic</em> branch is what we call a local branch made for a single topic like a feature, bug fix, etc.</strong> In this guide I’ll name branches literally <code>topic</code> to indicate that it’s just an arbitrary branch. But in real life you’d name the topic branch after what it is you’re doing, like <code>bugfix37</code>, <code>newfeature</code>, <code>experiment</code>, etc.</p>
+</blockquote>
+<p>But what if you were working on a branch and wanted to abandon it before you merge it into something? For that, we have the more imperative Capital <code>D</code> option, which means, “I <em>really</em> mean it. Delete this unmerged branch!”</p>
+<div class="sourceCode" id="cb70"><pre class="sourceCode default"><code class="sourceCode default"><span id="cb70-1"><a href="branches-and-fast-forward-merges.html#cb70-1" aria-hidden="true" tabindex="-1"></a>$ git branch -D topic1</span></code></pre></div>
+<p>Use lowercase <code>-d</code> unless you have reason to do otherwise. It’ll at least tell you if you’re about to lose your reference to your unmerged commits, and then you can override with <code>-D</code> if you really want to.</p>
+<p></p>
+<!-- BG_NEW_CHAPTER -->
+<hr><div style="text-align:center"><span><a href="the-git-log-and-head.html" rel="prev">Prev</a> | </span><a href="index.html">Contents</a><span> | <a href="merge.html" rel="next">Next</a></span></div></body>
+</html>

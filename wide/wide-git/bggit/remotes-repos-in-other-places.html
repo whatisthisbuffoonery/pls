@@ -1,0 +1,586 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <title>Beej's Guide to Git</title>
+  <style>
+    html {
+      color: #1a1a1a;
+      background-color: #fdfdfd;
+    }
+    body {
+      margin: 0 auto;
+      max-width: 36em;
+      padding-left: 50px;
+      padding-right: 50px;
+      padding-top: 50px;
+      padding-bottom: 50px;
+      hyphens: auto;
+      overflow-wrap: break-word;
+      text-rendering: optimizeLegibility;
+      font-kerning: normal;
+    }
+    @media (max-width: 600px) {
+      body {
+        font-size: 0.9em;
+        padding: 12px;
+      }
+      h1 {
+        font-size: 1.8em;
+      }
+    }
+    @media print {
+      html {
+        background-color: white;
+      }
+      body {
+        background-color: transparent;
+        color: black;
+        font-size: 12pt;
+      }
+      p, h2, h3 {
+        orphans: 3;
+        widows: 3;
+      }
+      h2, h3, h4 {
+        page-break-after: avoid;
+      }
+    }
+    p {
+      margin: 1em 0;
+    }
+    a {
+      color: #1a1a1a;
+    }
+    a:visited {
+      color: #1a1a1a;
+    }
+    img {
+      max-width: 100%;
+    }
+    svg {
+      height: auto;
+      max-width: 100%;
+    }
+    h1, h2, h3, h4, h5, h6 {
+      margin-top: 1.4em;
+    }
+    h5, h6 {
+      font-size: 1em;
+      font-style: italic;
+    }
+    h6 {
+      font-weight: normal;
+    }
+    ol, ul {
+      padding-left: 1.7em;
+      margin-top: 1em;
+    }
+    li > ol, li > ul {
+      margin-top: 0;
+    }
+    blockquote {
+      margin: 1em 0 1em 1.7em;
+      padding-left: 1em;
+      border-left: 2px solid #e6e6e6;
+      color: #606060;
+    }
+    code {
+      font-family: Menlo, Monaco, Consolas, 'Lucida Console', monospace;
+      font-size: 85%;
+      margin: 0;
+      hyphens: manual;
+    }
+    pre {
+      margin: 1em 0;
+      overflow: auto;
+    }
+    pre code {
+      padding: 0;
+      overflow: visible;
+      overflow-wrap: normal;
+    }
+    .sourceCode {
+     background-color: transparent;
+     overflow: visible;
+    }
+    hr {
+      background-color: #1a1a1a;
+      border: none;
+      height: 1px;
+      margin: 1em 0;
+    }
+    table {
+      margin: 1em 0;
+      border-collapse: collapse;
+      width: 100%;
+      overflow-x: auto;
+      display: block;
+      font-variant-numeric: lining-nums tabular-nums;
+    }
+    table caption {
+      margin-bottom: 0.75em;
+    }
+    tbody {
+      margin-top: 0.5em;
+      border-top: 1px solid #1a1a1a;
+      border-bottom: 1px solid #1a1a1a;
+    }
+    th {
+      border-top: 1px solid #1a1a1a;
+      padding: 0.25em 0.5em 0.25em 0.5em;
+    }
+    td {
+      padding: 0.125em 0.5em 0.25em 0.5em;
+    }
+    header {
+      margin-bottom: 4em;
+      text-align: center;
+    }
+    #TOC li {
+      list-style: none;
+    }
+    #TOC ul {
+      padding-left: 1.3em;
+    }
+    #TOC > ul {
+      padding-left: 0;
+    }
+    #TOC a:not(:hover) {
+      text-decoration: none;
+    }
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+    /* CSS for syntax highlighting */
+    html { -webkit-text-size-adjust: 100%; }
+    pre > code.sourceCode { white-space: pre; position: relative; }
+    pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+    pre > code.sourceCode > span:empty { height: 1.2em; }
+    .sourceCode { overflow: visible; }
+    code.sourceCode > span { color: inherit; text-decoration: inherit; }
+    div.sourceCode { margin: 1em 0; }
+    pre.sourceCode { margin: 0; }
+    @media screen {
+    div.sourceCode { overflow: auto; }
+    }
+    @media print {
+    pre > code.sourceCode { white-space: pre-wrap; }
+    pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+    }
+    pre.numberSource code
+      { counter-reset: source-line 0; }
+    pre.numberSource code > span
+      { position: relative; left: -4em; counter-increment: source-line; }
+    pre.numberSource code > span > a:first-child::before
+      { content: counter(source-line);
+        position: relative; left: -1em; text-align: right; vertical-align: baseline;
+        border: none; display: inline-block;
+        -webkit-touch-callout: none; -webkit-user-select: none;
+        -khtml-user-select: none; -moz-user-select: none;
+        -ms-user-select: none; user-select: none;
+        padding: 0 4px; width: 4em;
+        color: #aaaaaa;
+      }
+    pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+    div.sourceCode
+      {   }
+    @media screen {
+    pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+    }
+    code span.al { color: #ff0000; font-weight: bold; } /* Alert */
+    code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+    code span.at { color: #7d9029; } /* Attribute */
+    code span.bn { color: #40a070; } /* BaseN */
+    code span.bu { color: #008000; } /* BuiltIn */
+    code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+    code span.ch { color: #4070a0; } /* Char */
+    code span.cn { color: #880000; } /* Constant */
+    code span.co { color: #60a0b0; font-style: italic; } /* Comment */
+    code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+    code span.do { color: #ba2121; font-style: italic; } /* Documentation */
+    code span.dt { color: #902000; } /* DataType */
+    code span.dv { color: #40a070; } /* DecVal */
+    code span.er { color: #ff0000; font-weight: bold; } /* Error */
+    code span.ex { } /* Extension */
+    code span.fl { color: #40a070; } /* Float */
+    code span.fu { color: #06287e; } /* Function */
+    code span.im { color: #008000; font-weight: bold; } /* Import */
+    code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+    code span.kw { color: #007020; font-weight: bold; } /* Keyword */
+    code span.op { color: #666666; } /* Operator */
+    code span.ot { color: #007020; } /* Other */
+    code span.pp { color: #bc7a00; } /* Preprocessor */
+    code span.sc { color: #4070a0; } /* SpecialChar */
+    code span.ss { color: #bb6688; } /* SpecialString */
+    code span.st { color: #4070a0; } /* String */
+    code span.va { color: #19177c; } /* Variable */
+    code span.vs { color: #4070a0; } /* VerbatimString */
+    code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+  </style>
+  <!-- BG custom styling -->
+  <style type="text/css">
+  /* Fix for line numbers not visible */
+  pre.numberSource code > span {
+      left: -1em;
+  }
+  pre.numberSource {
+      margin-left: initial;
+  }
+
+  /* Put some space after the section numbers */
+  span.toc-section-number::after {
+      content: "\a0\a0\a0";  /* non-breaking whitespace */
+  }
+
+  /* Hide underlines on code number links */
+  pre > code.sourceCode > span > a:first-child::before {
+      text-decoration: none;
+  }
+
+  /* Color the source blocks */
+  div.sourceCode {
+      background-color: #f0f0f0;
+  }
+
+  /* Fix iOS big text rendering issue */
+  pre > code.sourceCode > span {
+      display: initial;
+  }
+
+
+  /* Color the inline code */
+  code:not(.sourceCode) {
+      background: #f0f0f0;
+      padding-left: 0.2em;
+      padding-right: 0.2em;
+      border-radius: 0.2em;
+  }
+
+  pre.sourceCode {
+      border: 1px solid #ccc;
+      padding: 0.5em;
+      border-radius: 0.2em;
+  }
+
+  /* Keep code tags from wrapping in tables */
+  tbody code {
+      white-space: nowrap;
+  }
+
+  /* Prevent hyphenation and hyphen breaks in code*/
+  code {
+      word-break: keep-all;
+  }
+
+  td {
+      vertical-align: top;
+  }
+
+  body {
+      font-size: 12pt;
+      max-width: 43em;
+      font-family: sans-serif;
+  }
+
+  html {
+      background: #f9f9f9;
+  }
+
+  figure > embed {
+      max-width: 100%;
+  }
+
+  figure {
+      text-align: center;
+      margin-top: 2em;
+      margin-bottom: 2em;
+  }
+
+  figcaption {
+      font-size: 0.9em;
+      font-style: italic;
+      margin-top: 0.6em;
+  }
+
+  body {
+      counter-reset: figure-counter-major;
+      counter-reset: figure-counter-minor;
+  }
+
+  figure {
+      counter-increment: figure-counter-minor;
+  }
+
+  figcaption::before {
+      content: "Figure " counter(figure-counter-major) "." counter(figure-counter-minor) ": ";
+  }
+
+  blockquote {
+      border-left: 2px solid #bbb;
+      color: #444;
+  }
+
+  /* Contents */
+
+  nav[role="doc-toc"] > ul > li {
+    font-weight: bold;
+    margin-top: 1.2em;
+  }
+
+  nav[role="doc-toc"] > ul > li:first {
+    font-weight: bold;
+    margin-top: initial;
+  }
+
+  nav[role="doc-toc"] > ul > li > ul {
+    font-weight: normal;
+    margin-top: 0.3em;
+  }
+
+  /*
+  In multipage, we need to reset the figure counter to the chapter
+  number. Luckily, this is in the <h1 data-number> attribute. Unluckily,
+  there is no way to get this in a general way.
+
+  This doesn't work:
+
+    h1[data-number] {
+      counter-set: figure-counter-major attr(data-number);
+    }
+
+  Nor this:
+
+    h1[data-number] {
+      --figure-counter-major-value: attr(data-number);
+      counter-set: figure-counter-major var(--figure-counter-major-value);
+    }
+
+  So, dumbly, we have a bunch of rules for all these sections, up to the
+  maximum possible section.
+
+  Here's a program to generate them:
+
+    for (let i = 1; i < 100; i++)
+        console.log(`h1[data-number="${i}"]{counter-set:figure-counter-major ${i};counter-reset:figure-counter-minor;}`);
+
+  Note to self: never write a book with more than 99 frickin' chapters.
+  */
+
+  h1[data-number="1"]{counter-set:figure-counter-major 1;counter-reset:figure-counter-minor;}
+  h1[data-number="2"]{counter-set:figure-counter-major 2;counter-reset:figure-counter-minor;}
+  h1[data-number="3"]{counter-set:figure-counter-major 3;counter-reset:figure-counter-minor;}
+  h1[data-number="4"]{counter-set:figure-counter-major 4;counter-reset:figure-counter-minor;}
+  h1[data-number="5"]{counter-set:figure-counter-major 5;counter-reset:figure-counter-minor;}
+  h1[data-number="6"]{counter-set:figure-counter-major 6;counter-reset:figure-counter-minor;}
+  h1[data-number="7"]{counter-set:figure-counter-major 7;counter-reset:figure-counter-minor;}
+  h1[data-number="8"]{counter-set:figure-counter-major 8;counter-reset:figure-counter-minor;}
+  h1[data-number="9"]{counter-set:figure-counter-major 9;counter-reset:figure-counter-minor;}
+  h1[data-number="10"]{counter-set:figure-counter-major 10;counter-reset:figure-counter-minor;}
+  h1[data-number="11"]{counter-set:figure-counter-major 11;counter-reset:figure-counter-minor;}
+  h1[data-number="12"]{counter-set:figure-counter-major 12;counter-reset:figure-counter-minor;}
+  h1[data-number="13"]{counter-set:figure-counter-major 13;counter-reset:figure-counter-minor;}
+  h1[data-number="14"]{counter-set:figure-counter-major 14;counter-reset:figure-counter-minor;}
+  h1[data-number="15"]{counter-set:figure-counter-major 15;counter-reset:figure-counter-minor;}
+  h1[data-number="16"]{counter-set:figure-counter-major 16;counter-reset:figure-counter-minor;}
+  h1[data-number="17"]{counter-set:figure-counter-major 17;counter-reset:figure-counter-minor;}
+  h1[data-number="18"]{counter-set:figure-counter-major 18;counter-reset:figure-counter-minor;}
+  h1[data-number="19"]{counter-set:figure-counter-major 19;counter-reset:figure-counter-minor;}
+  h1[data-number="20"]{counter-set:figure-counter-major 20;counter-reset:figure-counter-minor;}
+  h1[data-number="21"]{counter-set:figure-counter-major 21;counter-reset:figure-counter-minor;}
+  h1[data-number="22"]{counter-set:figure-counter-major 22;counter-reset:figure-counter-minor;}
+  h1[data-number="23"]{counter-set:figure-counter-major 23;counter-reset:figure-counter-minor;}
+  h1[data-number="24"]{counter-set:figure-counter-major 24;counter-reset:figure-counter-minor;}
+  h1[data-number="25"]{counter-set:figure-counter-major 25;counter-reset:figure-counter-minor;}
+  h1[data-number="26"]{counter-set:figure-counter-major 26;counter-reset:figure-counter-minor;}
+  h1[data-number="27"]{counter-set:figure-counter-major 27;counter-reset:figure-counter-minor;}
+  h1[data-number="28"]{counter-set:figure-counter-major 28;counter-reset:figure-counter-minor;}
+  h1[data-number="29"]{counter-set:figure-counter-major 29;counter-reset:figure-counter-minor;}
+  h1[data-number="30"]{counter-set:figure-counter-major 30;counter-reset:figure-counter-minor;}
+  h1[data-number="31"]{counter-set:figure-counter-major 31;counter-reset:figure-counter-minor;}
+  h1[data-number="32"]{counter-set:figure-counter-major 32;counter-reset:figure-counter-minor;}
+  h1[data-number="33"]{counter-set:figure-counter-major 33;counter-reset:figure-counter-minor;}
+  h1[data-number="34"]{counter-set:figure-counter-major 34;counter-reset:figure-counter-minor;}
+  h1[data-number="35"]{counter-set:figure-counter-major 35;counter-reset:figure-counter-minor;}
+  h1[data-number="36"]{counter-set:figure-counter-major 36;counter-reset:figure-counter-minor;}
+  h1[data-number="37"]{counter-set:figure-counter-major 37;counter-reset:figure-counter-minor;}
+  h1[data-number="38"]{counter-set:figure-counter-major 38;counter-reset:figure-counter-minor;}
+  h1[data-number="39"]{counter-set:figure-counter-major 39;counter-reset:figure-counter-minor;}
+  h1[data-number="40"]{counter-set:figure-counter-major 40;counter-reset:figure-counter-minor;}
+  h1[data-number="41"]{counter-set:figure-counter-major 41;counter-reset:figure-counter-minor;}
+  h1[data-number="42"]{counter-set:figure-counter-major 42;counter-reset:figure-counter-minor;}
+  h1[data-number="43"]{counter-set:figure-counter-major 43;counter-reset:figure-counter-minor;}
+  h1[data-number="44"]{counter-set:figure-counter-major 44;counter-reset:figure-counter-minor;}
+  h1[data-number="45"]{counter-set:figure-counter-major 45;counter-reset:figure-counter-minor;}
+  h1[data-number="46"]{counter-set:figure-counter-major 46;counter-reset:figure-counter-minor;}
+  h1[data-number="47"]{counter-set:figure-counter-major 47;counter-reset:figure-counter-minor;}
+  h1[data-number="48"]{counter-set:figure-counter-major 48;counter-reset:figure-counter-minor;}
+  h1[data-number="49"]{counter-set:figure-counter-major 49;counter-reset:figure-counter-minor;}
+  h1[data-number="50"]{counter-set:figure-counter-major 50;counter-reset:figure-counter-minor;}
+  h1[data-number="51"]{counter-set:figure-counter-major 51;counter-reset:figure-counter-minor;}
+  h1[data-number="52"]{counter-set:figure-counter-major 52;counter-reset:figure-counter-minor;}
+  h1[data-number="53"]{counter-set:figure-counter-major 53;counter-reset:figure-counter-minor;}
+  h1[data-number="54"]{counter-set:figure-counter-major 54;counter-reset:figure-counter-minor;}
+  h1[data-number="55"]{counter-set:figure-counter-major 55;counter-reset:figure-counter-minor;}
+  h1[data-number="56"]{counter-set:figure-counter-major 56;counter-reset:figure-counter-minor;}
+  h1[data-number="57"]{counter-set:figure-counter-major 57;counter-reset:figure-counter-minor;}
+  h1[data-number="58"]{counter-set:figure-counter-major 58;counter-reset:figure-counter-minor;}
+  h1[data-number="59"]{counter-set:figure-counter-major 59;counter-reset:figure-counter-minor;}
+  h1[data-number="60"]{counter-set:figure-counter-major 60;counter-reset:figure-counter-minor;}
+  h1[data-number="61"]{counter-set:figure-counter-major 61;counter-reset:figure-counter-minor;}
+  h1[data-number="62"]{counter-set:figure-counter-major 62;counter-reset:figure-counter-minor;}
+  h1[data-number="63"]{counter-set:figure-counter-major 63;counter-reset:figure-counter-minor;}
+  h1[data-number="64"]{counter-set:figure-counter-major 64;counter-reset:figure-counter-minor;}
+  h1[data-number="65"]{counter-set:figure-counter-major 65;counter-reset:figure-counter-minor;}
+  h1[data-number="66"]{counter-set:figure-counter-major 66;counter-reset:figure-counter-minor;}
+  h1[data-number="67"]{counter-set:figure-counter-major 67;counter-reset:figure-counter-minor;}
+  h1[data-number="68"]{counter-set:figure-counter-major 68;counter-reset:figure-counter-minor;}
+  h1[data-number="69"]{counter-set:figure-counter-major 69;counter-reset:figure-counter-minor;}
+  h1[data-number="70"]{counter-set:figure-counter-major 70;counter-reset:figure-counter-minor;}
+  h1[data-number="71"]{counter-set:figure-counter-major 71;counter-reset:figure-counter-minor;}
+  h1[data-number="72"]{counter-set:figure-counter-major 72;counter-reset:figure-counter-minor;}
+  h1[data-number="73"]{counter-set:figure-counter-major 73;counter-reset:figure-counter-minor;}
+  h1[data-number="74"]{counter-set:figure-counter-major 74;counter-reset:figure-counter-minor;}
+  h1[data-number="75"]{counter-set:figure-counter-major 75;counter-reset:figure-counter-minor;}
+  h1[data-number="76"]{counter-set:figure-counter-major 76;counter-reset:figure-counter-minor;}
+  h1[data-number="77"]{counter-set:figure-counter-major 77;counter-reset:figure-counter-minor;}
+  h1[data-number="78"]{counter-set:figure-counter-major 78;counter-reset:figure-counter-minor;}
+  h1[data-number="79"]{counter-set:figure-counter-major 79;counter-reset:figure-counter-minor;}
+  h1[data-number="80"]{counter-set:figure-counter-major 80;counter-reset:figure-counter-minor;}
+  h1[data-number="81"]{counter-set:figure-counter-major 81;counter-reset:figure-counter-minor;}
+  h1[data-number="82"]{counter-set:figure-counter-major 82;counter-reset:figure-counter-minor;}
+  h1[data-number="83"]{counter-set:figure-counter-major 83;counter-reset:figure-counter-minor;}
+  h1[data-number="84"]{counter-set:figure-counter-major 84;counter-reset:figure-counter-minor;}
+  h1[data-number="85"]{counter-set:figure-counter-major 85;counter-reset:figure-counter-minor;}
+  h1[data-number="86"]{counter-set:figure-counter-major 86;counter-reset:figure-counter-minor;}
+  h1[data-number="87"]{counter-set:figure-counter-major 87;counter-reset:figure-counter-minor;}
+  h1[data-number="88"]{counter-set:figure-counter-major 88;counter-reset:figure-counter-minor;}
+  h1[data-number="89"]{counter-set:figure-counter-major 89;counter-reset:figure-counter-minor;}
+  h1[data-number="90"]{counter-set:figure-counter-major 90;counter-reset:figure-counter-minor;}
+  h1[data-number="91"]{counter-set:figure-counter-major 91;counter-reset:figure-counter-minor;}
+  h1[data-number="92"]{counter-set:figure-counter-major 92;counter-reset:figure-counter-minor;}
+  h1[data-number="93"]{counter-set:figure-counter-major 93;counter-reset:figure-counter-minor;}
+  h1[data-number="94"]{counter-set:figure-counter-major 94;counter-reset:figure-counter-minor;}
+  h1[data-number="95"]{counter-set:figure-counter-major 95;counter-reset:figure-counter-minor;}
+  h1[data-number="96"]{counter-set:figure-counter-major 96;counter-reset:figure-counter-minor;}
+  h1[data-number="97"]{counter-set:figure-counter-major 97;counter-reset:figure-counter-minor;}
+  h1[data-number="98"]{counter-set:figure-counter-major 98;counter-reset:figure-counter-minor;}
+  h1[data-number="99"]{counter-set:figure-counter-major 99;counter-reset:figure-counter-minor;}
+
+
+  </style>
+  <!-- BG custom styling for the wide body variant -->
+  <!-- Gets appended after bg-css.html -->
+
+  <style type="text/css">
+  body {
+      max-width: inherit;
+  }
+  </style>
+</head>
+<body>
+<div style="text-align:center"><span><a href="ignoring-files-with-.gitignore.html" rel="prev">Prev</a> | </span><a href="index.html">Contents</a><span> | <a href="remote-tracking-branch.html" rel="next">Next</a></span></div><hr>
+<h1 data-number="9" id="remotes-repos-in-other-places"><span class="header-section-number">9</span> Remotes: Repos in Other Places</h1>
+<p></p>
+<p>A <em>remote</em> is just a name for a remote server you can clone, push, and pull from.</p>
+<p>We identify these by a URL. With GitHub, this is a URL we copied when we went to clone the repo initially.</p>
+<p>It’s possible to use this URL to identify the server in our everyday Git usage, but it’s unwieldy to type. So we give the remote server URLs nicknames that we just tend to call “remotes”.</p>
+<p>A remote we’ve already seen a bunch of is <code>origin</code>. This is the nickname for the remote repo you cloned from, and it gets set automatically by Git when you clone.</p>
+<h2 data-number="9.1" id="remote-and-branch-notation"><span class="header-section-number">9.1</span> Remote and Branch Notation</h2>
+<p></p>
+<p>Before we begin, note that Git uses slash notation to refer to a specific branch on a specific remote: <code>remotename/branchname</code>.</p>
+<p>For example, this refers to the <code>main</code> branch on the remote named <code>origin</code>:</p>
+<div class="sourceCode" id="cb97"><pre class="sourceCode default"><code class="sourceCode default"><span id="cb97-1"><a href="remotes-repos-in-other-places.html#cb97-1" aria-hidden="true" tabindex="-1"></a>origin/main</span></code></pre></div>
+<p>And this refers to the branch named <code>feature3490</code> on a remote named <code>nitfol</code>:</p>
+<div class="sourceCode" id="cb98"><pre class="sourceCode default"><code class="sourceCode default"><span id="cb98-1"><a href="remotes-repos-in-other-places.html#cb98-1" aria-hidden="true" tabindex="-1"></a>nitfol/feature3490</span></code></pre></div>
+<p>We’ll talk more about this in the Remote Tracking Branches chapter.</p>
+<p></p>
+<h2 data-number="9.2" id="getting-a-list-of-remotes"><span class="header-section-number">9.2</span> Getting a List of Remotes</h2>
+<p></p>
+<p>You can run <code>git remote</code> with the <code>-v</code> option in any repo directory to see what remotes you have for that repo:</p>
+<div class="sourceCode" id="cb99"><pre class="sourceCode default"><code class="sourceCode default"><span id="cb99-1"><a href="remotes-repos-in-other-places.html#cb99-1" aria-hidden="true" tabindex="-1"></a>$ git remote -v</span>
+<span id="cb99-2"><a href="remotes-repos-in-other-places.html#cb99-2" aria-hidden="true" tabindex="-1"></a>  origin    https://github.com/example-repo.git (fetch)</span>
+<span id="cb99-3"><a href="remotes-repos-in-other-places.html#cb99-3" aria-hidden="true" tabindex="-1"></a>  origin    https://github.com/example-repo.git (push)</span></code></pre></div>
+<p>We see that we’re using the same URL for the remote named <code>origin</code> for both pull (part of which is <code>fetch</code>) and push. Having the same URL for both is super common.</p>
+<p>And that URL is the exact same one we copied from GitHub when cloning the repo in the first place.</p>
+<p></p>
+<h2 data-number="9.3" id="changing-a-remotes-url"><span class="header-section-number">9.3</span> Changing a Remote’s URL</h2>
+<p></p>
+<p>Remember that a remote name is just an alias for some URL that you cloned the repo from.</p>
+<p>Let’s say that you are all set up with your SSH keys to use GitHub for both push and pull, but you accidentally cloned the repo using the HTTPS URL. In that case, you’ll see the following remote:</p>
+<div class="sourceCode" id="cb100"><pre class="sourceCode default"><code class="sourceCode default"><span id="cb100-1"><a href="remotes-repos-in-other-places.html#cb100-1" aria-hidden="true" tabindex="-1"></a>$ git remote -v</span>
+<span id="cb100-2"><a href="remotes-repos-in-other-places.html#cb100-2" aria-hidden="true" tabindex="-1"></a>origin    https://github.com/example-repo.git (fetch)</span>
+<span id="cb100-3"><a href="remotes-repos-in-other-places.html#cb100-3" aria-hidden="true" tabindex="-1"></a>origin    https://github.com/example-repo.git (push)</span></code></pre></div>
+<p>And then you try to push, and GitHub tells you that you can’t push to an HTTPS remote… dang it!</p>
+<p>You meant to copy the SSH URL when you cloned, which for me looks like:</p>
+<div class="sourceCode" id="cb101"><pre class="sourceCode default"><code class="sourceCode default"><span id="cb101-1"><a href="remotes-repos-in-other-places.html#cb101-1" aria-hidden="true" tabindex="-1"></a>git@github.com:beejjorgensen/git-example-repo.git</span></code></pre></div>
+<p>Luckily it’s not the end of the world. We can just change what the alias points to.</p>
+<p>(The example below is split into two lines so that it’s not too wide for the book, but it can be on a single line. The backslash lets Bash know that the line continues.)</p>
+<div class="sourceCode" id="cb102"><pre class="sourceCode default"><code class="sourceCode default"><span id="cb102-1"><a href="remotes-repos-in-other-places.html#cb102-1" aria-hidden="true" tabindex="-1"></a>$ git remote set-url origin \</span>
+<span id="cb102-2"><a href="remotes-repos-in-other-places.html#cb102-2" aria-hidden="true" tabindex="-1"></a>             git@github.com:beejjorgensen/git-example-repo.git</span></code></pre></div>
+<p>And now when we look at our remotes, we see:</p>
+<div class="sourceCode" id="cb103"><pre class="sourceCode default"><code class="sourceCode default"><span id="cb103-1"><a href="remotes-repos-in-other-places.html#cb103-1" aria-hidden="true" tabindex="-1"></a>$ git remote -v</span>
+<span id="cb103-2"><a href="remotes-repos-in-other-places.html#cb103-2" aria-hidden="true" tabindex="-1"></a>origin    git@github.com:beejjorgensen/git-example-repo.git (fetch)</span>
+<span id="cb103-3"><a href="remotes-repos-in-other-places.html#cb103-3" aria-hidden="true" tabindex="-1"></a>origin    git@github.com:beejjorgensen/git-example-repo.git (push)</span></code></pre></div>
+<p>And now we can push! (Assuming we have our SSH keys set up.)</p>
+<p></p>
+<h2 data-number="9.4" id="adding-a-remote"><span class="header-section-number">9.4</span> Adding a Remote</h2>
+<p></p>
+<p>There’s nothing stopping you from adding another remote.</p>
+<p>A common example is if you <em>forked</em> a GitHub Project (more on that later). A fork is a GitHub construct that enables you to easily clone someone else’s public repo into your own account, and gives you a handy way to share changes you make with the original repo.</p>
+<p>Let’s say I forked the Linux source repo. When I clone my fork, I’ll see these remotes:</p>
+<div class="sourceCode" id="cb104"><pre class="sourceCode default"><code class="sourceCode default"><span id="cb104-1"><a href="remotes-repos-in-other-places.html#cb104-1" aria-hidden="true" tabindex="-1"></a>origin    git@github.com:beejjorgensen/linux.git (fetch)</span>
+<span id="cb104-2"><a href="remotes-repos-in-other-places.html#cb104-2" aria-hidden="true" tabindex="-1"></a>origin    git@github.com:beejjorgensen/linux.git (push)</span></code></pre></div>
+<p>I don’t have access to the real Linux source code, but I can fork it and get my own copy of the repo.</p>
+<p>Now, if Linus Torvalds makes changes to his repo, I won’t automatically see them. So I’d like some way to get his changes and merge them in with my repo.</p>
+<p>I need some way to refer to his repo, so I’m going to add a remote called <code>reallinux</code> that points to it:</p>
+<div class="sourceCode" id="cb105"><pre class="sourceCode default"><code class="sourceCode default"><span id="cb105-1"><a href="remotes-repos-in-other-places.html#cb105-1" aria-hidden="true" tabindex="-1"></a>$ git remote add reallinux https://github.com/torvalds/linux.git</span></code></pre></div>
+<p>Now my remotes look like this:</p>
+<div class="sourceCode" id="cb106"><pre class="sourceCode default"><code class="sourceCode default"><span id="cb106-1"><a href="remotes-repos-in-other-places.html#cb106-1" aria-hidden="true" tabindex="-1"></a>origin    git@github.com:beejjorgensen/linux.git (fetch)</span>
+<span id="cb106-2"><a href="remotes-repos-in-other-places.html#cb106-2" aria-hidden="true" tabindex="-1"></a>origin    git@github.com:beejjorgensen/linux.git (push)</span>
+<span id="cb106-3"><a href="remotes-repos-in-other-places.html#cb106-3" aria-hidden="true" tabindex="-1"></a>reallinux    https://github.com/torvalds/linux.git (fetch)</span>
+<span id="cb106-4"><a href="remotes-repos-in-other-places.html#cb106-4" aria-hidden="true" tabindex="-1"></a>reallinux    https://github.com/torvalds/linux.git (push)</span></code></pre></div>
+<blockquote>
+<p> Normally when setting up a remote that refers to the source of a forked repo on GitHub, people tend to call that remote <code>upstream</code>, whereas I’ve clearly called it <code>reallinux</code>.</p>
+<p>I did this because when we subsequently talk about <a href="remote-tracking-branch.html#remote-tracking-branch">remote tracking branches</a>, we’re going to use “upstream” to mean something else, and I don’t want the two to be confusing.</p>
+<p>Just remember IRL when you set up a remote to point to the forked-from repo, it’s relatively customary to call that remote <code>upstream</code>.</p>
+</blockquote>
+<p></p>
+<p>Now I can run this to get all the changes from Linus’s repo:</p>
+<div class="sourceCode" id="cb107"><pre class="sourceCode default"><code class="sourceCode default"><span id="cb107-1"><a href="remotes-repos-in-other-places.html#cb107-1" aria-hidden="true" tabindex="-1"></a>$ git fetch reallinux</span></code></pre></div>
+<p>And I can merge it into my branch (the Linux repo uses <code>master</code> for the instead of <code>main</code> for the main branch):</p>
+<div class="sourceCode" id="cb108"><pre class="sourceCode default"><code class="sourceCode default"><span id="cb108-1"><a href="remotes-repos-in-other-places.html#cb108-1" aria-hidden="true" tabindex="-1"></a>$ git switch master            # My local master</span>
+<span id="cb108-2"><a href="remotes-repos-in-other-places.html#cb108-2" aria-hidden="true" tabindex="-1"></a>$ git merge reallinux/master   # Note the slash notation!</span></code></pre></div>
+<p>That will merge the <code>master</code> branch from the <code>reallinux</code> into my local <code>master</code>, once we’ve dealt with any conflicts.</p>
+<p>If I make another commit, this will move my local <code>HEAD</code> and <code>master</code> to that new commit, and will leave <code>origin/master</code> (my fork on GitHub) and <code>reallinux/master</code> (Linus’s repo) farther behind.</p>
+<p>Let’s say for fun I made two commits that I didn’t have on my <code>origin</code> remote at GitHub. In that case, a chopped up and fabricated-for-demonstration-purposes log might look like this:</p>
+<div class="sourceCode" id="cb109"><pre class="sourceCode default"><code class="sourceCode default"><span id="cb109-1"><a href="remotes-repos-in-other-places.html#cb109-1" aria-hidden="true" tabindex="-1"></a>commit 2d7d5d (HEAD -&gt; master)</span>
+<span id="cb109-2"><a href="remotes-repos-in-other-places.html#cb109-2" aria-hidden="true" tabindex="-1"></a>commit cde831</span>
+<span id="cb109-3"><a href="remotes-repos-in-other-places.html#cb109-3" aria-hidden="true" tabindex="-1"></a>commit 311eb3 (origin/master)</span>
+<span id="cb109-4"><a href="remotes-repos-in-other-places.html#cb109-4" aria-hidden="true" tabindex="-1"></a>commit d5d2cc (reallinux/master)</span></code></pre></div>
+<p>At this point I’d do a <code>git push</code> to send my local <code>master</code> changes to GitHub and catch up my <code>origin/master</code> there. So the top commit would show:</p>
+<div class="sourceCode" id="cb110"><pre class="sourceCode default"><code class="sourceCode default"><span id="cb110-1"><a href="remotes-repos-in-other-places.html#cb110-1" aria-hidden="true" tabindex="-1"></a>commit 2d7d5d (HEAD -&gt; master, origin/master)</span>
+<span id="cb110-2"><a href="remotes-repos-in-other-places.html#cb110-2" aria-hidden="true" tabindex="-1"></a>commit cde831</span>
+<span id="cb110-3"><a href="remotes-repos-in-other-places.html#cb110-3" aria-hidden="true" tabindex="-1"></a>commit 311eb3</span>
+<span id="cb110-4"><a href="remotes-repos-in-other-places.html#cb110-4" aria-hidden="true" tabindex="-1"></a>commit d5d2cc (reallinux/master)</span></code></pre></div>
+<p>And <code>reallinux/master</code> would still be behind somewhere. (And there it would remain until Linus deigned to merge my changes.)</p>
+<p>It’s interesting that my local <code>master</code> can be out of sync from the <code>master</code> on <code>origin</code>, right?</p>
+<p>We’ll look at this in the <a href="remote-tracking-branch.html#remote-tracking-branch">Remote Tracking Branches chapter</a>.</p>
+<p></p>
+<p></p>
+<!-- BG_NEW_CHAPTER -->
+<hr><div style="text-align:center"><span><a href="ignoring-files-with-.gitignore.html" rel="prev">Prev</a> | </span><a href="index.html">Contents</a><span> | <a href="remote-tracking-branch.html" rel="next">Next</a></span></div></body>
+</html>

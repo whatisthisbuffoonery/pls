@@ -1,0 +1,875 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <title>Beej's Guide to Git</title>
+  <style>
+    html {
+      color: #1a1a1a;
+      background-color: #fdfdfd;
+    }
+    body {
+      margin: 0 auto;
+      max-width: 36em;
+      padding-left: 50px;
+      padding-right: 50px;
+      padding-top: 50px;
+      padding-bottom: 50px;
+      hyphens: auto;
+      overflow-wrap: break-word;
+      text-rendering: optimizeLegibility;
+      font-kerning: normal;
+    }
+    @media (max-width: 600px) {
+      body {
+        font-size: 0.9em;
+        padding: 12px;
+      }
+      h1 {
+        font-size: 1.8em;
+      }
+    }
+    @media print {
+      html {
+        background-color: white;
+      }
+      body {
+        background-color: transparent;
+        color: black;
+        font-size: 12pt;
+      }
+      p, h2, h3 {
+        orphans: 3;
+        widows: 3;
+      }
+      h2, h3, h4 {
+        page-break-after: avoid;
+      }
+    }
+    p {
+      margin: 1em 0;
+    }
+    a {
+      color: #1a1a1a;
+    }
+    a:visited {
+      color: #1a1a1a;
+    }
+    img {
+      max-width: 100%;
+    }
+    svg {
+      height: auto;
+      max-width: 100%;
+    }
+    h1, h2, h3, h4, h5, h6 {
+      margin-top: 1.4em;
+    }
+    h5, h6 {
+      font-size: 1em;
+      font-style: italic;
+    }
+    h6 {
+      font-weight: normal;
+    }
+    ol, ul {
+      padding-left: 1.7em;
+      margin-top: 1em;
+    }
+    li > ol, li > ul {
+      margin-top: 0;
+    }
+    blockquote {
+      margin: 1em 0 1em 1.7em;
+      padding-left: 1em;
+      border-left: 2px solid #e6e6e6;
+      color: #606060;
+    }
+    code {
+      font-family: Menlo, Monaco, Consolas, 'Lucida Console', monospace;
+      font-size: 85%;
+      margin: 0;
+      hyphens: manual;
+    }
+    pre {
+      margin: 1em 0;
+      overflow: auto;
+    }
+    pre code {
+      padding: 0;
+      overflow: visible;
+      overflow-wrap: normal;
+    }
+    .sourceCode {
+     background-color: transparent;
+     overflow: visible;
+    }
+    hr {
+      background-color: #1a1a1a;
+      border: none;
+      height: 1px;
+      margin: 1em 0;
+    }
+    table {
+      margin: 1em 0;
+      border-collapse: collapse;
+      width: 100%;
+      overflow-x: auto;
+      display: block;
+      font-variant-numeric: lining-nums tabular-nums;
+    }
+    table caption {
+      margin-bottom: 0.75em;
+    }
+    tbody {
+      margin-top: 0.5em;
+      border-top: 1px solid #1a1a1a;
+      border-bottom: 1px solid #1a1a1a;
+    }
+    th {
+      border-top: 1px solid #1a1a1a;
+      padding: 0.25em 0.5em 0.25em 0.5em;
+    }
+    td {
+      padding: 0.125em 0.5em 0.25em 0.5em;
+    }
+    header {
+      margin-bottom: 4em;
+      text-align: center;
+    }
+    #TOC li {
+      list-style: none;
+    }
+    #TOC ul {
+      padding-left: 1.3em;
+    }
+    #TOC > ul {
+      padding-left: 0;
+    }
+    #TOC a:not(:hover) {
+      text-decoration: none;
+    }
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+    /* CSS for syntax highlighting */
+    html { -webkit-text-size-adjust: 100%; }
+    pre > code.sourceCode { white-space: pre; position: relative; }
+    pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+    pre > code.sourceCode > span:empty { height: 1.2em; }
+    .sourceCode { overflow: visible; }
+    code.sourceCode > span { color: inherit; text-decoration: inherit; }
+    div.sourceCode { margin: 1em 0; }
+    pre.sourceCode { margin: 0; }
+    @media screen {
+    div.sourceCode { overflow: auto; }
+    }
+    @media print {
+    pre > code.sourceCode { white-space: pre-wrap; }
+    pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+    }
+    pre.numberSource code
+      { counter-reset: source-line 0; }
+    pre.numberSource code > span
+      { position: relative; left: -4em; counter-increment: source-line; }
+    pre.numberSource code > span > a:first-child::before
+      { content: counter(source-line);
+        position: relative; left: -1em; text-align: right; vertical-align: baseline;
+        border: none; display: inline-block;
+        -webkit-touch-callout: none; -webkit-user-select: none;
+        -khtml-user-select: none; -moz-user-select: none;
+        -ms-user-select: none; user-select: none;
+        padding: 0 4px; width: 4em;
+        color: #aaaaaa;
+      }
+    pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+    div.sourceCode
+      {   }
+    @media screen {
+    pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+    }
+    code span.al { color: #ff0000; font-weight: bold; } /* Alert */
+    code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+    code span.at { color: #7d9029; } /* Attribute */
+    code span.bn { color: #40a070; } /* BaseN */
+    code span.bu { color: #008000; } /* BuiltIn */
+    code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+    code span.ch { color: #4070a0; } /* Char */
+    code span.cn { color: #880000; } /* Constant */
+    code span.co { color: #60a0b0; font-style: italic; } /* Comment */
+    code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+    code span.do { color: #ba2121; font-style: italic; } /* Documentation */
+    code span.dt { color: #902000; } /* DataType */
+    code span.dv { color: #40a070; } /* DecVal */
+    code span.er { color: #ff0000; font-weight: bold; } /* Error */
+    code span.ex { } /* Extension */
+    code span.fl { color: #40a070; } /* Float */
+    code span.fu { color: #06287e; } /* Function */
+    code span.im { color: #008000; font-weight: bold; } /* Import */
+    code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+    code span.kw { color: #007020; font-weight: bold; } /* Keyword */
+    code span.op { color: #666666; } /* Operator */
+    code span.ot { color: #007020; } /* Other */
+    code span.pp { color: #bc7a00; } /* Preprocessor */
+    code span.sc { color: #4070a0; } /* SpecialChar */
+    code span.ss { color: #bb6688; } /* SpecialString */
+    code span.st { color: #4070a0; } /* String */
+    code span.va { color: #19177c; } /* Variable */
+    code span.vs { color: #4070a0; } /* VerbatimString */
+    code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+  </style>
+  <!-- BG custom styling -->
+  <style type="text/css">
+  /* Fix for line numbers not visible */
+  pre.numberSource code > span {
+      left: -1em;
+  }
+  pre.numberSource {
+      margin-left: initial;
+  }
+
+  /* Put some space after the section numbers */
+  span.toc-section-number::after {
+      content: "\a0\a0\a0";  /* non-breaking whitespace */
+  }
+
+  /* Hide underlines on code number links */
+  pre > code.sourceCode > span > a:first-child::before {
+      text-decoration: none;
+  }
+
+  /* Color the source blocks */
+  div.sourceCode {
+      background-color: #f0f0f0;
+  }
+
+  /* Fix iOS big text rendering issue */
+  pre > code.sourceCode > span {
+      display: initial;
+  }
+
+
+  /* Color the inline code */
+  code:not(.sourceCode) {
+      background: #f0f0f0;
+      padding-left: 0.2em;
+      padding-right: 0.2em;
+      border-radius: 0.2em;
+  }
+
+  pre.sourceCode {
+      border: 1px solid #ccc;
+      padding: 0.5em;
+      border-radius: 0.2em;
+  }
+
+  /* Keep code tags from wrapping in tables */
+  tbody code {
+      white-space: nowrap;
+  }
+
+  /* Prevent hyphenation and hyphen breaks in code*/
+  code {
+      word-break: keep-all;
+  }
+
+  td {
+      vertical-align: top;
+  }
+
+  body {
+      font-size: 12pt;
+      max-width: 43em;
+      font-family: sans-serif;
+  }
+
+  html {
+      background: #f9f9f9;
+  }
+
+  figure > embed {
+      max-width: 100%;
+  }
+
+  figure {
+      text-align: center;
+      margin-top: 2em;
+      margin-bottom: 2em;
+  }
+
+  figcaption {
+      font-size: 0.9em;
+      font-style: italic;
+      margin-top: 0.6em;
+  }
+
+  body {
+      counter-reset: figure-counter-major;
+      counter-reset: figure-counter-minor;
+  }
+
+  figure {
+      counter-increment: figure-counter-minor;
+  }
+
+  figcaption::before {
+      content: "Figure " counter(figure-counter-major) "." counter(figure-counter-minor) ": ";
+  }
+
+  blockquote {
+      border-left: 2px solid #bbb;
+      color: #444;
+  }
+
+  /* Contents */
+
+  nav[role="doc-toc"] > ul > li {
+    font-weight: bold;
+    margin-top: 1.2em;
+  }
+
+  nav[role="doc-toc"] > ul > li:first {
+    font-weight: bold;
+    margin-top: initial;
+  }
+
+  nav[role="doc-toc"] > ul > li > ul {
+    font-weight: normal;
+    margin-top: 0.3em;
+  }
+
+  /*
+  In multipage, we need to reset the figure counter to the chapter
+  number. Luckily, this is in the <h1 data-number> attribute. Unluckily,
+  there is no way to get this in a general way.
+
+  This doesn't work:
+
+    h1[data-number] {
+      counter-set: figure-counter-major attr(data-number);
+    }
+
+  Nor this:
+
+    h1[data-number] {
+      --figure-counter-major-value: attr(data-number);
+      counter-set: figure-counter-major var(--figure-counter-major-value);
+    }
+
+  So, dumbly, we have a bunch of rules for all these sections, up to the
+  maximum possible section.
+
+  Here's a program to generate them:
+
+    for (let i = 1; i < 100; i++)
+        console.log(`h1[data-number="${i}"]{counter-set:figure-counter-major ${i};counter-reset:figure-counter-minor;}`);
+
+  Note to self: never write a book with more than 99 frickin' chapters.
+  */
+
+  h1[data-number="1"]{counter-set:figure-counter-major 1;counter-reset:figure-counter-minor;}
+  h1[data-number="2"]{counter-set:figure-counter-major 2;counter-reset:figure-counter-minor;}
+  h1[data-number="3"]{counter-set:figure-counter-major 3;counter-reset:figure-counter-minor;}
+  h1[data-number="4"]{counter-set:figure-counter-major 4;counter-reset:figure-counter-minor;}
+  h1[data-number="5"]{counter-set:figure-counter-major 5;counter-reset:figure-counter-minor;}
+  h1[data-number="6"]{counter-set:figure-counter-major 6;counter-reset:figure-counter-minor;}
+  h1[data-number="7"]{counter-set:figure-counter-major 7;counter-reset:figure-counter-minor;}
+  h1[data-number="8"]{counter-set:figure-counter-major 8;counter-reset:figure-counter-minor;}
+  h1[data-number="9"]{counter-set:figure-counter-major 9;counter-reset:figure-counter-minor;}
+  h1[data-number="10"]{counter-set:figure-counter-major 10;counter-reset:figure-counter-minor;}
+  h1[data-number="11"]{counter-set:figure-counter-major 11;counter-reset:figure-counter-minor;}
+  h1[data-number="12"]{counter-set:figure-counter-major 12;counter-reset:figure-counter-minor;}
+  h1[data-number="13"]{counter-set:figure-counter-major 13;counter-reset:figure-counter-minor;}
+  h1[data-number="14"]{counter-set:figure-counter-major 14;counter-reset:figure-counter-minor;}
+  h1[data-number="15"]{counter-set:figure-counter-major 15;counter-reset:figure-counter-minor;}
+  h1[data-number="16"]{counter-set:figure-counter-major 16;counter-reset:figure-counter-minor;}
+  h1[data-number="17"]{counter-set:figure-counter-major 17;counter-reset:figure-counter-minor;}
+  h1[data-number="18"]{counter-set:figure-counter-major 18;counter-reset:figure-counter-minor;}
+  h1[data-number="19"]{counter-set:figure-counter-major 19;counter-reset:figure-counter-minor;}
+  h1[data-number="20"]{counter-set:figure-counter-major 20;counter-reset:figure-counter-minor;}
+  h1[data-number="21"]{counter-set:figure-counter-major 21;counter-reset:figure-counter-minor;}
+  h1[data-number="22"]{counter-set:figure-counter-major 22;counter-reset:figure-counter-minor;}
+  h1[data-number="23"]{counter-set:figure-counter-major 23;counter-reset:figure-counter-minor;}
+  h1[data-number="24"]{counter-set:figure-counter-major 24;counter-reset:figure-counter-minor;}
+  h1[data-number="25"]{counter-set:figure-counter-major 25;counter-reset:figure-counter-minor;}
+  h1[data-number="26"]{counter-set:figure-counter-major 26;counter-reset:figure-counter-minor;}
+  h1[data-number="27"]{counter-set:figure-counter-major 27;counter-reset:figure-counter-minor;}
+  h1[data-number="28"]{counter-set:figure-counter-major 28;counter-reset:figure-counter-minor;}
+  h1[data-number="29"]{counter-set:figure-counter-major 29;counter-reset:figure-counter-minor;}
+  h1[data-number="30"]{counter-set:figure-counter-major 30;counter-reset:figure-counter-minor;}
+  h1[data-number="31"]{counter-set:figure-counter-major 31;counter-reset:figure-counter-minor;}
+  h1[data-number="32"]{counter-set:figure-counter-major 32;counter-reset:figure-counter-minor;}
+  h1[data-number="33"]{counter-set:figure-counter-major 33;counter-reset:figure-counter-minor;}
+  h1[data-number="34"]{counter-set:figure-counter-major 34;counter-reset:figure-counter-minor;}
+  h1[data-number="35"]{counter-set:figure-counter-major 35;counter-reset:figure-counter-minor;}
+  h1[data-number="36"]{counter-set:figure-counter-major 36;counter-reset:figure-counter-minor;}
+  h1[data-number="37"]{counter-set:figure-counter-major 37;counter-reset:figure-counter-minor;}
+  h1[data-number="38"]{counter-set:figure-counter-major 38;counter-reset:figure-counter-minor;}
+  h1[data-number="39"]{counter-set:figure-counter-major 39;counter-reset:figure-counter-minor;}
+  h1[data-number="40"]{counter-set:figure-counter-major 40;counter-reset:figure-counter-minor;}
+  h1[data-number="41"]{counter-set:figure-counter-major 41;counter-reset:figure-counter-minor;}
+  h1[data-number="42"]{counter-set:figure-counter-major 42;counter-reset:figure-counter-minor;}
+  h1[data-number="43"]{counter-set:figure-counter-major 43;counter-reset:figure-counter-minor;}
+  h1[data-number="44"]{counter-set:figure-counter-major 44;counter-reset:figure-counter-minor;}
+  h1[data-number="45"]{counter-set:figure-counter-major 45;counter-reset:figure-counter-minor;}
+  h1[data-number="46"]{counter-set:figure-counter-major 46;counter-reset:figure-counter-minor;}
+  h1[data-number="47"]{counter-set:figure-counter-major 47;counter-reset:figure-counter-minor;}
+  h1[data-number="48"]{counter-set:figure-counter-major 48;counter-reset:figure-counter-minor;}
+  h1[data-number="49"]{counter-set:figure-counter-major 49;counter-reset:figure-counter-minor;}
+  h1[data-number="50"]{counter-set:figure-counter-major 50;counter-reset:figure-counter-minor;}
+  h1[data-number="51"]{counter-set:figure-counter-major 51;counter-reset:figure-counter-minor;}
+  h1[data-number="52"]{counter-set:figure-counter-major 52;counter-reset:figure-counter-minor;}
+  h1[data-number="53"]{counter-set:figure-counter-major 53;counter-reset:figure-counter-minor;}
+  h1[data-number="54"]{counter-set:figure-counter-major 54;counter-reset:figure-counter-minor;}
+  h1[data-number="55"]{counter-set:figure-counter-major 55;counter-reset:figure-counter-minor;}
+  h1[data-number="56"]{counter-set:figure-counter-major 56;counter-reset:figure-counter-minor;}
+  h1[data-number="57"]{counter-set:figure-counter-major 57;counter-reset:figure-counter-minor;}
+  h1[data-number="58"]{counter-set:figure-counter-major 58;counter-reset:figure-counter-minor;}
+  h1[data-number="59"]{counter-set:figure-counter-major 59;counter-reset:figure-counter-minor;}
+  h1[data-number="60"]{counter-set:figure-counter-major 60;counter-reset:figure-counter-minor;}
+  h1[data-number="61"]{counter-set:figure-counter-major 61;counter-reset:figure-counter-minor;}
+  h1[data-number="62"]{counter-set:figure-counter-major 62;counter-reset:figure-counter-minor;}
+  h1[data-number="63"]{counter-set:figure-counter-major 63;counter-reset:figure-counter-minor;}
+  h1[data-number="64"]{counter-set:figure-counter-major 64;counter-reset:figure-counter-minor;}
+  h1[data-number="65"]{counter-set:figure-counter-major 65;counter-reset:figure-counter-minor;}
+  h1[data-number="66"]{counter-set:figure-counter-major 66;counter-reset:figure-counter-minor;}
+  h1[data-number="67"]{counter-set:figure-counter-major 67;counter-reset:figure-counter-minor;}
+  h1[data-number="68"]{counter-set:figure-counter-major 68;counter-reset:figure-counter-minor;}
+  h1[data-number="69"]{counter-set:figure-counter-major 69;counter-reset:figure-counter-minor;}
+  h1[data-number="70"]{counter-set:figure-counter-major 70;counter-reset:figure-counter-minor;}
+  h1[data-number="71"]{counter-set:figure-counter-major 71;counter-reset:figure-counter-minor;}
+  h1[data-number="72"]{counter-set:figure-counter-major 72;counter-reset:figure-counter-minor;}
+  h1[data-number="73"]{counter-set:figure-counter-major 73;counter-reset:figure-counter-minor;}
+  h1[data-number="74"]{counter-set:figure-counter-major 74;counter-reset:figure-counter-minor;}
+  h1[data-number="75"]{counter-set:figure-counter-major 75;counter-reset:figure-counter-minor;}
+  h1[data-number="76"]{counter-set:figure-counter-major 76;counter-reset:figure-counter-minor;}
+  h1[data-number="77"]{counter-set:figure-counter-major 77;counter-reset:figure-counter-minor;}
+  h1[data-number="78"]{counter-set:figure-counter-major 78;counter-reset:figure-counter-minor;}
+  h1[data-number="79"]{counter-set:figure-counter-major 79;counter-reset:figure-counter-minor;}
+  h1[data-number="80"]{counter-set:figure-counter-major 80;counter-reset:figure-counter-minor;}
+  h1[data-number="81"]{counter-set:figure-counter-major 81;counter-reset:figure-counter-minor;}
+  h1[data-number="82"]{counter-set:figure-counter-major 82;counter-reset:figure-counter-minor;}
+  h1[data-number="83"]{counter-set:figure-counter-major 83;counter-reset:figure-counter-minor;}
+  h1[data-number="84"]{counter-set:figure-counter-major 84;counter-reset:figure-counter-minor;}
+  h1[data-number="85"]{counter-set:figure-counter-major 85;counter-reset:figure-counter-minor;}
+  h1[data-number="86"]{counter-set:figure-counter-major 86;counter-reset:figure-counter-minor;}
+  h1[data-number="87"]{counter-set:figure-counter-major 87;counter-reset:figure-counter-minor;}
+  h1[data-number="88"]{counter-set:figure-counter-major 88;counter-reset:figure-counter-minor;}
+  h1[data-number="89"]{counter-set:figure-counter-major 89;counter-reset:figure-counter-minor;}
+  h1[data-number="90"]{counter-set:figure-counter-major 90;counter-reset:figure-counter-minor;}
+  h1[data-number="91"]{counter-set:figure-counter-major 91;counter-reset:figure-counter-minor;}
+  h1[data-number="92"]{counter-set:figure-counter-major 92;counter-reset:figure-counter-minor;}
+  h1[data-number="93"]{counter-set:figure-counter-major 93;counter-reset:figure-counter-minor;}
+  h1[data-number="94"]{counter-set:figure-counter-major 94;counter-reset:figure-counter-minor;}
+  h1[data-number="95"]{counter-set:figure-counter-major 95;counter-reset:figure-counter-minor;}
+  h1[data-number="96"]{counter-set:figure-counter-major 96;counter-reset:figure-counter-minor;}
+  h1[data-number="97"]{counter-set:figure-counter-major 97;counter-reset:figure-counter-minor;}
+  h1[data-number="98"]{counter-set:figure-counter-major 98;counter-reset:figure-counter-minor;}
+  h1[data-number="99"]{counter-set:figure-counter-major 99;counter-reset:figure-counter-minor;}
+
+
+  </style>
+  <!-- BG custom styling for the wide body variant -->
+  <!-- Gets appended after bg-css.html -->
+
+  <style type="text/css">
+  body {
+      max-width: inherit;
+  }
+  </style>
+</head>
+<body>
+<div style="text-align:center"><span style="visibility: hidden"><a href="" rel="prev">Prev</a> | </span><a href="index.html">Contents</a><span> | <a href="foreword.html" rel="next">Next</a></span></div><hr>
+<header id="title-block-header">
+<h1 class="title">Beej's Guide to Git</h1>
+<p class="author">Brian “Beej Jorgensen” Hall</p>
+<p class="date">v1.2.6, Copyright © June 12, 2025</p>
+</header>
+<nav id="TOC" role="doc-toc">
+<ul>
+<li><a href="foreword.html#foreword" id="toc-foreword"><span class="toc-section-number">1</span> Foreword</a>
+<ul>
+<li><a href="foreword.html#audience" id="toc-audience"><span class="toc-section-number">1.1</span> Audience</a></li>
+<li><a href="foreword.html#official-homepage" id="toc-official-homepage"><span class="toc-section-number">1.2</span> Official Homepage</a></li>
+<li><a href="foreword.html#email-policy" id="toc-email-policy"><span class="toc-section-number">1.3</span> Email Policy</a></li>
+<li><a href="foreword.html#mirroring" id="toc-mirroring"><span class="toc-section-number">1.4</span> Mirroring</a></li>
+<li><a href="foreword.html#note-for-translators" id="toc-note-for-translators"><span class="toc-section-number">1.5</span> Note for Translators</a></li>
+<li><a href="foreword.html#copyright-and-distribution" id="toc-copyright-and-distribution"><span class="toc-section-number">1.6</span> Copyright and Distribution</a></li>
+<li><a href="foreword.html#dedication" id="toc-dedication"><span class="toc-section-number">1.7</span> Dedication</a></li>
+</ul></li>
+<li><a href="git-basics.html#git-basics" id="toc-git-basics"><span class="toc-section-number">2</span> Git Basics</a>
+<ul>
+<li><a href="git-basics.html#what-is-git" id="toc-what-is-git"><span class="toc-section-number">2.1</span> What is Git?</a>
+<ul>
+<li><a href="git-basics.html#definitions" id="toc-definitions"><span class="toc-section-number">2.1.1</span> Definitions</a></li>
+</ul></li>
+<li><a href="git-basics.html#what-is-github" id="toc-what-is-github"><span class="toc-section-number">2.2</span> What is GitHub?</a></li>
+<li><a href="git-basics.html#what-is-github-1" id="toc-what-is-github-1"><span class="toc-section-number">2.3</span> What is GitHub?</a></li>
+<li><a href="git-basics.html#the-most-basic-git-workflow" id="toc-the-most-basic-git-workflow"><span class="toc-section-number">2.4</span> The Most Basic Git Workflow</a>
+<ul>
+<li><a href="git-basics.html#definitions-1" id="toc-definitions-1"><span class="toc-section-number">2.4.1</span> Definitions</a></li>
+</ul></li>
+<li><a href="git-basics.html#what-is-cloning" id="toc-what-is-cloning"><span class="toc-section-number">2.5</span> What is Cloning?</a>
+<ul>
+<li><a href="git-basics.html#definitions-2" id="toc-definitions-2"><span class="toc-section-number">2.5.1</span> Definitions</a></li>
+</ul></li>
+<li><a href="git-basics.html#how-do-clones-interact" id="toc-how-do-clones-interact"><span class="toc-section-number">2.6</span> How Do Clones Interact?</a></li>
+<li><a href="git-basics.html#actual-git-usage" id="toc-actual-git-usage"><span class="toc-section-number">2.7</span> Actual Git Usage</a>
+<ul>
+<li><a href="git-basics.html#initial-setup" id="toc-initial-setup"><span class="toc-section-number">2.7.1</span> Step 0: One-time Setup</a></li>
+<li><a href="git-basics.html#step-1-clone-an-existing-repo" id="toc-step-1-clone-an-existing-repo"><span class="toc-section-number">2.7.2</span> Step 1: Clone an Existing Repo</a></li>
+<li><a href="git-basics.html#step-2-make-some-local-changes" id="toc-step-2-make-some-local-changes"><span class="toc-section-number">2.7.3</span> Step 2: Make Some Local Changes</a></li>
+<li><a href="git-basics.html#step-3-add-changes-to-the-stage" id="toc-step-3-add-changes-to-the-stage"><span class="toc-section-number">2.7.4</span> Step 3: Add Changes to the Stage</a></li>
+<li><a href="git-basics.html#step-4-commit-those-changes" id="toc-step-4-commit-those-changes"><span class="toc-section-number">2.7.5</span> Step 4: Commit those Changes</a></li>
+<li><a href="git-basics.html#step-5-push-your-changes-to-the-remote-repo" id="toc-step-5-push-your-changes-to-the-remote-repo"><span class="toc-section-number">2.7.6</span> Step 5: Push Your Changes to the Remote Repo</a></li>
+</ul></li>
+</ul></li>
+<li><a href="github-how-to-use-it.html#github-how-to-use-it" id="toc-github-how-to-use-it"><span class="toc-section-number">3</span> GitHub: How To Use It</a>
+<ul>
+<li><a href="github-how-to-use-it.html#making-a-github-account" id="toc-making-a-github-account"><span class="toc-section-number">3.1</span> Making a GitHub Account</a></li>
+<li><a href="github-how-to-use-it.html#creating-a-new-repo-on-github" id="toc-creating-a-new-repo-on-github"><span class="toc-section-number">3.2</span> Creating a New Repo on GitHub</a></li>
+<li><a href="github-how-to-use-it.html#authentication" id="toc-authentication"><span class="toc-section-number">3.3</span> Authentication</a>
+<ul>
+<li><a href="github-how-to-use-it.html#github-cli" id="toc-github-cli"><span class="toc-section-number">3.3.1</span> GitHub CLI</a></li>
+<li><a href="github-how-to-use-it.html#ssh-keys" id="toc-ssh-keys"><span class="toc-section-number">3.3.2</span> SSH Keys</a></li>
+<li><a href="github-how-to-use-it.html#using-personal-access-tokens" id="toc-using-personal-access-tokens"><span class="toc-section-number">3.3.3</span> Using Personal Access Tokens</a></li>
+</ul></li>
+<li><a href="github-how-to-use-it.html#make-a-local-clone-of-the-repo" id="toc-make-a-local-clone-of-the-repo"><span class="toc-section-number">3.4</span> Make a Local Clone of the Repo</a>
+<ul>
+<li><a href="github-how-to-use-it.html#cloning-from-github-with-github-cli" id="toc-cloning-from-github-with-github-cli"><span class="toc-section-number">3.4.1</span> Cloning from GitHub with GitHub CLI</a></li>
+<li><a href="github-how-to-use-it.html#cloning-from-github-with-ssh-keys" id="toc-cloning-from-github-with-ssh-keys"><span class="toc-section-number">3.4.2</span> Cloning from GitHub with SSH Keys</a></li>
+</ul></li>
+<li><a href="github-how-to-use-it.html#make-changes-and-push" id="toc-make-changes-and-push"><span class="toc-section-number">3.5</span> Make Changes and Push!</a></li>
+<li><a href="github-how-to-use-it.html#collaboration-on-github" id="toc-collaboration-on-github"><span class="toc-section-number">3.6</span> Collaboration on GitHub</a></li>
+</ul></li>
+<li><a href="the-git-log-and-head.html#the-git-log-and-head" id="toc-the-git-log-and-head"><span class="toc-section-number">4</span> The Git Log and <code>HEAD</code></a>
+<ul>
+<li><a href="the-git-log-and-head.html#an-example-log" id="toc-an-example-log"><span class="toc-section-number">4.1</span> An Example Log</a></li>
+<li><a href="the-git-log-and-head.html#whats-in-the-log" id="toc-whats-in-the-log"><span class="toc-section-number">4.2</span> What’s in the log?</a></li>
+<li><a href="the-git-log-and-head.html#the-head-reference" id="toc-the-head-reference"><span class="toc-section-number">4.3</span> The <code>HEAD</code> Reference</a></li>
+<li><a href="the-git-log-and-head.html#going-back-in-time-and-detached-head" id="toc-going-back-in-time-and-detached-head"><span class="toc-section-number">4.4</span> Going Back In Time and Detached <code>HEAD</code></a></li>
+<li><a href="the-git-log-and-head.html#the-old-command-git-checkout" id="toc-the-old-command-git-checkout"><span class="toc-section-number">4.5</span> The Old Command: <code>git checkout</code></a></li>
+<li><a href="the-git-log-and-head.html#commits-relative-to-head" id="toc-commits-relative-to-head"><span class="toc-section-number">4.6</span> Commits Relative to <code>HEAD</code></a></li>
+</ul></li>
+<li><a href="branches-and-fast-forward-merges.html#branches-and-fast-forward-merges" id="toc-branches-and-fast-forward-merges"><span class="toc-section-number">5</span> Branches and Fast-Forward Merges</a>
+<ul>
+<li><a href="branches-and-fast-forward-merges.html#what-is-a-branch" id="toc-what-is-a-branch"><span class="toc-section-number">5.1</span> What is a Branch?</a></li>
+<li><a href="branches-and-fast-forward-merges.html#a-quick-note-about-git-pull" id="toc-a-quick-note-about-git-pull"><span class="toc-section-number">5.2</span> A Quick Note about <code>git pull</code></a></li>
+<li><a href="branches-and-fast-forward-merges.html#head-and-branches" id="toc-head-and-branches"><span class="toc-section-number">5.3</span> <code>HEAD</code> and Branches</a></li>
+<li><a href="branches-and-fast-forward-merges.html#listing-all-your-branches" id="toc-listing-all-your-branches"><span class="toc-section-number">5.4</span> Listing All Your Branches</a></li>
+<li><a href="branches-and-fast-forward-merges.html#creating-a-branch" id="toc-creating-a-branch"><span class="toc-section-number">5.5</span> Creating a Branch</a></li>
+<li><a href="branches-and-fast-forward-merges.html#make-some-commits-on-a-branch" id="toc-make-some-commits-on-a-branch"><span class="toc-section-number">5.6</span> Make Some Commits on a Branch</a></li>
+<li><a href="branches-and-fast-forward-merges.html#merging-fast-forward" id="toc-merging-fast-forward"><span class="toc-section-number">5.7</span> Merging: Fast-Forward</a></li>
+<li><a href="branches-and-fast-forward-merges.html#deleting-a-branch" id="toc-deleting-a-branch"><span class="toc-section-number">5.8</span> Deleting a Branch</a></li>
+</ul></li>
+<li><a href="merge.html#merge" id="toc-merge"><span class="toc-section-number">6</span> Merging and Conflicts</a>
+<ul>
+<li><a href="merge.html#an-example-of-divergent-branches" id="toc-an-example-of-divergent-branches"><span class="toc-section-number">6.1</span> An Example of Divergent Branches</a></li>
+<li><a href="merge.html#merging-divergent-branches" id="toc-merging-divergent-branches"><span class="toc-section-number">6.2</span> Merging Divergent Branches</a></li>
+<li><a href="merge.html#merge-conflicts" id="toc-merge-conflicts"><span class="toc-section-number">6.3</span> Merge Conflicts</a></li>
+<li><a href="merge.html#what-a-conflict-looks-like" id="toc-what-a-conflict-looks-like"><span class="toc-section-number">6.4</span> What a Conflict Looks Like</a></li>
+<li><a href="merge.html#why-merge-conflicts-happen" id="toc-why-merge-conflicts-happen"><span class="toc-section-number">6.5</span> Why Merge Conflicts Happen</a></li>
+<li><a href="merge.html#merging-with-ides-or-other-merge-tools" id="toc-merging-with-ides-or-other-merge-tools"><span class="toc-section-number">6.6</span> Merging with IDEs or other Merge Tools</a></li>
+<li><a href="merge.html#merge-big-ideas" id="toc-merge-big-ideas"><span class="toc-section-number">6.7</span> Merge Big Ideas</a></li>
+</ul></li>
+<li><a href="using-subdirectories-with-git.html#using-subdirectories-with-git" id="toc-using-subdirectories-with-git"><span class="toc-section-number">7</span> Using Subdirectories with Git</a>
+<ul>
+<li><a href="using-subdirectories-with-git.html#repos-and-subdirectories" id="toc-repos-and-subdirectories"><span class="toc-section-number">7.1</span> Repos and Subdirectories</a>
+<ul>
+<li><a href="using-subdirectories-with-git.html#what-about-subprojects" id="toc-what-about-subprojects"><span class="toc-section-number">7.1.1</span> What about Subprojects?</a></li>
+</ul></li>
+<li><a href="using-subdirectories-with-git.html#accidentally-making-a-repo-in-your-home-directory" id="toc-accidentally-making-a-repo-in-your-home-directory"><span class="toc-section-number">7.2</span> Accidentally Making a Repo in your Home Directory</a></li>
+<li><a href="using-subdirectories-with-git.html#empty-subdirectories-in-repos" id="toc-empty-subdirectories-in-repos"><span class="toc-section-number">7.3</span> Empty Subdirectories in Repos</a></li>
+</ul></li>
+<li><a href="ignoring-files-with-.gitignore.html#ignoring-files-with-.gitignore" id="toc-ignoring-files-with-.gitignore"><span class="toc-section-number">8</span> Ignoring Files with <code>.gitignore</code></a>
+<ul>
+<li><a href="ignoring-files-with-.gitignore.html#adding-a-.gitignore-file" id="toc-adding-a-.gitignore-file"><span class="toc-section-number">8.1</span> Adding a <code>.gitignore</code> File</a></li>
+<li><a href="ignoring-files-with-.gitignore.html#can-i-specify-subdirectories-in-.gitignore" id="toc-can-i-specify-subdirectories-in-.gitignore"><span class="toc-section-number">8.2</span> Can I Specify Subdirectories in <code>.gitignore</code>?</a></li>
+<li><a href="ignoring-files-with-.gitignore.html#where-do-i-put-the-.gitignore" id="toc-where-do-i-put-the-.gitignore"><span class="toc-section-number">8.3</span> Where do I Put the <code>.gitignore</code>?</a></li>
+<li><a href="ignoring-files-with-.gitignore.html#wildcards" id="toc-wildcards"><span class="toc-section-number">8.4</span> Wildcards</a></li>
+<li><a href="ignoring-files-with-.gitignore.html#negated-.gitignore-rules" id="toc-negated-.gitignore-rules"><span class="toc-section-number">8.5</span> Negated <code>.gitignore</code> Rules</a></li>
+<li><a href="ignoring-files-with-.gitignore.html#how-to-ignore-all-files-except-a-few" id="toc-how-to-ignore-all-files-except-a-few"><span class="toc-section-number">8.6</span> How To Ignore All Files Except a Few?</a></li>
+<li><a href="ignoring-files-with-.gitignore.html#getting-premade-.gitignore-files" id="toc-getting-premade-.gitignore-files"><span class="toc-section-number">8.7</span> Getting Premade <code>.gitignore</code> Files</a></li>
+</ul></li>
+<li><a href="remotes-repos-in-other-places.html#remotes-repos-in-other-places" id="toc-remotes-repos-in-other-places"><span class="toc-section-number">9</span> Remotes: Repos in Other Places</a>
+<ul>
+<li><a href="remotes-repos-in-other-places.html#remote-and-branch-notation" id="toc-remote-and-branch-notation"><span class="toc-section-number">9.1</span> Remote and Branch Notation</a></li>
+<li><a href="remotes-repos-in-other-places.html#getting-a-list-of-remotes" id="toc-getting-a-list-of-remotes"><span class="toc-section-number">9.2</span> Getting a List of Remotes</a></li>
+<li><a href="remotes-repos-in-other-places.html#changing-a-remotes-url" id="toc-changing-a-remotes-url"><span class="toc-section-number">9.3</span> Changing a Remote’s URL</a></li>
+<li><a href="remotes-repos-in-other-places.html#adding-a-remote" id="toc-adding-a-remote"><span class="toc-section-number">9.4</span> Adding a Remote</a></li>
+</ul></li>
+<li><a href="remote-tracking-branch.html#remote-tracking-branch" id="toc-remote-tracking-branch"><span class="toc-section-number">10</span> Remote Tracking Branches</a>
+<ul>
+<li><a href="remote-tracking-branch.html#branches-on-remotes" id="toc-branches-on-remotes"><span class="toc-section-number">10.1</span> Branches on Remotes</a></li>
+<li><a href="remote-tracking-branch.html#listing-remote-tracking-branches" id="toc-listing-remote-tracking-branches"><span class="toc-section-number">10.2</span> Listing Remote Tracking Branches</a></li>
+<li><a href="remote-tracking-branch.html#pushing-to-a-remote" id="toc-pushing-to-a-remote"><span class="toc-section-number">10.3</span> Pushing to a Remote</a></li>
+<li><a href="remote-tracking-branch.html#making-a-branch-and-pushing-to-remote" id="toc-making-a-branch-and-pushing-to-remote"><span class="toc-section-number">10.4</span> Making a Branch and Pushing to Remote</a></li>
+<li><a href="remote-tracking-branch.html#deleting-remote-tracking-branches" id="toc-deleting-remote-tracking-branches"><span class="toc-section-number">10.5</span> Deleting Remote Tracking Branches</a>
+<ul>
+<li><a href="remote-tracking-branch.html#fetching-deleted-remote-branches" id="toc-fetching-deleted-remote-branches"><span class="toc-section-number">10.5.1</span> Fetching Deleted Remote Branches</a></li>
+<li><a href="remote-tracking-branch.html#deleting-your-remote-tracking-branch" id="toc-deleting-your-remote-tracking-branch"><span class="toc-section-number">10.5.2</span> Deleting Your Remote Tracking Branch</a></li>
+<li><a href="remote-tracking-branch.html#deleting-a-branch-on-a-remote" id="toc-deleting-a-branch-on-a-remote"><span class="toc-section-number">10.5.3</span> Deleting a Branch on a Remote</a></li>
+</ul></li>
+<li><a href="remote-tracking-branch.html#multiple-remotes" id="toc-multiple-remotes"><span class="toc-section-number">10.6</span> Multiple Remotes</a></li>
+</ul></li>
+<li><a href="file-states.html#file-states" id="toc-file-states"><span class="toc-section-number">11</span> File States</a>
+<ul>
+<li><a href="file-states.html#what-states-can-files-in-git-be-in" id="toc-what-states-can-files-in-git-be-in"><span class="toc-section-number">11.1</span> What States Can Files in Git Be In?</a></li>
+<li><a href="file-states.html#unmodified-to-untracked" id="toc-unmodified-to-untracked"><span class="toc-section-number">11.2</span> Unmodified to Untracked</a></li>
+<li><a href="file-states.html#files-in-multiple-states" id="toc-files-in-multiple-states"><span class="toc-section-number">11.3</span> Files In Multiple States</a></li>
+</ul></li>
+<li><a href="diff.html#diff" id="toc-diff"><span class="toc-section-number">12</span> Comparing Files with Diff</a>
+<ul>
+<li><a href="diff.html#basic-usage" id="toc-basic-usage"><span class="toc-section-number">12.1</span> Basic Usage</a></li>
+<li><a href="diff.html#diffing-the-stage" id="toc-diffing-the-stage"><span class="toc-section-number">12.2</span> Diffing the Stage</a></li>
+<li><a href="diff.html#more-diff-fun" id="toc-more-diff-fun"><span class="toc-section-number">12.3</span> More Diff Fun</a>
+<ul>
+<li><a href="diff.html#diff-any-commits-or-branches" id="toc-diff-any-commits-or-branches"><span class="toc-section-number">12.3.1</span> Diff Any Commits or Branches</a></li>
+<li><a href="diff.html#diffing-order" id="toc-diffing-order"><span class="toc-section-number">12.3.2</span> Diffing Order</a></li>
+<li><a href="diff.html#diffing-with-parent-commit" id="toc-diffing-with-parent-commit"><span class="toc-section-number">12.3.3</span> Diffing with Parent Commit</a></li>
+<li><a href="diff.html#more-context" id="toc-more-context"><span class="toc-section-number">12.3.4</span> More Context</a></li>
+<li><a href="diff.html#just-the-file-names" id="toc-just-the-file-names"><span class="toc-section-number">12.3.5</span> Just the File Names</a></li>
+<li><a href="diff.html#ignoring-whitespace" id="toc-ignoring-whitespace"><span class="toc-section-number">12.3.6</span> Ignoring Whitespace</a></li>
+<li><a href="diff.html#just-certain-files" id="toc-just-certain-files"><span class="toc-section-number">12.3.7</span> Just Certain Files</a></li>
+<li><a href="diff.html#inter-branch-diffs" id="toc-inter-branch-diffs"><span class="toc-section-number">12.3.8</span> Inter-branch Diffs</a></li>
+</ul></li>
+<li><a href="diff.html#difftool" id="toc-difftool"><span class="toc-section-number">12.4</span> Difftool</a></li>
+</ul></li>
+<li><a href="renaming-and-removing-files.html#renaming-and-removing-files" id="toc-renaming-and-removing-files"><span class="toc-section-number">13</span> Renaming and Removing Files</a>
+<ul>
+<li><a href="renaming-and-removing-files.html#renaming-files" id="toc-renaming-files"><span class="toc-section-number">13.1</span> Renaming Files</a></li>
+<li><a href="renaming-and-removing-files.html#unrenaming-files-from-the-stage" id="toc-unrenaming-files-from-the-stage"><span class="toc-section-number">13.2</span> Unrenaming Files from the Stage</a></li>
+<li><a href="renaming-and-removing-files.html#removing-files" id="toc-removing-files"><span class="toc-section-number">13.3</span> Removing Files</a></li>
+<li><a href="renaming-and-removing-files.html#unremoving-files-from-the-stage" id="toc-unremoving-files-from-the-stage"><span class="toc-section-number">13.4</span> Unremoving Files from the Stage</a></li>
+<li><a href="renaming-and-removing-files.html#unremoving-files-from-earlier-commits" id="toc-unremoving-files-from-earlier-commits"><span class="toc-section-number">13.5</span> Unremoving Files from Earlier Commits</a></li>
+<li><a href="renaming-and-removing-files.html#a-note-on-removing-secrets" id="toc-a-note-on-removing-secrets"><span class="toc-section-number">13.6</span> A Note on Removing Secrets</a></li>
+</ul></li>
+<li><a href="collaboration-across-branches.html#collaboration-across-branches" id="toc-collaboration-across-branches"><span class="toc-section-number">14</span> Collaboration across Branches</a>
+<ul>
+<li><a href="collaboration-across-branches.html#communication-and-delegation" id="toc-communication-and-delegation"><span class="toc-section-number">14.1</span> Communication and Delegation</a></li>
+<li><a href="collaboration-across-branches.html#approach-everyone-uses-one-branch" id="toc-approach-everyone-uses-one-branch"><span class="toc-section-number">14.2</span> Approach: Everyone Uses One Branch</a></li>
+<li><a href="collaboration-across-branches.html#approach-everyone-uses-their-own-branch" id="toc-approach-everyone-uses-their-own-branch"><span class="toc-section-number">14.3</span> Approach: Everyone Uses Their Own Branch</a></li>
+<li><a href="collaboration-across-branches.html#approach-everyone-merges-to-the-dev-branch" id="toc-approach-everyone-merges-to-the-dev-branch"><span class="toc-section-number">14.4</span> Approach: Everyone Merges to the Dev Branch</a></li>
+</ul></li>
+<li><a href="rebase.html#rebase" id="toc-rebase"><span class="toc-section-number">15</span> Rebasing: Moving Commits</a>
+<ul>
+<li><a href="rebase.html#contrasted-to-merging" id="toc-contrasted-to-merging"><span class="toc-section-number">15.1</span> Contrasted to Merging</a></li>
+<li><a href="rebase.html#how-it-works" id="toc-how-it-works"><span class="toc-section-number">15.2</span> How it Works</a></li>
+<li><a href="rebase.html#when-should-i-do-this" id="toc-when-should-i-do-this"><span class="toc-section-number">15.3</span> When Should I Do This?</a></li>
+<li><a href="rebase.html#pulling-and-rebasing" id="toc-pulling-and-rebasing"><span class="toc-section-number">15.4</span> Pulling and Rebasing</a></li>
+<li><a href="rebase.html#rebasing-conflicts" id="toc-rebasing-conflicts"><span class="toc-section-number">15.5</span> Conflicts</a></li>
+<li><a href="rebase.html#squashing-commits" id="toc-squashing-commits"><span class="toc-section-number">15.6</span> Squashing Commits</a>
+<ul>
+<li><a href="rebase.html#squash-versus-fixup" id="toc-squash-versus-fixup"><span class="toc-section-number">15.6.1</span> Squash versus Fixup</a></li>
+</ul></li>
+<li><a href="rebase.html#multiple-conflicts-in-the-rebase" id="toc-multiple-conflicts-in-the-rebase"><span class="toc-section-number">15.7</span> Multiple Conflicts in the Rebase</a></li>
+</ul></li>
+<li><a href="stash.html#stash" id="toc-stash"><span class="toc-section-number">16</span> Stashing: Temporarily Set Changes Aside</a>
+<ul>
+<li><a href="stash.html#example" id="toc-example"><span class="toc-section-number">16.1</span> Example</a></li>
+<li><a href="stash.html#the-stash-stack" id="toc-the-stash-stack"><span class="toc-section-number">16.2</span> The Stash Stack</a></li>
+<li><a href="stash.html#conflicts" id="toc-conflicts"><span class="toc-section-number">16.3</span> Conflicts</a></li>
+<li><a href="stash.html#stashing-new-files" id="toc-stashing-new-files"><span class="toc-section-number">16.4</span> Stashing New Files</a></li>
+</ul></li>
+<li><a href="github-forking-and-pull-requests.html#github-forking-and-pull-requests" id="toc-github-forking-and-pull-requests"><span class="toc-section-number">17</span> GitHub: Forking and Pull Requests</a>
+<ul>
+<li><a href="github-forking-and-pull-requests.html#making-a-fork" id="toc-making-a-fork"><span class="toc-section-number">17.1</span> Making a Fork</a></li>
+<li><a href="github-forking-and-pull-requests.html#making-your-changes" id="toc-making-your-changes"><span class="toc-section-number">17.2</span> Making Your Changes</a></li>
+<li><a href="github-forking-and-pull-requests.html#syncing-the-upstream-with-your-fork" id="toc-syncing-the-upstream-with-your-fork"><span class="toc-section-number">17.3</span> Syncing the Upstream with Your Fork</a></li>
+<li><a href="github-forking-and-pull-requests.html#making-a-pull-request" id="toc-making-a-pull-request"><span class="toc-section-number">17.4</span> Making a Pull Request</a></li>
+<li><a href="github-forking-and-pull-requests.html#flipside-merging-a-pull-request" id="toc-flipside-merging-a-pull-request"><span class="toc-section-number">17.5</span> Flipside: Merging a Pull Request</a></li>
+<li><a href="github-forking-and-pull-requests.html#making-many-pull-requests-with-branches" id="toc-making-many-pull-requests-with-branches"><span class="toc-section-number">17.6</span> Making Many Pull Requests with Branches</a></li>
+<li><a href="github-forking-and-pull-requests.html#deleting-a-pull-request" id="toc-deleting-a-pull-request"><span class="toc-section-number">17.7</span> Deleting a Pull Request</a></li>
+<li><a href="github-forking-and-pull-requests.html#sync-cl" id="toc-sync-cl"><span class="toc-section-number">17.8</span> Syncing on the Command Line</a></li>
+</ul></li>
+<li><a href="revert.html#revert" id="toc-revert"><span class="toc-section-number">18</span> Reverting: Undoing Commits</a>
+<ul>
+<li><a href="revert.html#performing-the-revert" id="toc-performing-the-revert"><span class="toc-section-number">18.1</span> Performing the Revert</a></li>
+<li><a href="revert.html#revert-conflicts" id="toc-revert-conflicts"><span class="toc-section-number">18.2</span> Revert Conflicts</a></li>
+<li><a href="revert.html#reverting-multiple-commits" id="toc-reverting-multiple-commits"><span class="toc-section-number">18.3</span> Reverting Multiple Commits</a></li>
+</ul></li>
+<li><a href="reset.html#reset" id="toc-reset"><span class="toc-section-number">19</span> Reset: Moving Branches Around</a>
+<ul>
+<li><a href="reset.html#soft-reset" id="toc-soft-reset"><span class="toc-section-number">19.1</span> Soft Reset</a></li>
+<li><a href="reset.html#mixed-reset" id="toc-mixed-reset"><span class="toc-section-number">19.2</span> Mixed Reset</a></li>
+<li><a href="reset.html#hard-reset" id="toc-hard-reset"><span class="toc-section-number">19.3</span> Hard Reset</a></li>
+<li><a href="reset.html#reset-to-a-divergent-branch" id="toc-reset-to-a-divergent-branch"><span class="toc-section-number">19.4</span> Reset to a Divergent Branch</a></li>
+<li><a href="reset.html#resetting-files" id="toc-resetting-files"><span class="toc-section-number">19.5</span> Resetting Files</a></li>
+<li><a href="reset.html#pushing-branch-changes-to-a-remote" id="toc-pushing-branch-changes-to-a-remote"><span class="toc-section-number">19.6</span> Pushing Branch Changes to a Remote</a>
+<ul>
+<li><a href="reset.html#forcing-the-push" id="toc-forcing-the-push"><span class="toc-section-number">19.6.1</span> Forcing the Push</a></li>
+<li><a href="reset.html#example-rewrite-public-history" id="toc-example-rewrite-public-history"><span class="toc-section-number">19.6.2</span> Example: Rewrite Public History</a></li>
+<li><a href="reset.html#example-receiving-rewritten-history" id="toc-example-receiving-rewritten-history"><span class="toc-section-number">19.6.3</span> Example: Receiving Rewritten History</a></li>
+</ul></li>
+<li><a href="reset.html#resetting-without-moving-head" id="toc-resetting-without-moving-head"><span class="toc-section-number">19.7</span> Resetting Without Moving <code>HEAD</code></a></li>
+<li><a href="reset.html#resetting-to-remove-credentials" id="toc-resetting-to-remove-credentials"><span class="toc-section-number">19.8</span> Resetting to Remove Credentials</a></li>
+</ul></li>
+<li><a href="the-reference-log-reflog.html#the-reference-log-reflog" id="toc-the-reference-log-reflog"><span class="toc-section-number">20</span> The Reference Log, “reflog”</a>
+<ul>
+<li><a href="the-reference-log-reflog.html#what-can-we-use-it-for" id="toc-what-can-we-use-it-for"><span class="toc-section-number">20.1</span> What Can We Use It For?</a></li>
+<li><a href="the-reference-log-reflog.html#looking-back-at-an-orphan-commit" id="toc-looking-back-at-an-orphan-commit"><span class="toc-section-number">20.2</span> Looking Back at an Orphan Commit</a></li>
+<li><a href="the-reference-log-reflog.html#reflog-selectors" id="toc-reflog-selectors"><span class="toc-section-number">20.3</span> Reflog Selectors</a></li>
+</ul></li>
+<li><a href="patch-mode-applying-partial-changes.html#patch-mode-applying-partial-changes" id="toc-patch-mode-applying-partial-changes"><span class="toc-section-number">21</span> Patch Mode: Applying Partial Changes</a>
+<ul>
+<li><a href="patch-mode-applying-partial-changes.html#adding-files-in-patch-mode" id="toc-adding-files-in-patch-mode"><span class="toc-section-number">21.1</span> Adding Files in Patch Mode</a></li>
+<li><a href="patch-mode-applying-partial-changes.html#resetting-files-in-patch-mode" id="toc-resetting-files-in-patch-mode"><span class="toc-section-number">21.2</span> Resetting Files in Patch Mode</a></li>
+<li><a href="patch-mode-applying-partial-changes.html#other-patch-mode-commands" id="toc-other-patch-mode-commands"><span class="toc-section-number">21.3</span> Other Patch Mode Commands</a></li>
+</ul></li>
+<li><a href="cherry-pick-bringing-in-specific-commits.html#cherry-pick-bringing-in-specific-commits" id="toc-cherry-pick-bringing-in-specific-commits"><span class="toc-section-number">22</span> Cherry-Pick: Bringing in Specific Commits</a>
+<ul>
+<li><a href="cherry-pick-bringing-in-specific-commits.html#cherry-pick-example" id="toc-cherry-pick-example"><span class="toc-section-number">22.1</span> Cherry-Pick Example</a></li>
+<li><a href="cherry-pick-bringing-in-specific-commits.html#cherry-pick-conflicts" id="toc-cherry-pick-conflicts"><span class="toc-section-number">22.2</span> Cherry-Pick Conflicts</a></li>
+</ul></li>
+<li><a href="whos-to-blame-for-this-code.html#whos-to-blame-for-this-code" id="toc-whos-to-blame-for-this-code"><span class="toc-section-number">23</span> Who’s to Blame for this Code?</a>
+<ul>
+<li><a href="whos-to-blame-for-this-code.html#fancier-blaming" id="toc-fancier-blaming"><span class="toc-section-number">23.1</span> Fancier Blaming</a></li>
+</ul></li>
+<li><a href="configuration.html#configuration" id="toc-configuration"><span class="toc-section-number">24</span> Configuration</a>
+<ul>
+<li><a href="configuration.html#local-configuration" id="toc-local-configuration"><span class="toc-section-number">24.1</span> Local Configuration</a></li>
+<li><a href="configuration.html#listing-the-current-config" id="toc-listing-the-current-config"><span class="toc-section-number">24.2</span> Listing the Current Config</a></li>
+<li><a href="configuration.html#getting-setting-and-deleting-variables" id="toc-getting-setting-and-deleting-variables"><span class="toc-section-number">24.3</span> Getting, Setting, and Deleting Variables</a></li>
+<li><a href="configuration.html#some-popular-variables" id="toc-some-popular-variables"><span class="toc-section-number">24.4</span> Some Popular Variables</a></li>
+<li><a href="configuration.html#editing-the-config-directly" id="toc-editing-the-config-directly"><span class="toc-section-number">24.5</span> Editing the Config Directly</a></li>
+<li><a href="configuration.html#conditional-configuration" id="toc-conditional-configuration"><span class="toc-section-number">24.6</span> Conditional Configuration</a></li>
+<li><a href="configuration.html#config-old" id="toc-config-old"><span class="toc-section-number">24.7</span> Older Git Versions</a></li>
+</ul></li>
+<li><a href="git-aliases.html#git-aliases" id="toc-git-aliases"><span class="toc-section-number">25</span> Git Aliases</a>
+<ul>
+<li><a href="git-aliases.html#creating-an-alias" id="toc-creating-an-alias"><span class="toc-section-number">25.1</span> Creating an Alias</a></li>
+<li><a href="git-aliases.html#displaying-aliases" id="toc-displaying-aliases"><span class="toc-section-number">25.2</span> Displaying Aliases</a></li>
+<li><a href="git-aliases.html#some-neat-sample-aliases" id="toc-some-neat-sample-aliases"><span class="toc-section-number">25.3</span> Some Neat Sample Aliases</a></li>
+<li><a href="git-aliases.html#seeing-gits-alias-expansion" id="toc-seeing-gits-alias-expansion"><span class="toc-section-number">25.4</span> Seeing Git’s Alias Expansion</a></li>
+</ul></li>
+<li><a href="changing-identity.html#changing-identity" id="toc-changing-identity"><span class="toc-section-number">26</span> Changing Identity</a>
+<ul>
+<li><a href="changing-identity.html#changing-the-user-configuration-variables" id="toc-changing-the-user-configuration-variables"><span class="toc-section-number">26.1</span> Changing the User Configuration Variables</a></li>
+<li><a href="changing-identity.html#changing-the-ssh-authentication-key" id="toc-changing-the-ssh-authentication-key"><span class="toc-section-number">26.2</span> Changing the SSH Authentication Key</a></li>
+<li><a href="changing-identity.html#gpg-signing" id="toc-gpg-signing"><span class="toc-section-number">26.3</span> Changing your GPG Signing Key</a></li>
+<li><a href="changing-identity.html#changing-your-ssh-signing-key" id="toc-changing-your-ssh-signing-key"><span class="toc-section-number">26.4</span> Changing your SSH Signing Key</a></li>
+</ul></li>
+<li><a href="amend.html#amend" id="toc-amend"><span class="toc-section-number">27</span> Amending Commits</a>
+<ul>
+<li><a href="amend.html#amending-the-commit-message" id="toc-amending-the-commit-message"><span class="toc-section-number">27.1</span> Amending the Commit Message</a></li>
+<li><a href="amend.html#adding-some-files-to-the-commit" id="toc-adding-some-files-to-the-commit"><span class="toc-section-number">27.2</span> Adding some Files to the Commit</a></li>
+</ul></li>
+<li><a href="difftool-1.html#difftool-1" id="toc-difftool-1"><span class="toc-section-number">28</span> Difftool</a>
+<ul>
+<li><a href="difftool-1.html#configuring" id="toc-configuring"><span class="toc-section-number">28.1</span> Configuring</a></li>
+<li><a href="difftool-1.html#available-difftools" id="toc-available-difftools"><span class="toc-section-number">28.2</span> Available Difftools</a></li>
+</ul></li>
+<li><a href="mergetool.html#mergetool" id="toc-mergetool"><span class="toc-section-number">29</span> Mergetool</a>
+<ul>
+<li><a href="mergetool.html#merge-tool-operations" id="toc-merge-tool-operations"><span class="toc-section-number">29.1</span> Merge Tool Operations</a></li>
+<li><a href="mergetool.html#some-example-merge-tools" id="toc-some-example-merge-tools"><span class="toc-section-number">29.2</span> Some Example Merge Tools</a></li>
+<li><a href="mergetool.html#using-vimdiff-as-a-merge-tool" id="toc-using-vimdiff-as-a-merge-tool"><span class="toc-section-number">29.3</span> Using Vimdiff as a Merge Tool</a></li>
+<li><a href="mergetool.html#backing-up-the-originals" id="toc-backing-up-the-originals"><span class="toc-section-number">29.4</span> Backing up the Originals</a></li>
+</ul></li>
+<li><a href="submodules.html#submodules" id="toc-submodules"><span class="toc-section-number">30</span> Submodules</a>
+<ul>
+<li><a href="submodules.html#using-a-repo-with-submodules" id="toc-using-a-repo-with-submodules"><span class="toc-section-number">30.1</span> Using a Repo with Submodules</a></li>
+<li><a href="submodules.html#creating-a-submodule" id="toc-creating-a-submodule"><span class="toc-section-number">30.2</span> Creating a Submodule</a></li>
+<li><a href="submodules.html#set-submodule-commit" id="toc-set-submodule-commit"><span class="toc-section-number">30.3</span> Setting the Commit for the Submodule</a></li>
+<li><a href="submodules.html#getting-submodule-latest" id="toc-getting-submodule-latest"><span class="toc-section-number">30.4</span> Getting Submodule Latest</a></li>
+<li><a href="submodules.html#updating-the-actual-submodule-itself" id="toc-updating-the-actual-submodule-itself"><span class="toc-section-number">30.5</span> Updating the Actual Submodule Itself</a>
+<ul>
+<li><a href="submodules.html#modify-the-submodule-repo-elsewhere" id="toc-modify-the-submodule-repo-elsewhere"><span class="toc-section-number">30.5.1</span> Modify the Submodule Repo Elsewhere</a></li>
+<li><a href="submodules.html#modify-the-submodule-repo-in-the-submodule-directory" id="toc-modify-the-submodule-repo-in-the-submodule-directory"><span class="toc-section-number">30.5.2</span> Modify the Submodule Repo in the Submodule Directory</a></li>
+</ul></li>
+<li><a href="submodules.html#getting-the-submodule-status" id="toc-getting-the-submodule-status"><span class="toc-section-number">30.6</span> Getting the Submodule Status</a></li>
+<li><a href="submodules.html#some-behind-the-scenes" id="toc-some-behind-the-scenes"><span class="toc-section-number">30.7</span> Some Behind the Scenes</a></li>
+<li><a href="submodules.html#deleting-a-submodule" id="toc-deleting-a-submodule"><span class="toc-section-number">30.8</span> Deleting a Submodule</a></li>
+</ul></li>
+<li><a href="tags.html#tags" id="toc-tags"><span class="toc-section-number">31</span> Tags</a>
+<ul>
+<li><a href="tags.html#lightweight-tags" id="toc-lightweight-tags"><span class="toc-section-number">31.1</span> Lightweight Tags</a></li>
+<li><a href="tags.html#annotated-tags" id="toc-annotated-tags"><span class="toc-section-number">31.2</span> Annotated Tags</a></li>
+<li><a href="tags.html#pushing-tags" id="toc-pushing-tags"><span class="toc-section-number">31.3</span> Pushing Tags</a></li>
+<li><a href="tags.html#deleting-tags" id="toc-deleting-tags"><span class="toc-section-number">31.4</span> Deleting Tags</a></li>
+</ul></li>
+<li><a href="worktrees.html#worktrees" id="toc-worktrees"><span class="toc-section-number">32</span> Worktrees</a>
+<ul>
+<li><a href="worktrees.html#worktree-rules-and-regulations" id="toc-worktree-rules-and-regulations"><span class="toc-section-number">32.1</span> Worktree Rules and Regulations</a></li>
+<li><a href="worktrees.html#making-a-new-worktree" id="toc-making-a-new-worktree"><span class="toc-section-number">32.2</span> Making a New Worktree</a></li>
+<li><a href="worktrees.html#removing-a-worktree" id="toc-removing-a-worktree"><span class="toc-section-number">32.3</span> Removing a Worktree</a></li>
+<li><a href="worktrees.html#listing-worktrees" id="toc-listing-worktrees"><span class="toc-section-number">32.4</span> Listing Worktrees</a></li>
+<li><a href="worktrees.html#worktrees-and-detached-head" id="toc-worktrees-and-detached-head"><span class="toc-section-number">32.5</span> Worktrees and Detached <code>HEAD</code></a></li>
+</ul></li>
+<li><a href="making-playground.html#making-playground" id="toc-making-playground"><span class="toc-section-number">33</span> Appendix: Making a Playground</a>
+<ul>
+<li><a href="making-playground.html#cloning-bare-repos" id="toc-cloning-bare-repos"><span class="toc-section-number">33.1</span> Cloning Bare Repos</a></li>
+<li><a href="making-playground.html#automating-playground-builds" id="toc-automating-playground-builds"><span class="toc-section-number">33.2</span> Automating Playground Builds</a></li>
+</ul></li>
+<li><a href="editor-get-out.html#editor-get-out" id="toc-editor-get-out"><span class="toc-section-number">34</span> Appendix: Getting Out of Editors</a></li>
+<li><a href="appendix-errors-and-scary-messages.html#appendix-errors-and-scary-messages" id="toc-appendix-errors-and-scary-messages"><span class="toc-section-number">35</span> Appendix: Errors and Scary Messages</a>
+<ul>
+<li><a href="appendix-errors-and-scary-messages.html#detached-head" id="toc-detached-head"><span class="toc-section-number">35.1</span> Detached Head</a></li>
+<li><a href="appendix-errors-and-scary-messages.html#upstream-branch-name-doesnt-match-current" id="toc-upstream-branch-name-doesnt-match-current"><span class="toc-section-number">35.2</span> Upstream Branch Name Doesn’t Match Current</a></li>
+<li><a href="appendix-errors-and-scary-messages.html#current-branch-has-no-upstream-branch" id="toc-current-branch-has-no-upstream-branch"><span class="toc-section-number">35.3</span> Current Branch Has No Upstream Branch</a></li>
+</ul></li>
+<li><a href="vim-tutorial.html#vim-tutorial" id="toc-vim-tutorial"><span class="toc-section-number">36</span> Appendix: Just Enough Vim</a>
+<ul>
+<li><a href="vim-tutorial.html#launching-vim" id="toc-launching-vim"><span class="toc-section-number">36.1</span> Launching Vim</a></li>
+<li><a href="vim-tutorial.html#modal-editing" id="toc-modal-editing"><span class="toc-section-number">36.2</span> Modal Editing</a></li>
+<li><a href="vim-tutorial.html#going-between-modes" id="toc-going-between-modes"><span class="toc-section-number">36.3</span> Going Between Modes</a></li>
+<li><a href="vim-tutorial.html#moving-the-cursor" id="toc-moving-the-cursor"><span class="toc-section-number">36.4</span> Moving the Cursor</a></li>
+<li><a href="vim-tutorial.html#more-modes" id="toc-more-modes"><span class="toc-section-number">36.5</span> More Modes</a></li>
+<li><a href="vim-tutorial.html#command-line-mode" id="toc-command-line-mode"><span class="toc-section-number">36.6</span> Command Line Mode</a></li>
+<li><a href="vim-tutorial.html#exiting-vim" id="toc-exiting-vim"><span class="toc-section-number">36.7</span> Exiting Vim</a></li>
+<li><a href="vim-tutorial.html#learn-more" id="toc-learn-more"><span class="toc-section-number">36.8</span> Learn More</a></li>
+</ul></li>
+<li><a href="appendix-other-references.html#appendix-other-references" id="toc-appendix-other-references"><span class="toc-section-number">37</span> Appendix: Other References</a></li>
+<li><a href="quick-reference.html#quick-reference" id="toc-quick-reference"><span class="toc-section-number">38</span> Quick Reference</a>
+<ul>
+<li><a href="quick-reference.html#glossary" id="toc-glossary"><span class="toc-section-number">38.1</span> Glossary</a></li>
+<li><a href="quick-reference.html#file-states-1" id="toc-file-states-1"><span class="toc-section-number">38.2</span> File States</a></li>
+<li><a href="quick-reference.html#configuration-1" id="toc-configuration-1"><span class="toc-section-number">38.3</span> Configuration</a>
+<ul>
+<li><a href="quick-reference.html#set-identity" id="toc-set-identity"><span class="toc-section-number">38.3.1</span> Set identity</a></li>
+<li><a href="quick-reference.html#set-default-branch" id="toc-set-default-branch"><span class="toc-section-number">38.3.2</span> Set default branch</a></li>
+<li><a href="quick-reference.html#set-default-pull-behavior-to-merge-or-rebase" id="toc-set-default-pull-behavior-to-merge-or-rebase"><span class="toc-section-number">38.3.3</span> Set default pull behavior to merge or rebase</a></li>
+<li><a href="quick-reference.html#set-default-editor-difftool-and-mergetool" id="toc-set-default-editor-difftool-and-mergetool"><span class="toc-section-number">38.3.4</span> Set default editor, difftool, and mergetool</a></li>
+<li><a href="quick-reference.html#colorful-git-output" id="toc-colorful-git-output"><span class="toc-section-number">38.3.5</span> Colorful Git output</a></li>
+<li><a href="quick-reference.html#autocorrect" id="toc-autocorrect"><span class="toc-section-number">38.3.6</span> Autocorrect</a></li>
+<li><a href="quick-reference.html#newline-translation" id="toc-newline-translation"><span class="toc-section-number">38.3.7</span> Newline translation</a></li>
+<li><a href="quick-reference.html#aliases" id="toc-aliases"><span class="toc-section-number">38.3.8</span> Aliases</a></li>
+</ul></li>
+<li><a href="quick-reference.html#creating-and-cloning-repos" id="toc-creating-and-cloning-repos"><span class="toc-section-number">38.4</span> Creating and Cloning Repos</a></li>
+<li><a href="quick-reference.html#adding-renaming-deleting-committing" id="toc-adding-renaming-deleting-committing"><span class="toc-section-number">38.5</span> Adding, Renaming, Deleting, Committing</a></li>
+<li><a href="quick-reference.html#getting-status" id="toc-getting-status"><span class="toc-section-number">38.6</span> Getting Status</a></li>
+<li><a href="quick-reference.html#getting-a-diff" id="toc-getting-a-diff"><span class="toc-section-number">38.7</span> Getting a Diff</a></li>
+<li><a href="quick-reference.html#branches" id="toc-branches"><span class="toc-section-number">38.8</span> Branches</a></li>
+<li><a href="quick-reference.html#pulling-and-pushing-and-fetching" id="toc-pulling-and-pushing-and-fetching"><span class="toc-section-number">38.9</span> Pulling and Pushing, and Fetching</a></li>
+<li><a href="quick-reference.html#merging" id="toc-merging"><span class="toc-section-number">38.10</span> Merging</a></li>
+<li><a href="quick-reference.html#remotes" id="toc-remotes"><span class="toc-section-number">38.11</span> Remotes</a></li>
+<li><a href="quick-reference.html#ignoring-files" id="toc-ignoring-files"><span class="toc-section-number">38.12</span> Ignoring Files</a></li>
+<li><a href="quick-reference.html#rebasing" id="toc-rebasing"><span class="toc-section-number">38.13</span> Rebasing</a></li>
+<li><a href="quick-reference.html#stashing" id="toc-stashing"><span class="toc-section-number">38.14</span> Stashing</a></li>
+<li><a href="quick-reference.html#reverting" id="toc-reverting"><span class="toc-section-number">38.15</span> Reverting</a></li>
+<li><a href="quick-reference.html#resetting" id="toc-resetting"><span class="toc-section-number">38.16</span> Resetting</a></li>
+<li><a href="quick-reference.html#the-reflog" id="toc-the-reflog"><span class="toc-section-number">38.17</span> The Reflog</a></li>
+<li><a href="quick-reference.html#cherry-pick" id="toc-cherry-pick"><span class="toc-section-number">38.18</span> Cherry-pick</a></li>
+<li><a href="quick-reference.html#blame" id="toc-blame"><span class="toc-section-number">38.19</span> Blame</a></li>
+<li><a href="quick-reference.html#submodules-1" id="toc-submodules-1"><span class="toc-section-number">38.20</span> Submodules</a></li>
+<li><a href="quick-reference.html#tags-1" id="toc-tags-1"><span class="toc-section-number">38.21</span> Tags</a></li>
+<li><a href="quick-reference.html#worktrees-1" id="toc-worktrees-1"><span class="toc-section-number">38.22</span> Worktrees</a></li>
+</ul></li>
+</ul>
+</nav>
+<!-- BG_NEW_CHAPTER -->
+<hr><div style="text-align:center"><span style="visibility: hidden"><a href="" rel="prev">Prev</a> | </span><a href="index.html">Contents</a><span> | <a href="foreword.html" rel="next">Next</a></span></div></body>
+</html>

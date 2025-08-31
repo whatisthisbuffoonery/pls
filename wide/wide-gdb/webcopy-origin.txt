@@ -1,0 +1,28 @@
+Uri: https://beej.us/guide/bggdb/
+File Name: D:\sussy\beej.us\guide\bggdb\index.htm
+Content Type: text/html
+
+Uri: https://beej.us/guide/bggdb/88x31.png
+File Name: D:\sussy\beej.us\guide\bggdb\88x31.png
+Content Type: image/png
+
+Uri: https://beej.us/guide/bggdb/bg.css
+File Name: D:\sussy\beej.us\guide\bggdb\bg.css
+Content Type: text/css
+
+Uri: https://beej.us/guide/bggdb/coredump.png
+File Name: D:\sussy\beej.us\guide\bggdb\coredump.png
+Content Type: image/png
+
+Uri: https://beej.us/guide/bggdb/gdbwinss.png
+File Name: D:\sussy\beej.us\guide\bggdb\gdbwinss.png
+Content Type: image/png
+
+Uri: https://beej.us/guide/bggdb/hellotui.png
+File Name: D:\sussy\beej.us\guide\bggdb\hellotui.png
+Content Type: image/png
+
+Uri: https://beej.us/guide/favicon.gif
+File Name: D:\sussy\beej.us\guide\favicon.gif
+Content Type: image/gif
+

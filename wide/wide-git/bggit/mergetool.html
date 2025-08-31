@@ -1,0 +1,613 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <title>Beej's Guide to Git</title>
+  <style>
+    html {
+      color: #1a1a1a;
+      background-color: #fdfdfd;
+    }
+    body {
+      margin: 0 auto;
+      max-width: 36em;
+      padding-left: 50px;
+      padding-right: 50px;
+      padding-top: 50px;
+      padding-bottom: 50px;
+      hyphens: auto;
+      overflow-wrap: break-word;
+      text-rendering: optimizeLegibility;
+      font-kerning: normal;
+    }
+    @media (max-width: 600px) {
+      body {
+        font-size: 0.9em;
+        padding: 12px;
+      }
+      h1 {
+        font-size: 1.8em;
+      }
+    }
+    @media print {
+      html {
+        background-color: white;
+      }
+      body {
+        background-color: transparent;
+        color: black;
+        font-size: 12pt;
+      }
+      p, h2, h3 {
+        orphans: 3;
+        widows: 3;
+      }
+      h2, h3, h4 {
+        page-break-after: avoid;
+      }
+    }
+    p {
+      margin: 1em 0;
+    }
+    a {
+      color: #1a1a1a;
+    }
+    a:visited {
+      color: #1a1a1a;
+    }
+    img {
+      max-width: 100%;
+    }
+    svg {
+      height: auto;
+      max-width: 100%;
+    }
+    h1, h2, h3, h4, h5, h6 {
+      margin-top: 1.4em;
+    }
+    h5, h6 {
+      font-size: 1em;
+      font-style: italic;
+    }
+    h6 {
+      font-weight: normal;
+    }
+    ol, ul {
+      padding-left: 1.7em;
+      margin-top: 1em;
+    }
+    li > ol, li > ul {
+      margin-top: 0;
+    }
+    blockquote {
+      margin: 1em 0 1em 1.7em;
+      padding-left: 1em;
+      border-left: 2px solid #e6e6e6;
+      color: #606060;
+    }
+    code {
+      font-family: Menlo, Monaco, Consolas, 'Lucida Console', monospace;
+      font-size: 85%;
+      margin: 0;
+      hyphens: manual;
+    }
+    pre {
+      margin: 1em 0;
+      overflow: auto;
+    }
+    pre code {
+      padding: 0;
+      overflow: visible;
+      overflow-wrap: normal;
+    }
+    .sourceCode {
+     background-color: transparent;
+     overflow: visible;
+    }
+    hr {
+      background-color: #1a1a1a;
+      border: none;
+      height: 1px;
+      margin: 1em 0;
+    }
+    table {
+      margin: 1em 0;
+      border-collapse: collapse;
+      width: 100%;
+      overflow-x: auto;
+      display: block;
+      font-variant-numeric: lining-nums tabular-nums;
+    }
+    table caption {
+      margin-bottom: 0.75em;
+    }
+    tbody {
+      margin-top: 0.5em;
+      border-top: 1px solid #1a1a1a;
+      border-bottom: 1px solid #1a1a1a;
+    }
+    th {
+      border-top: 1px solid #1a1a1a;
+      padding: 0.25em 0.5em 0.25em 0.5em;
+    }
+    td {
+      padding: 0.125em 0.5em 0.25em 0.5em;
+    }
+    header {
+      margin-bottom: 4em;
+      text-align: center;
+    }
+    #TOC li {
+      list-style: none;
+    }
+    #TOC ul {
+      padding-left: 1.3em;
+    }
+    #TOC > ul {
+      padding-left: 0;
+    }
+    #TOC a:not(:hover) {
+      text-decoration: none;
+    }
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+    /* CSS for syntax highlighting */
+    html { -webkit-text-size-adjust: 100%; }
+    pre > code.sourceCode { white-space: pre; position: relative; }
+    pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+    pre > code.sourceCode > span:empty { height: 1.2em; }
+    .sourceCode { overflow: visible; }
+    code.sourceCode > span { color: inherit; text-decoration: inherit; }
+    div.sourceCode { margin: 1em 0; }
+    pre.sourceCode { margin: 0; }
+    @media screen {
+    div.sourceCode { overflow: auto; }
+    }
+    @media print {
+    pre > code.sourceCode { white-space: pre-wrap; }
+    pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+    }
+    pre.numberSource code
+      { counter-reset: source-line 0; }
+    pre.numberSource code > span
+      { position: relative; left: -4em; counter-increment: source-line; }
+    pre.numberSource code > span > a:first-child::before
+      { content: counter(source-line);
+        position: relative; left: -1em; text-align: right; vertical-align: baseline;
+        border: none; display: inline-block;
+        -webkit-touch-callout: none; -webkit-user-select: none;
+        -khtml-user-select: none; -moz-user-select: none;
+        -ms-user-select: none; user-select: none;
+        padding: 0 4px; width: 4em;
+        color: #aaaaaa;
+      }
+    pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+    div.sourceCode
+      {   }
+    @media screen {
+    pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+    }
+    code span.al { color: #ff0000; font-weight: bold; } /* Alert */
+    code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+    code span.at { color: #7d9029; } /* Attribute */
+    code span.bn { color: #40a070; } /* BaseN */
+    code span.bu { color: #008000; } /* BuiltIn */
+    code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+    code span.ch { color: #4070a0; } /* Char */
+    code span.cn { color: #880000; } /* Constant */
+    code span.co { color: #60a0b0; font-style: italic; } /* Comment */
+    code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+    code span.do { color: #ba2121; font-style: italic; } /* Documentation */
+    code span.dt { color: #902000; } /* DataType */
+    code span.dv { color: #40a070; } /* DecVal */
+    code span.er { color: #ff0000; font-weight: bold; } /* Error */
+    code span.ex { } /* Extension */
+    code span.fl { color: #40a070; } /* Float */
+    code span.fu { color: #06287e; } /* Function */
+    code span.im { color: #008000; font-weight: bold; } /* Import */
+    code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+    code span.kw { color: #007020; font-weight: bold; } /* Keyword */
+    code span.op { color: #666666; } /* Operator */
+    code span.ot { color: #007020; } /* Other */
+    code span.pp { color: #bc7a00; } /* Preprocessor */
+    code span.sc { color: #4070a0; } /* SpecialChar */
+    code span.ss { color: #bb6688; } /* SpecialString */
+    code span.st { color: #4070a0; } /* String */
+    code span.va { color: #19177c; } /* Variable */
+    code span.vs { color: #4070a0; } /* VerbatimString */
+    code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+  </style>
+  <!-- BG custom styling -->
+  <style type="text/css">
+  /* Fix for line numbers not visible */
+  pre.numberSource code > span {
+      left: -1em;
+  }
+  pre.numberSource {
+      margin-left: initial;
+  }
+
+  /* Put some space after the section numbers */
+  span.toc-section-number::after {
+      content: "\a0\a0\a0";  /* non-breaking whitespace */
+  }
+
+  /* Hide underlines on code number links */
+  pre > code.sourceCode > span > a:first-child::before {
+      text-decoration: none;
+  }
+
+  /* Color the source blocks */
+  div.sourceCode {
+      background-color: #f0f0f0;
+  }
+
+  /* Fix iOS big text rendering issue */
+  pre > code.sourceCode > span {
+      display: initial;
+  }
+
+
+  /* Color the inline code */
+  code:not(.sourceCode) {
+      background: #f0f0f0;
+      padding-left: 0.2em;
+      padding-right: 0.2em;
+      border-radius: 0.2em;
+  }
+
+  pre.sourceCode {
+      border: 1px solid #ccc;
+      padding: 0.5em;
+      border-radius: 0.2em;
+  }
+
+  /* Keep code tags from wrapping in tables */
+  tbody code {
+      white-space: nowrap;
+  }
+
+  /* Prevent hyphenation and hyphen breaks in code*/
+  code {
+      word-break: keep-all;
+  }
+
+  td {
+      vertical-align: top;
+  }
+
+  body {
+      font-size: 12pt;
+      max-width: 43em;
+      font-family: sans-serif;
+  }
+
+  html {
+      background: #f9f9f9;
+  }
+
+  figure > embed {
+      max-width: 100%;
+  }
+
+  figure {
+      text-align: center;
+      margin-top: 2em;
+      margin-bottom: 2em;
+  }
+
+  figcaption {
+      font-size: 0.9em;
+      font-style: italic;
+      margin-top: 0.6em;
+  }
+
+  body {
+      counter-reset: figure-counter-major;
+      counter-reset: figure-counter-minor;
+  }
+
+  figure {
+      counter-increment: figure-counter-minor;
+  }
+
+  figcaption::before {
+      content: "Figure " counter(figure-counter-major) "." counter(figure-counter-minor) ": ";
+  }
+
+  blockquote {
+      border-left: 2px solid #bbb;
+      color: #444;
+  }
+
+  /* Contents */
+
+  nav[role="doc-toc"] > ul > li {
+    font-weight: bold;
+    margin-top: 1.2em;
+  }
+
+  nav[role="doc-toc"] > ul > li:first {
+    font-weight: bold;
+    margin-top: initial;
+  }
+
+  nav[role="doc-toc"] > ul > li > ul {
+    font-weight: normal;
+    margin-top: 0.3em;
+  }
+
+  /*
+  In multipage, we need to reset the figure counter to the chapter
+  number. Luckily, this is in the <h1 data-number> attribute. Unluckily,
+  there is no way to get this in a general way.
+
+  This doesn't work:
+
+    h1[data-number] {
+      counter-set: figure-counter-major attr(data-number);
+    }
+
+  Nor this:
+
+    h1[data-number] {
+      --figure-counter-major-value: attr(data-number);
+      counter-set: figure-counter-major var(--figure-counter-major-value);
+    }
+
+  So, dumbly, we have a bunch of rules for all these sections, up to the
+  maximum possible section.
+
+  Here's a program to generate them:
+
+    for (let i = 1; i < 100; i++)
+        console.log(`h1[data-number="${i}"]{counter-set:figure-counter-major ${i};counter-reset:figure-counter-minor;}`);
+
+  Note to self: never write a book with more than 99 frickin' chapters.
+  */
+
+  h1[data-number="1"]{counter-set:figure-counter-major 1;counter-reset:figure-counter-minor;}
+  h1[data-number="2"]{counter-set:figure-counter-major 2;counter-reset:figure-counter-minor;}
+  h1[data-number="3"]{counter-set:figure-counter-major 3;counter-reset:figure-counter-minor;}
+  h1[data-number="4"]{counter-set:figure-counter-major 4;counter-reset:figure-counter-minor;}
+  h1[data-number="5"]{counter-set:figure-counter-major 5;counter-reset:figure-counter-minor;}
+  h1[data-number="6"]{counter-set:figure-counter-major 6;counter-reset:figure-counter-minor;}
+  h1[data-number="7"]{counter-set:figure-counter-major 7;counter-reset:figure-counter-minor;}
+  h1[data-number="8"]{counter-set:figure-counter-major 8;counter-reset:figure-counter-minor;}
+  h1[data-number="9"]{counter-set:figure-counter-major 9;counter-reset:figure-counter-minor;}
+  h1[data-number="10"]{counter-set:figure-counter-major 10;counter-reset:figure-counter-minor;}
+  h1[data-number="11"]{counter-set:figure-counter-major 11;counter-reset:figure-counter-minor;}
+  h1[data-number="12"]{counter-set:figure-counter-major 12;counter-reset:figure-counter-minor;}
+  h1[data-number="13"]{counter-set:figure-counter-major 13;counter-reset:figure-counter-minor;}
+  h1[data-number="14"]{counter-set:figure-counter-major 14;counter-reset:figure-counter-minor;}
+  h1[data-number="15"]{counter-set:figure-counter-major 15;counter-reset:figure-counter-minor;}
+  h1[data-number="16"]{counter-set:figure-counter-major 16;counter-reset:figure-counter-minor;}
+  h1[data-number="17"]{counter-set:figure-counter-major 17;counter-reset:figure-counter-minor;}
+  h1[data-number="18"]{counter-set:figure-counter-major 18;counter-reset:figure-counter-minor;}
+  h1[data-number="19"]{counter-set:figure-counter-major 19;counter-reset:figure-counter-minor;}
+  h1[data-number="20"]{counter-set:figure-counter-major 20;counter-reset:figure-counter-minor;}
+  h1[data-number="21"]{counter-set:figure-counter-major 21;counter-reset:figure-counter-minor;}
+  h1[data-number="22"]{counter-set:figure-counter-major 22;counter-reset:figure-counter-minor;}
+  h1[data-number="23"]{counter-set:figure-counter-major 23;counter-reset:figure-counter-minor;}
+  h1[data-number="24"]{counter-set:figure-counter-major 24;counter-reset:figure-counter-minor;}
+  h1[data-number="25"]{counter-set:figure-counter-major 25;counter-reset:figure-counter-minor;}
+  h1[data-number="26"]{counter-set:figure-counter-major 26;counter-reset:figure-counter-minor;}
+  h1[data-number="27"]{counter-set:figure-counter-major 27;counter-reset:figure-counter-minor;}
+  h1[data-number="28"]{counter-set:figure-counter-major 28;counter-reset:figure-counter-minor;}
+  h1[data-number="29"]{counter-set:figure-counter-major 29;counter-reset:figure-counter-minor;}
+  h1[data-number="30"]{counter-set:figure-counter-major 30;counter-reset:figure-counter-minor;}
+  h1[data-number="31"]{counter-set:figure-counter-major 31;counter-reset:figure-counter-minor;}
+  h1[data-number="32"]{counter-set:figure-counter-major 32;counter-reset:figure-counter-minor;}
+  h1[data-number="33"]{counter-set:figure-counter-major 33;counter-reset:figure-counter-minor;}
+  h1[data-number="34"]{counter-set:figure-counter-major 34;counter-reset:figure-counter-minor;}
+  h1[data-number="35"]{counter-set:figure-counter-major 35;counter-reset:figure-counter-minor;}
+  h1[data-number="36"]{counter-set:figure-counter-major 36;counter-reset:figure-counter-minor;}
+  h1[data-number="37"]{counter-set:figure-counter-major 37;counter-reset:figure-counter-minor;}
+  h1[data-number="38"]{counter-set:figure-counter-major 38;counter-reset:figure-counter-minor;}
+  h1[data-number="39"]{counter-set:figure-counter-major 39;counter-reset:figure-counter-minor;}
+  h1[data-number="40"]{counter-set:figure-counter-major 40;counter-reset:figure-counter-minor;}
+  h1[data-number="41"]{counter-set:figure-counter-major 41;counter-reset:figure-counter-minor;}
+  h1[data-number="42"]{counter-set:figure-counter-major 42;counter-reset:figure-counter-minor;}
+  h1[data-number="43"]{counter-set:figure-counter-major 43;counter-reset:figure-counter-minor;}
+  h1[data-number="44"]{counter-set:figure-counter-major 44;counter-reset:figure-counter-minor;}
+  h1[data-number="45"]{counter-set:figure-counter-major 45;counter-reset:figure-counter-minor;}
+  h1[data-number="46"]{counter-set:figure-counter-major 46;counter-reset:figure-counter-minor;}
+  h1[data-number="47"]{counter-set:figure-counter-major 47;counter-reset:figure-counter-minor;}
+  h1[data-number="48"]{counter-set:figure-counter-major 48;counter-reset:figure-counter-minor;}
+  h1[data-number="49"]{counter-set:figure-counter-major 49;counter-reset:figure-counter-minor;}
+  h1[data-number="50"]{counter-set:figure-counter-major 50;counter-reset:figure-counter-minor;}
+  h1[data-number="51"]{counter-set:figure-counter-major 51;counter-reset:figure-counter-minor;}
+  h1[data-number="52"]{counter-set:figure-counter-major 52;counter-reset:figure-counter-minor;}
+  h1[data-number="53"]{counter-set:figure-counter-major 53;counter-reset:figure-counter-minor;}
+  h1[data-number="54"]{counter-set:figure-counter-major 54;counter-reset:figure-counter-minor;}
+  h1[data-number="55"]{counter-set:figure-counter-major 55;counter-reset:figure-counter-minor;}
+  h1[data-number="56"]{counter-set:figure-counter-major 56;counter-reset:figure-counter-minor;}
+  h1[data-number="57"]{counter-set:figure-counter-major 57;counter-reset:figure-counter-minor;}
+  h1[data-number="58"]{counter-set:figure-counter-major 58;counter-reset:figure-counter-minor;}
+  h1[data-number="59"]{counter-set:figure-counter-major 59;counter-reset:figure-counter-minor;}
+  h1[data-number="60"]{counter-set:figure-counter-major 60;counter-reset:figure-counter-minor;}
+  h1[data-number="61"]{counter-set:figure-counter-major 61;counter-reset:figure-counter-minor;}
+  h1[data-number="62"]{counter-set:figure-counter-major 62;counter-reset:figure-counter-minor;}
+  h1[data-number="63"]{counter-set:figure-counter-major 63;counter-reset:figure-counter-minor;}
+  h1[data-number="64"]{counter-set:figure-counter-major 64;counter-reset:figure-counter-minor;}
+  h1[data-number="65"]{counter-set:figure-counter-major 65;counter-reset:figure-counter-minor;}
+  h1[data-number="66"]{counter-set:figure-counter-major 66;counter-reset:figure-counter-minor;}
+  h1[data-number="67"]{counter-set:figure-counter-major 67;counter-reset:figure-counter-minor;}
+  h1[data-number="68"]{counter-set:figure-counter-major 68;counter-reset:figure-counter-minor;}
+  h1[data-number="69"]{counter-set:figure-counter-major 69;counter-reset:figure-counter-minor;}
+  h1[data-number="70"]{counter-set:figure-counter-major 70;counter-reset:figure-counter-minor;}
+  h1[data-number="71"]{counter-set:figure-counter-major 71;counter-reset:figure-counter-minor;}
+  h1[data-number="72"]{counter-set:figure-counter-major 72;counter-reset:figure-counter-minor;}
+  h1[data-number="73"]{counter-set:figure-counter-major 73;counter-reset:figure-counter-minor;}
+  h1[data-number="74"]{counter-set:figure-counter-major 74;counter-reset:figure-counter-minor;}
+  h1[data-number="75"]{counter-set:figure-counter-major 75;counter-reset:figure-counter-minor;}
+  h1[data-number="76"]{counter-set:figure-counter-major 76;counter-reset:figure-counter-minor;}
+  h1[data-number="77"]{counter-set:figure-counter-major 77;counter-reset:figure-counter-minor;}
+  h1[data-number="78"]{counter-set:figure-counter-major 78;counter-reset:figure-counter-minor;}
+  h1[data-number="79"]{counter-set:figure-counter-major 79;counter-reset:figure-counter-minor;}
+  h1[data-number="80"]{counter-set:figure-counter-major 80;counter-reset:figure-counter-minor;}
+  h1[data-number="81"]{counter-set:figure-counter-major 81;counter-reset:figure-counter-minor;}
+  h1[data-number="82"]{counter-set:figure-counter-major 82;counter-reset:figure-counter-minor;}
+  h1[data-number="83"]{counter-set:figure-counter-major 83;counter-reset:figure-counter-minor;}
+  h1[data-number="84"]{counter-set:figure-counter-major 84;counter-reset:figure-counter-minor;}
+  h1[data-number="85"]{counter-set:figure-counter-major 85;counter-reset:figure-counter-minor;}
+  h1[data-number="86"]{counter-set:figure-counter-major 86;counter-reset:figure-counter-minor;}
+  h1[data-number="87"]{counter-set:figure-counter-major 87;counter-reset:figure-counter-minor;}
+  h1[data-number="88"]{counter-set:figure-counter-major 88;counter-reset:figure-counter-minor;}
+  h1[data-number="89"]{counter-set:figure-counter-major 89;counter-reset:figure-counter-minor;}
+  h1[data-number="90"]{counter-set:figure-counter-major 90;counter-reset:figure-counter-minor;}
+  h1[data-number="91"]{counter-set:figure-counter-major 91;counter-reset:figure-counter-minor;}
+  h1[data-number="92"]{counter-set:figure-counter-major 92;counter-reset:figure-counter-minor;}
+  h1[data-number="93"]{counter-set:figure-counter-major 93;counter-reset:figure-counter-minor;}
+  h1[data-number="94"]{counter-set:figure-counter-major 94;counter-reset:figure-counter-minor;}
+  h1[data-number="95"]{counter-set:figure-counter-major 95;counter-reset:figure-counter-minor;}
+  h1[data-number="96"]{counter-set:figure-counter-major 96;counter-reset:figure-counter-minor;}
+  h1[data-number="97"]{counter-set:figure-counter-major 97;counter-reset:figure-counter-minor;}
+  h1[data-number="98"]{counter-set:figure-counter-major 98;counter-reset:figure-counter-minor;}
+  h1[data-number="99"]{counter-set:figure-counter-major 99;counter-reset:figure-counter-minor;}
+
+
+  </style>
+  <!-- BG custom styling for the wide body variant -->
+  <!-- Gets appended after bg-css.html -->
+
+  <style type="text/css">
+  body {
+      max-width: inherit;
+  }
+  </style>
+</head>
+<body>
+<div style="text-align:center"><span><a href="difftool-1.html" rel="prev">Prev</a> | </span><a href="index.html">Contents</a><span> | <a href="submodules.html" rel="next">Next</a></span></div><hr>
+<h1 data-number="29" id="mergetool"><span class="header-section-number">29</span> Mergetool</h1>
+<p></p>
+<p>Do you hate all those <code>&gt;&gt;&gt;&gt;&gt;</code>, <code>=====</code>, and <code>&lt;&lt;&lt;&lt;&lt;</code> things that Git puts in your files during a merge conflict?</p>
+<p>If so, using a <em>merge tool</em> might be what you’re after. A merge tool will give you a graphical display showing your changes, the conflicting changes, and the desired result of the merge. And it shows it in an easy-to-digest form.</p>
+<blockquote>
+<p><strong>Personally, I dislike merge tools.</strong> That seems nuts, but let me explain a moment. When you’re in a merge conflict, the only thing you have to do is edit those files with the <code>=====</code> delimiters and make them <em>Right</em>, remember? You have to modify the file until it is correct, ripping out those delimiters as you go.</p>
+<p>It’s just you and the file, that’s it. No intermediaries messing with the contents. And when you’re done, what you have is your final answer.</p>
+<p>But merge tools are intermediaries by their very nature. And we must trust that we’re using them correctly to get the job done. And, for me, even after I’ve used them probably correctly, I still feel like I have to manually inspect the result to make sure it’s <em>Right</em>.</p>
+<p>The benefit I do see is that with a merge tool you typically get a side-by-side view of the changes, as opposed to the up-and-down view you effectively get when editing the conflicting file. This can make the merge tool easier to use when you have a number of big conflicting hunks in a file.</p>
+<p>But in real life, I never use one. Also in real life, <em>lots</em> of people use them.</p>
+</blockquote>
+<h2 data-number="29.1" id="merge-tool-operations"><span class="header-section-number">29.1</span> Merge Tool Operations</h2>
+<p>Merge tools operate on a file-by-file basis. So when you’re using one, you’re using it on a particular conflicting file.</p>
+<p>They all tend to show you at least three panels:</p>
+<ul>
+<li>Your conflicting changes</li>
+<li>Their conflicting changes</li>
+<li>The result file that is <em>Right</em></li>
+</ul>
+<p>And they all tend to have the same core operations:</p>
+<ul>
+<li><strong>Go to next conflict</strong>—all panels will move to the next conflict.</li>
+<li><strong>Go to previous conflict</strong></li>
+<li><strong>Choose yours</strong>—copy <em>your</em> conflicting changes into the final result, i.e. your changes are <em>Right</em>.</li>
+<li><strong>Choose theirs</strong>—copy <em>their</em> conflicting changes into the final result, i.e. your changes are <em>Right</em>.</li>
+</ul>
+<p>In terms of usage, here’s what we’re going to do, assuming that the merge tool starts you at the first conflict when it is launched:</p>
+<ol type="1">
+<li>Choose either “yours” or “theirs” to keep the <em>Right</em> changes.</li>
+<li>Go to the next conflict.</li>
+<li>Repeat from Step 1 until all conflicts are resolved.</li>
+</ol>
+<p>After you’ve gone through all the conflicts and chosen one or the other, make sure the final result is <em>Right</em> and then save/finish the result.</p>
+<p>The merge tool will have staged the result for you, ready to commit and finish the merge.</p>
+<h2 data-number="29.2" id="some-example-merge-tools"><span class="header-section-number">29.2</span> Some Example Merge Tools</h2>
+<p>There are a lot of them, and I’ll include some links here in alphabetical order. Cross-platform unless otherwise noted.</p>
+<ul>
+<li><a href="https://www.araxis.com/merge/index.en">Araxis Merge</a><a href="quick-reference.html#fn56" class="footnote-ref" id="fnref56" role="doc-noteref"><sup>56</sup></a>—Windows, Mac</li>
+<li><a href="https://www.scootersoftware.com/">Beyond Compare</a><a href="quick-reference.html#fn57" class="footnote-ref" id="fnref57" role="doc-noteref"><sup>57</sup></a></li>
+<li><a href="https://www.devart.com/codecompare/">Code Compare</a><a href="quick-reference.html#fn58" class="footnote-ref" id="fnref58" role="doc-noteref"><sup>58</sup></a>—Windows</li>
+<li><a href="https://invent.kde.org/sdk/kdiff3">KDiff3</a><a href="quick-reference.html#fn59" class="footnote-ref" id="fnref59" role="doc-noteref"><sup>59</sup></a></li>
+<li><a href="https://meldmerge.org/">Meld</a><a href="quick-reference.html#fn60" class="footnote-ref" id="fnref60" role="doc-noteref"><sup>60</sup></a></li>
+<li><a href="https://www.perforce.com/products/helix-core-apps/merge-diff-tool-p4merge">P4Merge</a><a href="quick-reference.html#fn61" class="footnote-ref" id="fnref61" role="doc-noteref"><sup>61</sup></a></li>
+<li><a href="https://www.vim.org/">Vimdiff</a><a href="quick-reference.html#fn62" class="footnote-ref" id="fnref62" role="doc-noteref"><sup>62</sup></a></li>
+<li><a href="https://winmerge.org/">WinMerge</a><a href="quick-reference.html#fn63" class="footnote-ref" id="fnref63" role="doc-noteref"><sup>63</sup></a>—Windows</li>
+</ul>
+<p>In addition, IDEs like VS Code and IntelliJ often have their own built-in merge tools that work independent of Git (no need to configure anything in Git).</p>
+<h2 data-number="29.3" id="using-vimdiff-as-a-merge-tool"><span class="header-section-number">29.3</span> Using Vimdiff as a Merge Tool</h2>
+<p></p>
+<p>We’ll do a quick run-through of using Vimdiff as a merge tool since it covers all the bases and has some tricky configuration. Other third-party tools (except VS Code and other IDEs with this functionality built-in) would have a similar configuration. Search the Internet for the proper config for other tools.</p>
+<blockquote>
+<p><strong>This isn’t a Vim tutorial.</strong> So I’m just going to assume you know how to do things like save files and quit. I will say that to switch windows in Vim you use <code>CTRL-W</code> followed by a cursor direction, such as <code>CTRL-W</code> followed by <code>h</code> to move to the window to the left.</p>
+</blockquote>
+<p>First things first, let’s set up the configuration.</p>
+<div class="sourceCode" id="cb336"><pre class="sourceCode default"><code class="sourceCode default"><span id="cb336-1"><a href="mergetool.html#cb336-1" aria-hidden="true" tabindex="-1"></a>$ git config --global set merge.tool vimdiff</span>
+<span id="cb336-2"><a href="mergetool.html#cb336-2" aria-hidden="true" tabindex="-1"></a>$ git config --global set mergetool.vimdiff.cmd \</span>
+<span id="cb336-3"><a href="mergetool.html#cb336-3" aria-hidden="true" tabindex="-1"></a>                             &#39;vimdiff &quot;$LOCAL&quot; &quot;$REMOTE&quot; &quot;$MERGED&quot;&#39;</span>
+<span id="cb336-4"><a href="mergetool.html#cb336-4" aria-hidden="true" tabindex="-1"></a>$ git config --global set difftool.vimdiff.cmd \</span>
+<span id="cb336-5"><a href="mergetool.html#cb336-5" aria-hidden="true" tabindex="-1"></a>                             &#39;vimdiff &quot;$LOCAL&quot; &quot;$REMOTE&quot;&#39;</span></code></pre></div>
+<p>(Long commands split to fit in the book margins—it could be on a single line.)</p>
+<p>Note that last line is to explicitly set a two-panel view for <code>vimdiff</code> and <code>difftool</code>. If it’s not set, the <code>mergetool.vimdiff.cmd</code> directive will make <code>difftool</code> have a three-panel display—probably not what you wanted.</p>
+<p>Once that’s in place, let’s say we have a merge conflict.</p>
+<div class="sourceCode" id="cb337"><pre class="sourceCode default"><code class="sourceCode default"><span id="cb337-1"><a href="mergetool.html#cb337-1" aria-hidden="true" tabindex="-1"></a>$ git merge branch</span>
+<span id="cb337-2"><a href="mergetool.html#cb337-2" aria-hidden="true" tabindex="-1"></a>  Auto-merging foo.txt</span>
+<span id="cb337-3"><a href="mergetool.html#cb337-3" aria-hidden="true" tabindex="-1"></a>  CONFLICT (content): Merge conflict in foo.txt</span>
+<span id="cb337-4"><a href="mergetool.html#cb337-4" aria-hidden="true" tabindex="-1"></a>  Automatic merge failed; fix conflicts and then commit the result.</span></code></pre></div>
+<p>At this point, we’re in a classic run-of-the-mill merge conflict.</p>
+<div class="sourceCode" id="cb338"><pre class="sourceCode default"><code class="sourceCode default"><span id="cb338-1"><a href="mergetool.html#cb338-1" aria-hidden="true" tabindex="-1"></a>$ git status</span>
+<span id="cb338-2"><a href="mergetool.html#cb338-2" aria-hidden="true" tabindex="-1"></a>  On branch main</span>
+<span id="cb338-3"><a href="mergetool.html#cb338-3" aria-hidden="true" tabindex="-1"></a>  You have unmerged paths.</span>
+<span id="cb338-4"><a href="mergetool.html#cb338-4" aria-hidden="true" tabindex="-1"></a>    (fix conflicts and run &quot;git commit&quot;)</span>
+<span id="cb338-5"><a href="mergetool.html#cb338-5" aria-hidden="true" tabindex="-1"></a>    (use &quot;git merge --abort&quot; to abort the merge)</span>
+<span id="cb338-6"><a href="mergetool.html#cb338-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb338-7"><a href="mergetool.html#cb338-7" aria-hidden="true" tabindex="-1"></a>  Unmerged paths:</span>
+<span id="cb338-8"><a href="mergetool.html#cb338-8" aria-hidden="true" tabindex="-1"></a>    (use &quot;git add &lt;file&gt;...&quot; to mark resolution)</span>
+<span id="cb338-9"><a href="mergetool.html#cb338-9" aria-hidden="true" tabindex="-1"></a>      both modified:   foo.txt</span>
+<span id="cb338-10"><a href="mergetool.html#cb338-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb338-11"><a href="mergetool.html#cb338-11" aria-hidden="true" tabindex="-1"></a>  no changes added to commit (use &quot;git add&quot; and/or &quot;git commit -a&quot;)</span></code></pre></div>
+<p>But since we’ve set up our merge tool, let’s use it:</p>
+<div class="sourceCode" id="cb339"><pre class="sourceCode default"><code class="sourceCode default"><span id="cb339-1"><a href="mergetool.html#cb339-1" aria-hidden="true" tabindex="-1"></a>$ git mergetool</span></code></pre></div>
+<blockquote>
+<p><strong>If Git is prompting you to ask if you really want to run the merge tool</strong> (which you presumably do since you just ran <code>git mergetool</code>), you can turn off that “feature” with this config command:</p>
+<div class="sourceCode" id="cb340"><pre class="sourceCode default"><code class="sourceCode default"><span id="cb340-1"><a href="mergetool.html#cb340-1" aria-hidden="true" tabindex="-1"></a>$ git config --global set mergetool.prompt false</span></code></pre></div>
+</blockquote>
+<!-- ` -->
+<p>This is going to bring up a Vim window with three panels. The left is your local changes, the middle is the file as it exists in the repo, and the right is the result of the merge.</p>
+<p>The goal is to make the one on the right look <em>Right</em>. Now, you could just do that outright by modifying the file there, but at that point, why even use a merge tool?</p>
+<p>So we’ll follow the steps we outlined earlier.</p>
+<p>When we first run <code>git mergetool</code>, we get dropped at the first conflict with the cursor in the left window. The left window holds the changes we made.</p>
+<p>In the middle window, we’ll see the corresponding changes that are in the repo.</p>
+<p>And in the right repo, we see what will be staged when we’re done. Right now in the right window, we see all the <code>=====</code> and <code>&lt;&lt;&lt;&lt;&lt;</code> stuff. But we’ll change that in a moment.</p>
+<p><em>Move the cursor to the right window.</em> This is where the action will be.</p>
+<p>Make sure the cursor is on a highlighted section (which probably will be in multiple colors). This highlighted section is what we’ll replace.</p>
+<p>Let’s choose which change to use.</p>
+<p>If you want to keep your changes (and ditch the ones in the repo), use this Vim command:</p>
+<div class="sourceCode" id="cb341"><pre class="sourceCode default"><code class="sourceCode default"><span id="cb341-1"><a href="mergetool.html#cb341-1" aria-hidden="true" tabindex="-1"></a>:diffget LOCAL</span></code></pre></div>
+<p>If you want to discard your changes (and keep the ones in the repo), use this command:</p>
+<div class="sourceCode" id="cb342"><pre class="sourceCode default"><code class="sourceCode default"><span id="cb342-1"><a href="mergetool.html#cb342-1" aria-hidden="true" tabindex="-1"></a>:diffget REMOTE</span></code></pre></div>
+<p>When you run one of those, you’ll see the content in the right window change to what you wanted.</p>
+<p>And then you can go to the next conflict with <code>]c</code>. (or to the previous with <code>[c</code>.)</p>
+<p>Do this until the right window is <em>Right</em>. Note that you are also free to edit the right window directly all you want.</p>
+<p>When you’re done, save the right window and quit all the windows.</p>
+<p><strong>Importantly</strong> the second you exit the merge tool, Git will stage whatever you saved in the rightmost window. If you exited too soon and got stuff staged before you were done, use <code>git checkout --merge</code> with the file in question to get it off the stage and back to “both modified” state.</p>
+<p>If there are multiple conflicting files, Git will bring up the merge tool again to handle the next file in line.</p>
+<p>And when you’re done, the changes are made and you can finish the merge with a commit as per usual.</p>
+<p>But wait—what’s that <code>.orig</code> file that wasn’t there before? Read on!</p>
+<p></p>
+<h2 data-number="29.4" id="backing-up-the-originals"><span class="header-section-number">29.4</span> Backing up the Originals</h2>
+<p></p>
+<p>By default, when using a merge tool, Git will keep a backup of the file before the merge tool touched it. You’ll see these with a <code>.orig</code> extension, like so:</p>
+<div class="sourceCode" id="cb343"><pre class="sourceCode default"><code class="sourceCode default"><span id="cb343-1"><a href="mergetool.html#cb343-1" aria-hidden="true" tabindex="-1"></a>foo.txt.orig</span>
+<span id="cb343-2"><a href="mergetool.html#cb343-2" aria-hidden="true" tabindex="-1"></a>bar.txt.orig</span></code></pre></div>
+<p>You can add these to your <code>.gitignore</code> if you want to, or you can prevent the creation of them in the first place with this configuration variable:</p>
+<div class="sourceCode" id="cb344"><pre class="sourceCode default"><code class="sourceCode default"><span id="cb344-1"><a href="mergetool.html#cb344-1" aria-hidden="true" tabindex="-1"></a>$ git config --global set mergetool.keepBackup false</span></code></pre></div>
+<p></p>
+<!-- BG_NEW_CHAPTER -->
+<hr><div style="text-align:center"><span><a href="difftool-1.html" rel="prev">Prev</a> | </span><a href="index.html">Contents</a><span> | <a href="submodules.html" rel="next">Next</a></span></div></body>
+</html>

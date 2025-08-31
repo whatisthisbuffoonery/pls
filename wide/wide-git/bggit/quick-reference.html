@@ -1,0 +1,976 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <title>Beej's Guide to Git</title>
+  <style>
+    html {
+      color: #1a1a1a;
+      background-color: #fdfdfd;
+    }
+    body {
+      margin: 0 auto;
+      max-width: 36em;
+      padding-left: 50px;
+      padding-right: 50px;
+      padding-top: 50px;
+      padding-bottom: 50px;
+      hyphens: auto;
+      overflow-wrap: break-word;
+      text-rendering: optimizeLegibility;
+      font-kerning: normal;
+    }
+    @media (max-width: 600px) {
+      body {
+        font-size: 0.9em;
+        padding: 12px;
+      }
+      h1 {
+        font-size: 1.8em;
+      }
+    }
+    @media print {
+      html {
+        background-color: white;
+      }
+      body {
+        background-color: transparent;
+        color: black;
+        font-size: 12pt;
+      }
+      p, h2, h3 {
+        orphans: 3;
+        widows: 3;
+      }
+      h2, h3, h4 {
+        page-break-after: avoid;
+      }
+    }
+    p {
+      margin: 1em 0;
+    }
+    a {
+      color: #1a1a1a;
+    }
+    a:visited {
+      color: #1a1a1a;
+    }
+    img {
+      max-width: 100%;
+    }
+    svg {
+      height: auto;
+      max-width: 100%;
+    }
+    h1, h2, h3, h4, h5, h6 {
+      margin-top: 1.4em;
+    }
+    h5, h6 {
+      font-size: 1em;
+      font-style: italic;
+    }
+    h6 {
+      font-weight: normal;
+    }
+    ol, ul {
+      padding-left: 1.7em;
+      margin-top: 1em;
+    }
+    li > ol, li > ul {
+      margin-top: 0;
+    }
+    blockquote {
+      margin: 1em 0 1em 1.7em;
+      padding-left: 1em;
+      border-left: 2px solid #e6e6e6;
+      color: #606060;
+    }
+    code {
+      font-family: Menlo, Monaco, Consolas, 'Lucida Console', monospace;
+      font-size: 85%;
+      margin: 0;
+      hyphens: manual;
+    }
+    pre {
+      margin: 1em 0;
+      overflow: auto;
+    }
+    pre code {
+      padding: 0;
+      overflow: visible;
+      overflow-wrap: normal;
+    }
+    .sourceCode {
+     background-color: transparent;
+     overflow: visible;
+    }
+    hr {
+      background-color: #1a1a1a;
+      border: none;
+      height: 1px;
+      margin: 1em 0;
+    }
+    table {
+      margin: 1em 0;
+      border-collapse: collapse;
+      width: 100%;
+      overflow-x: auto;
+      display: block;
+      font-variant-numeric: lining-nums tabular-nums;
+    }
+    table caption {
+      margin-bottom: 0.75em;
+    }
+    tbody {
+      margin-top: 0.5em;
+      border-top: 1px solid #1a1a1a;
+      border-bottom: 1px solid #1a1a1a;
+    }
+    th {
+      border-top: 1px solid #1a1a1a;
+      padding: 0.25em 0.5em 0.25em 0.5em;
+    }
+    td {
+      padding: 0.125em 0.5em 0.25em 0.5em;
+    }
+    header {
+      margin-bottom: 4em;
+      text-align: center;
+    }
+    #TOC li {
+      list-style: none;
+    }
+    #TOC ul {
+      padding-left: 1.3em;
+    }
+    #TOC > ul {
+      padding-left: 0;
+    }
+    #TOC a:not(:hover) {
+      text-decoration: none;
+    }
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+    /* CSS for syntax highlighting */
+    html { -webkit-text-size-adjust: 100%; }
+    pre > code.sourceCode { white-space: pre; position: relative; }
+    pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+    pre > code.sourceCode > span:empty { height: 1.2em; }
+    .sourceCode { overflow: visible; }
+    code.sourceCode > span { color: inherit; text-decoration: inherit; }
+    div.sourceCode { margin: 1em 0; }
+    pre.sourceCode { margin: 0; }
+    @media screen {
+    div.sourceCode { overflow: auto; }
+    }
+    @media print {
+    pre > code.sourceCode { white-space: pre-wrap; }
+    pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+    }
+    pre.numberSource code
+      { counter-reset: source-line 0; }
+    pre.numberSource code > span
+      { position: relative; left: -4em; counter-increment: source-line; }
+    pre.numberSource code > span > a:first-child::before
+      { content: counter(source-line);
+        position: relative; left: -1em; text-align: right; vertical-align: baseline;
+        border: none; display: inline-block;
+        -webkit-touch-callout: none; -webkit-user-select: none;
+        -khtml-user-select: none; -moz-user-select: none;
+        -ms-user-select: none; user-select: none;
+        padding: 0 4px; width: 4em;
+        color: #aaaaaa;
+      }
+    pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+    div.sourceCode
+      {   }
+    @media screen {
+    pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+    }
+    code span.al { color: #ff0000; font-weight: bold; } /* Alert */
+    code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+    code span.at { color: #7d9029; } /* Attribute */
+    code span.bn { color: #40a070; } /* BaseN */
+    code span.bu { color: #008000; } /* BuiltIn */
+    code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+    code span.ch { color: #4070a0; } /* Char */
+    code span.cn { color: #880000; } /* Constant */
+    code span.co { color: #60a0b0; font-style: italic; } /* Comment */
+    code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+    code span.do { color: #ba2121; font-style: italic; } /* Documentation */
+    code span.dt { color: #902000; } /* DataType */
+    code span.dv { color: #40a070; } /* DecVal */
+    code span.er { color: #ff0000; font-weight: bold; } /* Error */
+    code span.ex { } /* Extension */
+    code span.fl { color: #40a070; } /* Float */
+    code span.fu { color: #06287e; } /* Function */
+    code span.im { color: #008000; font-weight: bold; } /* Import */
+    code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+    code span.kw { color: #007020; font-weight: bold; } /* Keyword */
+    code span.op { color: #666666; } /* Operator */
+    code span.ot { color: #007020; } /* Other */
+    code span.pp { color: #bc7a00; } /* Preprocessor */
+    code span.sc { color: #4070a0; } /* SpecialChar */
+    code span.ss { color: #bb6688; } /* SpecialString */
+    code span.st { color: #4070a0; } /* String */
+    code span.va { color: #19177c; } /* Variable */
+    code span.vs { color: #4070a0; } /* VerbatimString */
+    code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+  </style>
+  <!-- BG custom styling -->
+  <style type="text/css">
+  /* Fix for line numbers not visible */
+  pre.numberSource code > span {
+      left: -1em;
+  }
+  pre.numberSource {
+      margin-left: initial;
+  }
+
+  /* Put some space after the section numbers */
+  span.toc-section-number::after {
+      content: "\a0\a0\a0";  /* non-breaking whitespace */
+  }
+
+  /* Hide underlines on code number links */
+  pre > code.sourceCode > span > a:first-child::before {
+      text-decoration: none;
+  }
+
+  /* Color the source blocks */
+  div.sourceCode {
+      background-color: #f0f0f0;
+  }
+
+  /* Fix iOS big text rendering issue */
+  pre > code.sourceCode > span {
+      display: initial;
+  }
+
+
+  /* Color the inline code */
+  code:not(.sourceCode) {
+      background: #f0f0f0;
+      padding-left: 0.2em;
+      padding-right: 0.2em;
+      border-radius: 0.2em;
+  }
+
+  pre.sourceCode {
+      border: 1px solid #ccc;
+      padding: 0.5em;
+      border-radius: 0.2em;
+  }
+
+  /* Keep code tags from wrapping in tables */
+  tbody code {
+      white-space: nowrap;
+  }
+
+  /* Prevent hyphenation and hyphen breaks in code*/
+  code {
+      word-break: keep-all;
+  }
+
+  td {
+      vertical-align: top;
+  }
+
+  body {
+      font-size: 12pt;
+      max-width: 43em;
+      font-family: sans-serif;
+  }
+
+  html {
+      background: #f9f9f9;
+  }
+
+  figure > embed {
+      max-width: 100%;
+  }
+
+  figure {
+      text-align: center;
+      margin-top: 2em;
+      margin-bottom: 2em;
+  }
+
+  figcaption {
+      font-size: 0.9em;
+      font-style: italic;
+      margin-top: 0.6em;
+  }
+
+  body {
+      counter-reset: figure-counter-major;
+      counter-reset: figure-counter-minor;
+  }
+
+  figure {
+      counter-increment: figure-counter-minor;
+  }
+
+  figcaption::before {
+      content: "Figure " counter(figure-counter-major) "." counter(figure-counter-minor) ": ";
+  }
+
+  blockquote {
+      border-left: 2px solid #bbb;
+      color: #444;
+  }
+
+  /* Contents */
+
+  nav[role="doc-toc"] > ul > li {
+    font-weight: bold;
+    margin-top: 1.2em;
+  }
+
+  nav[role="doc-toc"] > ul > li:first {
+    font-weight: bold;
+    margin-top: initial;
+  }
+
+  nav[role="doc-toc"] > ul > li > ul {
+    font-weight: normal;
+    margin-top: 0.3em;
+  }
+
+  /*
+  In multipage, we need to reset the figure counter to the chapter
+  number. Luckily, this is in the <h1 data-number> attribute. Unluckily,
+  there is no way to get this in a general way.
+
+  This doesn't work:
+
+    h1[data-number] {
+      counter-set: figure-counter-major attr(data-number);
+    }
+
+  Nor this:
+
+    h1[data-number] {
+      --figure-counter-major-value: attr(data-number);
+      counter-set: figure-counter-major var(--figure-counter-major-value);
+    }
+
+  So, dumbly, we have a bunch of rules for all these sections, up to the
+  maximum possible section.
+
+  Here's a program to generate them:
+
+    for (let i = 1; i < 100; i++)
+        console.log(`h1[data-number="${i}"]{counter-set:figure-counter-major ${i};counter-reset:figure-counter-minor;}`);
+
+  Note to self: never write a book with more than 99 frickin' chapters.
+  */
+
+  h1[data-number="1"]{counter-set:figure-counter-major 1;counter-reset:figure-counter-minor;}
+  h1[data-number="2"]{counter-set:figure-counter-major 2;counter-reset:figure-counter-minor;}
+  h1[data-number="3"]{counter-set:figure-counter-major 3;counter-reset:figure-counter-minor;}
+  h1[data-number="4"]{counter-set:figure-counter-major 4;counter-reset:figure-counter-minor;}
+  h1[data-number="5"]{counter-set:figure-counter-major 5;counter-reset:figure-counter-minor;}
+  h1[data-number="6"]{counter-set:figure-counter-major 6;counter-reset:figure-counter-minor;}
+  h1[data-number="7"]{counter-set:figure-counter-major 7;counter-reset:figure-counter-minor;}
+  h1[data-number="8"]{counter-set:figure-counter-major 8;counter-reset:figure-counter-minor;}
+  h1[data-number="9"]{counter-set:figure-counter-major 9;counter-reset:figure-counter-minor;}
+  h1[data-number="10"]{counter-set:figure-counter-major 10;counter-reset:figure-counter-minor;}
+  h1[data-number="11"]{counter-set:figure-counter-major 11;counter-reset:figure-counter-minor;}
+  h1[data-number="12"]{counter-set:figure-counter-major 12;counter-reset:figure-counter-minor;}
+  h1[data-number="13"]{counter-set:figure-counter-major 13;counter-reset:figure-counter-minor;}
+  h1[data-number="14"]{counter-set:figure-counter-major 14;counter-reset:figure-counter-minor;}
+  h1[data-number="15"]{counter-set:figure-counter-major 15;counter-reset:figure-counter-minor;}
+  h1[data-number="16"]{counter-set:figure-counter-major 16;counter-reset:figure-counter-minor;}
+  h1[data-number="17"]{counter-set:figure-counter-major 17;counter-reset:figure-counter-minor;}
+  h1[data-number="18"]{counter-set:figure-counter-major 18;counter-reset:figure-counter-minor;}
+  h1[data-number="19"]{counter-set:figure-counter-major 19;counter-reset:figure-counter-minor;}
+  h1[data-number="20"]{counter-set:figure-counter-major 20;counter-reset:figure-counter-minor;}
+  h1[data-number="21"]{counter-set:figure-counter-major 21;counter-reset:figure-counter-minor;}
+  h1[data-number="22"]{counter-set:figure-counter-major 22;counter-reset:figure-counter-minor;}
+  h1[data-number="23"]{counter-set:figure-counter-major 23;counter-reset:figure-counter-minor;}
+  h1[data-number="24"]{counter-set:figure-counter-major 24;counter-reset:figure-counter-minor;}
+  h1[data-number="25"]{counter-set:figure-counter-major 25;counter-reset:figure-counter-minor;}
+  h1[data-number="26"]{counter-set:figure-counter-major 26;counter-reset:figure-counter-minor;}
+  h1[data-number="27"]{counter-set:figure-counter-major 27;counter-reset:figure-counter-minor;}
+  h1[data-number="28"]{counter-set:figure-counter-major 28;counter-reset:figure-counter-minor;}
+  h1[data-number="29"]{counter-set:figure-counter-major 29;counter-reset:figure-counter-minor;}
+  h1[data-number="30"]{counter-set:figure-counter-major 30;counter-reset:figure-counter-minor;}
+  h1[data-number="31"]{counter-set:figure-counter-major 31;counter-reset:figure-counter-minor;}
+  h1[data-number="32"]{counter-set:figure-counter-major 32;counter-reset:figure-counter-minor;}
+  h1[data-number="33"]{counter-set:figure-counter-major 33;counter-reset:figure-counter-minor;}
+  h1[data-number="34"]{counter-set:figure-counter-major 34;counter-reset:figure-counter-minor;}
+  h1[data-number="35"]{counter-set:figure-counter-major 35;counter-reset:figure-counter-minor;}
+  h1[data-number="36"]{counter-set:figure-counter-major 36;counter-reset:figure-counter-minor;}
+  h1[data-number="37"]{counter-set:figure-counter-major 37;counter-reset:figure-counter-minor;}
+  h1[data-number="38"]{counter-set:figure-counter-major 38;counter-reset:figure-counter-minor;}
+  h1[data-number="39"]{counter-set:figure-counter-major 39;counter-reset:figure-counter-minor;}
+  h1[data-number="40"]{counter-set:figure-counter-major 40;counter-reset:figure-counter-minor;}
+  h1[data-number="41"]{counter-set:figure-counter-major 41;counter-reset:figure-counter-minor;}
+  h1[data-number="42"]{counter-set:figure-counter-major 42;counter-reset:figure-counter-minor;}
+  h1[data-number="43"]{counter-set:figure-counter-major 43;counter-reset:figure-counter-minor;}
+  h1[data-number="44"]{counter-set:figure-counter-major 44;counter-reset:figure-counter-minor;}
+  h1[data-number="45"]{counter-set:figure-counter-major 45;counter-reset:figure-counter-minor;}
+  h1[data-number="46"]{counter-set:figure-counter-major 46;counter-reset:figure-counter-minor;}
+  h1[data-number="47"]{counter-set:figure-counter-major 47;counter-reset:figure-counter-minor;}
+  h1[data-number="48"]{counter-set:figure-counter-major 48;counter-reset:figure-counter-minor;}
+  h1[data-number="49"]{counter-set:figure-counter-major 49;counter-reset:figure-counter-minor;}
+  h1[data-number="50"]{counter-set:figure-counter-major 50;counter-reset:figure-counter-minor;}
+  h1[data-number="51"]{counter-set:figure-counter-major 51;counter-reset:figure-counter-minor;}
+  h1[data-number="52"]{counter-set:figure-counter-major 52;counter-reset:figure-counter-minor;}
+  h1[data-number="53"]{counter-set:figure-counter-major 53;counter-reset:figure-counter-minor;}
+  h1[data-number="54"]{counter-set:figure-counter-major 54;counter-reset:figure-counter-minor;}
+  h1[data-number="55"]{counter-set:figure-counter-major 55;counter-reset:figure-counter-minor;}
+  h1[data-number="56"]{counter-set:figure-counter-major 56;counter-reset:figure-counter-minor;}
+  h1[data-number="57"]{counter-set:figure-counter-major 57;counter-reset:figure-counter-minor;}
+  h1[data-number="58"]{counter-set:figure-counter-major 58;counter-reset:figure-counter-minor;}
+  h1[data-number="59"]{counter-set:figure-counter-major 59;counter-reset:figure-counter-minor;}
+  h1[data-number="60"]{counter-set:figure-counter-major 60;counter-reset:figure-counter-minor;}
+  h1[data-number="61"]{counter-set:figure-counter-major 61;counter-reset:figure-counter-minor;}
+  h1[data-number="62"]{counter-set:figure-counter-major 62;counter-reset:figure-counter-minor;}
+  h1[data-number="63"]{counter-set:figure-counter-major 63;counter-reset:figure-counter-minor;}
+  h1[data-number="64"]{counter-set:figure-counter-major 64;counter-reset:figure-counter-minor;}
+  h1[data-number="65"]{counter-set:figure-counter-major 65;counter-reset:figure-counter-minor;}
+  h1[data-number="66"]{counter-set:figure-counter-major 66;counter-reset:figure-counter-minor;}
+  h1[data-number="67"]{counter-set:figure-counter-major 67;counter-reset:figure-counter-minor;}
+  h1[data-number="68"]{counter-set:figure-counter-major 68;counter-reset:figure-counter-minor;}
+  h1[data-number="69"]{counter-set:figure-counter-major 69;counter-reset:figure-counter-minor;}
+  h1[data-number="70"]{counter-set:figure-counter-major 70;counter-reset:figure-counter-minor;}
+  h1[data-number="71"]{counter-set:figure-counter-major 71;counter-reset:figure-counter-minor;}
+  h1[data-number="72"]{counter-set:figure-counter-major 72;counter-reset:figure-counter-minor;}
+  h1[data-number="73"]{counter-set:figure-counter-major 73;counter-reset:figure-counter-minor;}
+  h1[data-number="74"]{counter-set:figure-counter-major 74;counter-reset:figure-counter-minor;}
+  h1[data-number="75"]{counter-set:figure-counter-major 75;counter-reset:figure-counter-minor;}
+  h1[data-number="76"]{counter-set:figure-counter-major 76;counter-reset:figure-counter-minor;}
+  h1[data-number="77"]{counter-set:figure-counter-major 77;counter-reset:figure-counter-minor;}
+  h1[data-number="78"]{counter-set:figure-counter-major 78;counter-reset:figure-counter-minor;}
+  h1[data-number="79"]{counter-set:figure-counter-major 79;counter-reset:figure-counter-minor;}
+  h1[data-number="80"]{counter-set:figure-counter-major 80;counter-reset:figure-counter-minor;}
+  h1[data-number="81"]{counter-set:figure-counter-major 81;counter-reset:figure-counter-minor;}
+  h1[data-number="82"]{counter-set:figure-counter-major 82;counter-reset:figure-counter-minor;}
+  h1[data-number="83"]{counter-set:figure-counter-major 83;counter-reset:figure-counter-minor;}
+  h1[data-number="84"]{counter-set:figure-counter-major 84;counter-reset:figure-counter-minor;}
+  h1[data-number="85"]{counter-set:figure-counter-major 85;counter-reset:figure-counter-minor;}
+  h1[data-number="86"]{counter-set:figure-counter-major 86;counter-reset:figure-counter-minor;}
+  h1[data-number="87"]{counter-set:figure-counter-major 87;counter-reset:figure-counter-minor;}
+  h1[data-number="88"]{counter-set:figure-counter-major 88;counter-reset:figure-counter-minor;}
+  h1[data-number="89"]{counter-set:figure-counter-major 89;counter-reset:figure-counter-minor;}
+  h1[data-number="90"]{counter-set:figure-counter-major 90;counter-reset:figure-counter-minor;}
+  h1[data-number="91"]{counter-set:figure-counter-major 91;counter-reset:figure-counter-minor;}
+  h1[data-number="92"]{counter-set:figure-counter-major 92;counter-reset:figure-counter-minor;}
+  h1[data-number="93"]{counter-set:figure-counter-major 93;counter-reset:figure-counter-minor;}
+  h1[data-number="94"]{counter-set:figure-counter-major 94;counter-reset:figure-counter-minor;}
+  h1[data-number="95"]{counter-set:figure-counter-major 95;counter-reset:figure-counter-minor;}
+  h1[data-number="96"]{counter-set:figure-counter-major 96;counter-reset:figure-counter-minor;}
+  h1[data-number="97"]{counter-set:figure-counter-major 97;counter-reset:figure-counter-minor;}
+  h1[data-number="98"]{counter-set:figure-counter-major 98;counter-reset:figure-counter-minor;}
+  h1[data-number="99"]{counter-set:figure-counter-major 99;counter-reset:figure-counter-minor;}
+
+
+  </style>
+  <!-- BG custom styling for the wide body variant -->
+  <!-- Gets appended after bg-css.html -->
+
+  <style type="text/css">
+  body {
+      max-width: inherit;
+  }
+  </style>
+</head>
+<body>
+<div style="text-align:center"><span><a href="appendix-other-references.html" rel="prev">Prev</a> | </span><a href="index.html">Contents</a><span style="visibility: hidden"> | <a href="" rel="next">Next</a></span></div><hr>
+<h1 data-number="38" id="quick-reference"><span class="header-section-number">38</span> Quick Reference</h1>
+<p>Quickly look up commands based on what you want to do! Caveat: this list is grotesquely incomplete! See your man pages for more info!</p>
+<p>In this reference section we use the following substitutions:</p>
+<ul>
+<li><code>URL</code>: Some URL either SSH, HTTP, or even a local file, usually the URL you cloned from.</li>
+<li><code>FILE</code>: Path to file, e.g. <code>foo/bar.txt</code>, etc.</li>
+<li><code>DIR</code>: Path to directory, e.g. <code>foo/</code>, etc.</li>
+<li><code>PATH</code>: Path to directory or file</li>
+<li><code>BRANCH</code>: Some branch name, e.g. <code>main</code>, etc.</li>
+<li><code>REMOTE</code>: A remote name, e.g. <code>origin</code>, <code>upstream</code>, etc.</li>
+<li><code>HASH</code>: Some commit hash—you can get a commit hash from <code>git log</code> or <code>git reflog</code>.</li>
+<li><code>CMMT</code>: a commit hash, branch, etc. Anything that refers to a commit. Officially this is called a <em>tree-ish</em>, but that was more letters than I wanted to repeatedly type.</li>
+<li><code>VARIABLE</code>: a Git config variable name, usually words separated by periods.</li>
+<li><code>VALUE</code>: an arbitrary value for Git configs.</li>
+<li><code>TAG</code>: a tag name</li>
+</ul>
+<p>Also, don’t type the <code>$</code>—it’s the shell prompt. And everything after a <code>#</code> is a comment. A backslash <code>\</code> at the end of a line indicates that it continues on the next line.</p>
+<h2 data-number="38.1" id="glossary"><span class="header-section-number">38.1</span> Glossary</h2>
+<ul>
+<li><strong>Clone</strong>: a duplicate (or to duplicate) a remote repo, commonly for local use.</li>
+<li><strong>Commit</strong>: a snapshot of all the files in the repo at a point in time.</li>
+<li><strong>Fork</strong>: a GitHub construct to make a clone of someone else’s GitHub repo under your GitHub account.</li>
+<li><strong><code>HEAD</code></strong>: the commit that is currently checked out/switched to.</li>
+<li><strong>Index</strong>: another name for the <em>stage</em>.</li>
+<li><strong><code>main</code></strong>: a common the first branch created.</li>
+<li><strong><code>master</code></strong>: another common name for the first branch created.</li>
+<li><strong><code>origin</code></strong>: the default name for the remote from which this repo was cloned.</li>
+<li><strong>Pull request</strong>: a way to get changes you made in your fork of a repo back into the repo you forked from.</li>
+<li><strong>Remote</strong>: an alias for a URL to another repo. Usually an HTTP or SSH URL.</li>
+<li><strong>Stage</strong>: where you collect files to be bundled into a commit.</li>
+<li><strong><code>upstream</code></strong>: the conventional name of the remote that you forked from. Not set up automatically.</li>
+<li><strong>Working Tree</strong>: the collection of files you can see, which might have changes from the commit at <code>HEAD</code>.</li>
+<li><strong>WT</strong>: shorthand for working tree.</li>
+</ul>
+<h2 data-number="38.2" id="file-states-1"><span class="header-section-number">38.2</span> File States</h2>
+<ul>
+<li><strong>Untracked</strong> to:
+<ul>
+<li>Unmodified: <code>git add FILE</code></li>
+</ul></li>
+<li><strong>Unmodified</strong> to:
+<ul>
+<li>Modified: Edit with your editor and save</li>
+<li>Untracked/deleted: <code>git rm --cached FILE</code></li>
+</ul></li>
+<li><strong>Modified</strong> to:
+<ul>
+<li>Staged: <code>git add FILE</code></li>
+<li>Unmodified: <code>git restore FILE</code> (discards changes)</li>
+<li>Untracked/deleted: <code>git rm --cached FILE</code></li>
+</ul></li>
+<li><strong>Staged</strong>
+<ul>
+<li>Unmodified: <code>git commit FILE</code> (finalize commit)</li>
+<li>Modified: <code>git restore --staged FILE</code> (unstage)</li>
+<li>Both modified: <code>git checkout --merged FILE</code> (during merge)</li>
+</ul></li>
+</ul>
+<h2 data-number="38.3" id="configuration-1"><span class="header-section-number">38.3</span> Configuration</h2>
+<p></p>
+<p>For all <code>git config</code> commands, specify <code>--global</code> for a universal setting or leave it off to set the value just for this repo.</p>
+<div class="sourceCode" id="cb424"><pre class="sourceCode default"><code class="sourceCode default"><span id="cb424-1"><a href="quick-reference.html#cb424-1" aria-hidden="true" tabindex="-1"></a>$ git config set VARIABLE VALUE</span>
+<span id="cb424-2"><a href="quick-reference.html#cb424-2" aria-hidden="true" tabindex="-1"></a>$ git config get VARIABLE</span>
+<span id="cb424-3"><a href="quick-reference.html#cb424-3" aria-hidden="true" tabindex="-1"></a>$ git config list</span>
+<span id="cb424-4"><a href="quick-reference.html#cb424-4" aria-hidden="true" tabindex="-1"></a>$ git config unset VARIABLE</span>
+<span id="cb424-5"><a href="quick-reference.html#cb424-5" aria-hidden="true" tabindex="-1"></a>$ git config --edit</span></code></pre></div>
+<h3 data-number="38.3.1" id="set-identity"><span class="header-section-number">38.3.1</span> Set identity</h3>
+<p> Username and email:</p>
+<div class="sourceCode" id="cb425"><pre class="sourceCode default"><code class="sourceCode default"><span id="cb425-1"><a href="quick-reference.html#cb425-1" aria-hidden="true" tabindex="-1"></a>$ git config set --global user.name &quot;Your Name&quot;</span>
+<span id="cb425-2"><a href="quick-reference.html#cb425-2" aria-hidden="true" tabindex="-1"></a>$ git config set --global user.email &quot;your-email@example.com&quot;</span></code></pre></div>
+<p> SSH identity:</p>
+<div class="sourceCode" id="cb426"><pre class="sourceCode default"><code class="sourceCode default"><span id="cb426-1"><a href="quick-reference.html#cb426-1" aria-hidden="true" tabindex="-1"></a>$ git config set core.sshCommand \</span>
+<span id="cb426-2"><a href="quick-reference.html#cb426-2" aria-hidden="true" tabindex="-1"></a>    &quot;ssh -i ~/.ssh/id_alterego_ed25519 -F none&quot;</span></code></pre></div>
+<h3 data-number="38.3.2" id="set-default-branch"><span class="header-section-number">38.3.2</span> Set default branch</h3>
+<p></p>
+<p>This is the first branch created when you make a new repo.</p>
+<div class="sourceCode" id="cb427"><pre class="sourceCode default"><code class="sourceCode default"><span id="cb427-1"><a href="quick-reference.html#cb427-1" aria-hidden="true" tabindex="-1"></a>$ git config set --global init.defaultBranch BRANCH</span></code></pre></div>
+<p>Common names are <code>main</code>, <code>master</code>, <code>trunk</code>, and <code>development</code>. This guide uses <code>main</code>.</p>
+<h3 data-number="38.3.3" id="set-default-pull-behavior-to-merge-or-rebase"><span class="header-section-number">38.3.3</span> Set default pull behavior to merge or rebase</h3>
+<p></p>
+<div class="sourceCode" id="cb428"><pre class="sourceCode default"><code class="sourceCode default"><span id="cb428-1"><a href="quick-reference.html#cb428-1" aria-hidden="true" tabindex="-1"></a>$ git config set --global pull.rebase false   # Merge</span>
+<span id="cb428-2"><a href="quick-reference.html#cb428-2" aria-hidden="true" tabindex="-1"></a>$ git config set --global pull.rebase true    # Rebase</span></code></pre></div>
+<h3 data-number="38.3.4" id="set-default-editor-difftool-and-mergetool"><span class="header-section-number">38.3.4</span> Set default editor, difftool, and mergetool</h3>
+<p>Set the default editor to Vim, and the default mergetool and difftool to Vimdiff, turn off prompting for the tools, and turn off mergetool backups:</p>
+<p> </p>
+<div class="sourceCode" id="cb429"><pre class="sourceCode default"><code class="sourceCode default"><span id="cb429-1"><a href="quick-reference.html#cb429-1" aria-hidden="true" tabindex="-1"></a>$ git config set core.editor vim</span>
+<span id="cb429-2"><a href="quick-reference.html#cb429-2" aria-hidden="true" tabindex="-1"></a>$ git config set diff.tool vimdiff</span>
+<span id="cb429-3"><a href="quick-reference.html#cb429-3" aria-hidden="true" tabindex="-1"></a>$ git config set difftool.prompt false</span>
+<span id="cb429-4"><a href="quick-reference.html#cb429-4" aria-hidden="true" tabindex="-1"></a>$ git config set difftool.vimdiff.cmd &#39;vimdiff &quot;$LOCAL&quot; &quot;$REMOTE&quot;&#39;</span>
+<span id="cb429-5"><a href="quick-reference.html#cb429-5" aria-hidden="true" tabindex="-1"></a>$ git config set merge.tool=vimdiff</span>
+<span id="cb429-6"><a href="quick-reference.html#cb429-6" aria-hidden="true" tabindex="-1"></a>$ git config set mergetool.vimdiff.cmd \</span>
+<span id="cb429-7"><a href="quick-reference.html#cb429-7" aria-hidden="true" tabindex="-1"></a>                             &#39;vimdiff &quot;$LOCAL&quot; &quot;$REMOTE&quot; &quot;$MERGED&quot;&#39;</span>
+<span id="cb429-8"><a href="quick-reference.html#cb429-8" aria-hidden="true" tabindex="-1"></a>$ git config --global set mergetool.keepBackup false</span></code></pre></div>
+<h3 data-number="38.3.5" id="colorful-git-output"><span class="header-section-number">38.3.5</span> Colorful Git output</h3>
+<p></p>
+<div class="sourceCode" id="cb430"><pre class="sourceCode default"><code class="sourceCode default"><span id="cb430-1"><a href="quick-reference.html#cb430-1" aria-hidden="true" tabindex="-1"></a>$ git config set color.ui true   # Or false</span></code></pre></div>
+<h3 data-number="38.3.6" id="autocorrect"><span class="header-section-number">38.3.6</span> Autocorrect</h3>
+<p> Autocorrect will automatically run the command it thinks you meant. For example, if you <code>git poush</code>, it will assume you meant <code>git push</code>.</p>
+<div class="sourceCode" id="cb431"><pre class="sourceCode default"><code class="sourceCode default"><span id="cb431-1"><a href="quick-reference.html#cb431-1" aria-hidden="true" tabindex="-1"></a>$ git config set help.autocorrect 0   # Ask &quot;Did you mean...?&quot;</span>
+<span id="cb431-2"><a href="quick-reference.html#cb431-2" aria-hidden="true" tabindex="-1"></a>$ git config set help.autocorrect 7   # Wait 0.7 seconds before run</span>
+<span id="cb431-3"><a href="quick-reference.html#cb431-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb431-4"><a href="quick-reference.html#cb431-4" aria-hidden="true" tabindex="-1"></a>$ git config set help.autocorrect immediate  # Just guess and go</span>
+<span id="cb431-5"><a href="quick-reference.html#cb431-5" aria-hidden="true" tabindex="-1"></a>$ git config set help.autocorrect prompt     # Prompt then go</span>
+<span id="cb431-6"><a href="quick-reference.html#cb431-6" aria-hidden="true" tabindex="-1"></a>$ git config set help.autocorrect never      # Turn autocorrect off</span></code></pre></div>
+<h3 data-number="38.3.7" id="newline-translation"><span class="header-section-number">38.3.7</span> Newline translation</h3>
+<p>Handle automatic newline translation. Recommend set to true for Windows (not WSL) and false everywhere else.</p>
+<p></p>
+<div class="sourceCode" id="cb432"><pre class="sourceCode default"><code class="sourceCode default"><span id="cb432-1"><a href="quick-reference.html#cb432-1" aria-hidden="true" tabindex="-1"></a>$ git config set core.autocrlf true  # Windows (non-WSL)</span>
+<span id="cb432-2"><a href="quick-reference.html#cb432-2" aria-hidden="true" tabindex="-1"></a>$ git config set core.autocrlf false # WSL, Linux, Mac, C64, etc.</span></code></pre></div>
+<p>Obsolete commands for older versions:</p>
+<div class="sourceCode" id="cb433"><pre class="sourceCode default"><code class="sourceCode default"><span id="cb433-1"><a href="quick-reference.html#cb433-1" aria-hidden="true" tabindex="-1"></a>git config user.email                     # Get</span>
+<span id="cb433-2"><a href="quick-reference.html#cb433-2" aria-hidden="true" tabindex="-1"></a>git config user.email &quot;user@example.com&quot;  # Set</span>
+<span id="cb433-3"><a href="quick-reference.html#cb433-3" aria-hidden="true" tabindex="-1"></a>git config --unset user.email             # Delete</span>
+<span id="cb433-4"><a href="quick-reference.html#cb433-4" aria-hidden="true" tabindex="-1"></a>git config --list                         # List</span>
+<span id="cb433-5"><a href="quick-reference.html#cb433-5" aria-hidden="true" tabindex="-1"></a>git config --edit                         # Edit</span></code></pre></div>
+<h3 data-number="38.3.8" id="aliases"><span class="header-section-number">38.3.8</span> Aliases</h3>
+<p></p>
+<p>Setting aliases, some examples:</p>
+<div class="sourceCode" id="cb434"><pre class="sourceCode default"><code class="sourceCode default"><span id="cb434-1"><a href="quick-reference.html#cb434-1" aria-hidden="true" tabindex="-1"></a>$ git config set --global alias.logn &#39;log --name-only&#39;</span>
+<span id="cb434-2"><a href="quick-reference.html#cb434-2" aria-hidden="true" tabindex="-1"></a>$ git config set alias.aa &quot;add --all&quot;</span>
+<span id="cb434-3"><a href="quick-reference.html#cb434-3" aria-hidden="true" tabindex="-1"></a>$ git config set alias.logc &quot;log --oneline --graph --decorate&quot;</span>
+<span id="cb434-4"><a href="quick-reference.html#cb434-4" aria-hidden="true" tabindex="-1"></a>$ git config set alias.diffs &quot;diff --staged&quot;</span>
+<span id="cb434-5"><a href="quick-reference.html#cb434-5" aria-hidden="true" tabindex="-1"></a>$ git config set alias.lol &quot;log --graph&quot;\</span>
+<span id="cb434-6"><a href="quick-reference.html#cb434-6" aria-hidden="true" tabindex="-1"></a>&quot; --pretty=format:&#39;%Cred%h%Creset -%C(yellow)%d%Creset %s&quot;\</span>
+<span id="cb434-7"><a href="quick-reference.html#cb434-7" aria-hidden="true" tabindex="-1"></a>&quot; %Cgreen(%cr) %C(bold blue)&lt;%an&gt;%Creset&#39; --abbrev-commit&quot;</span></code></pre></div>
+<p>Getting aliases:</p>
+<div class="sourceCode" id="cb435"><pre class="sourceCode default"><code class="sourceCode default"><span id="cb435-1"><a href="quick-reference.html#cb435-1" aria-hidden="true" tabindex="-1"></a>$ git config get alias.logx</span>
+<span id="cb435-2"><a href="quick-reference.html#cb435-2" aria-hidden="true" tabindex="-1"></a>$ git config get --all --show-names --regexp &#39;^alias\.&#39;</span>
+<span id="cb435-3"><a href="quick-reference.html#cb435-3" aria-hidden="true" tabindex="-1"></a>$ git config set alias.aliases \</span>
+<span id="cb435-4"><a href="quick-reference.html#cb435-4" aria-hidden="true" tabindex="-1"></a>    &quot;config get --all --show-names --regexp &#39;^alias\.&#39;&quot;</span></code></pre></div>
+<p>Tracing an alias run:</p>
+<div class="sourceCode" id="cb436"><pre class="sourceCode default"><code class="sourceCode default"><span id="cb436-1"><a href="quick-reference.html#cb436-1" aria-hidden="true" tabindex="-1"></a>$ GIT_TRACE=1 git logx</span></code></pre></div>
+<p> </p>
+<h2 data-number="38.4" id="creating-and-cloning-repos"><span class="header-section-number">38.4</span> Creating and Cloning Repos</h2>
+<p></p>
+<div class="sourceCode" id="cb437"><pre class="sourceCode default"><code class="sourceCode default"><span id="cb437-1"><a href="quick-reference.html#cb437-1" aria-hidden="true" tabindex="-1"></a>$ git clone URL       # Clone a URL</span>
+<span id="cb437-2"><a href="quick-reference.html#cb437-2" aria-hidden="true" tabindex="-1"></a>$ git clone URL DIR   # Clone a URL to directory</span>
+<span id="cb437-3"><a href="quick-reference.html#cb437-3" aria-hidden="true" tabindex="-1"></a>$ git init DIR        # Init repo at directory</span>
+<span id="cb437-4"><a href="quick-reference.html#cb437-4" aria-hidden="true" tabindex="-1"></a>$ git init .          # Init repo in the current directory</span></code></pre></div>
+<h2 data-number="38.5" id="adding-renaming-deleting-committing"><span class="header-section-number">38.5</span> Adding, Renaming, Deleting, Committing</h2>
+<p> </p>
+<div class="sourceCode" id="cb438"><pre class="sourceCode default"><code class="sourceCode default"><span id="cb438-1"><a href="quick-reference.html#cb438-1" aria-hidden="true" tabindex="-1"></a>$ git add PATH             # Add PATH to the repo</span>
+<span id="cb438-2"><a href="quick-reference.html#cb438-2" aria-hidden="true" tabindex="-1"></a>$ git mv FILE1 FILE2       # Rename (&quot;Move&quot;) FILE1 to FILE2</span>
+<span id="cb438-3"><a href="quick-reference.html#cb438-3" aria-hidden="true" tabindex="-1"></a>$ git mv FILE2 FILE1       # Undo the above rename</span>
+<span id="cb438-4"><a href="quick-reference.html#cb438-4" aria-hidden="true" tabindex="-1"></a>$ git rm FILE              # Delete (&quot;Remove&quot;) FILE</span>
+<span id="cb438-5"><a href="quick-reference.html#cb438-5" aria-hidden="true" tabindex="-1"></a>$ git add -p FILE          # Add file in patch mode</span>
+<span id="cb438-6"><a href="quick-reference.html#cb438-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb438-7"><a href="quick-reference.html#cb438-7" aria-hidden="true" tabindex="-1"></a>$ git commit               # Commit files on stage</span>
+<span id="cb438-8"><a href="quick-reference.html#cb438-8" aria-hidden="true" tabindex="-1"></a>$ git commit -m &quot;message&quot;  # Commit with a message</span></code></pre></div>
+<p>Amending commits—don’t amend commits you have pushed unless you know what you’re getting into!</p>
+<p></p>
+<div class="sourceCode" id="cb439"><pre class="sourceCode default"><code class="sourceCode default"><span id="cb439-1"><a href="quick-reference.html#cb439-1" aria-hidden="true" tabindex="-1"></a>$ git commit --amend               # Amend last commit</span>
+<span id="cb439-2"><a href="quick-reference.html#cb439-2" aria-hidden="true" tabindex="-1"></a>$ git commit --amend -m &quot;message&quot;  # Amend with commit message</span>
+<span id="cb439-3"><a href="quick-reference.html#cb439-3" aria-hidden="true" tabindex="-1"></a>$ git commit --amend --no-edit     # Don&#39;t change commit message</span></code></pre></div>
+<p> To undelete a staged file, run these two commands in sequence:</p>
+<div class="sourceCode" id="cb440"><pre class="sourceCode default"><code class="sourceCode default"><span id="cb440-1"><a href="quick-reference.html#cb440-1" aria-hidden="true" tabindex="-1"></a>$ git restore --staged FILE</span>
+<span id="cb440-2"><a href="quick-reference.html#cb440-2" aria-hidden="true" tabindex="-1"></a>$ git restore FILE</span></code></pre></div>
+<p>To undelete a deleted file, you could manually recover it from an old commit, or revert the commit that deleted it.</p>
+<h2 data-number="38.6" id="getting-status"><span class="header-section-number">38.6</span> Getting Status</h2>
+<p> </p>
+<div class="sourceCode" id="cb441"><pre class="sourceCode default"><code class="sourceCode default"><span id="cb441-1"><a href="quick-reference.html#cb441-1" aria-hidden="true" tabindex="-1"></a>$ git status             # Show current file states</span>
+<span id="cb441-2"><a href="quick-reference.html#cb441-2" aria-hidden="true" tabindex="-1"></a>$ git log                # Show the commit logs</span>
+<span id="cb441-3"><a href="quick-reference.html#cb441-3" aria-hidden="true" tabindex="-1"></a>$ git log --name-only    # Also list changed files</span>
+<span id="cb441-4"><a href="quick-reference.html#cb441-4" aria-hidden="true" tabindex="-1"></a>$ git log CMMT           # Show log from a specific branch</span>
+<span id="cb441-5"><a href="quick-reference.html#cb441-5" aria-hidden="true" tabindex="-1"></a>$ git log CMMT1 CMMT2    # Show logs from multiple branches</span>
+<span id="cb441-6"><a href="quick-reference.html#cb441-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb441-7"><a href="quick-reference.html#cb441-7" aria-hidden="true" tabindex="-1"></a>$ git log CMMT1..CMMT2   # Show logs from CMMT2 since it</span>
+<span id="cb441-8"><a href="quick-reference.html#cb441-8" aria-hidden="true" tabindex="-1"></a>                         # diverged from CMMT1</span>
+<span id="cb441-9"><a href="quick-reference.html#cb441-9" aria-hidden="true" tabindex="-1"></a>$ git log CMMT1...CMMT2  # Show logs from CMMT1 and CMMT2</span>
+<span id="cb441-10"><a href="quick-reference.html#cb441-10" aria-hidden="true" tabindex="-1"></a>                         # since they diverged</span></code></pre></div>
+<h2 data-number="38.7" id="getting-a-diff"><span class="header-section-number">38.7</span> Getting a Diff</h2>
+<p></p>
+<div class="sourceCode" id="cb442"><pre class="sourceCode default"><code class="sourceCode default"><span id="cb442-1"><a href="quick-reference.html#cb442-1" aria-hidden="true" tabindex="-1"></a>$ git diff                # Diffs between working tree and stage</span>
+<span id="cb442-2"><a href="quick-reference.html#cb442-2" aria-hidden="true" tabindex="-1"></a>$ git diff HEAD^          # Diff from the previous commit to here</span>
+<span id="cb442-3"><a href="quick-reference.html#cb442-3" aria-hidden="true" tabindex="-1"></a>$ git diff HEAD^^         # Diff from the 2nd last commit to here</span>
+<span id="cb442-4"><a href="quick-reference.html#cb442-4" aria-hidden="true" tabindex="-1"></a>$ git diff HEAD~3 HEAD~2  # Diff from 3rd last to 2nd last commit</span>
+<span id="cb442-5"><a href="quick-reference.html#cb442-5" aria-hidden="true" tabindex="-1"></a>$ git diff CMMT           # Diff between CMMT and now</span>
+<span id="cb442-6"><a href="quick-reference.html#cb442-6" aria-hidden="true" tabindex="-1"></a>$ git diff CMMT1 CMMT2    # Diff between two commits (older first)</span>
+<span id="cb442-7"><a href="quick-reference.html#cb442-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb442-8"><a href="quick-reference.html#cb442-8" aria-hidden="true" tabindex="-1"></a>$ git diff CMMT1...CMMT2  # Diff between CMMT2 and the common</span>
+<span id="cb442-9"><a href="quick-reference.html#cb442-9" aria-hidden="true" tabindex="-1"></a>                          # ancestor of CMMT1 and CMMT2</span>
+<span id="cb442-10"><a href="quick-reference.html#cb442-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb442-11"><a href="quick-reference.html#cb442-11" aria-hidden="true" tabindex="-1"></a>$ git diff HEAD~3^!       # Diff between HEAD~3 and its parent</span>
+<span id="cb442-12"><a href="quick-reference.html#cb442-12" aria-hidden="true" tabindex="-1"></a>$ git diff -- FILE        # Run a diff just for a specific file</span>
+<span id="cb442-13"><a href="quick-reference.html#cb442-13" aria-hidden="true" tabindex="-1"></a>$ git diff HEAD^ -- FILE  # Run a diff just for a specific file</span>
+<span id="cb442-14"><a href="quick-reference.html#cb442-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb442-15"><a href="quick-reference.html#cb442-15" aria-hidden="true" tabindex="-1"></a>$ git diff -U5          # Show 5 lines of context</span>
+<span id="cb442-16"><a href="quick-reference.html#cb442-16" aria-hidden="true" tabindex="-1"></a>$ git diff -w           # Ignore whitespace</span>
+<span id="cb442-17"><a href="quick-reference.html#cb442-17" aria-hidden="true" tabindex="-1"></a>$ git diff --name-only  # Only show filenames of changed files</span>
+<span id="cb442-18"><a href="quick-reference.html#cb442-18" aria-hidden="true" tabindex="-1"></a>$ git diff --staged     # Diffs between stage and repo</span>
+<span id="cb442-19"><a href="quick-reference.html#cb442-19" aria-hidden="true" tabindex="-1"></a>$ git difftool          # Diffs using the configured difftool</span></code></pre></div>
+<p></p>
+<h2 data-number="38.8" id="branches"><span class="header-section-number">38.8</span> Branches</h2>
+<p>A local branch looks like <code>branchname</code>. A remote tracking branch looks like <code>remote/branchname</code>.</p>
+<p></p>
+<div class="sourceCode" id="cb443"><pre class="sourceCode default"><code class="sourceCode default"><span id="cb443-1"><a href="quick-reference.html#cb443-1" aria-hidden="true" tabindex="-1"></a>$ git switch BRANCH         # Switch to a branch</span>
+<span id="cb443-2"><a href="quick-reference.html#cb443-2" aria-hidden="true" tabindex="-1"></a>$ git switch --detach HASH  # Detach HEAD to a commit</span>
+<span id="cb443-3"><a href="quick-reference.html#cb443-3" aria-hidden="true" tabindex="-1"></a>$ git switch -              # Switch back to previous commit</span></code></pre></div>
+<div class="sourceCode" id="cb444"><pre class="sourceCode default"><code class="sourceCode default"><span id="cb444-1"><a href="quick-reference.html#cb444-1" aria-hidden="true" tabindex="-1"></a>$ git switch --detach HEAD^   # Switch to previous commit</span>
+<span id="cb444-2"><a href="quick-reference.html#cb444-2" aria-hidden="true" tabindex="-1"></a>$ git switch --detach HEAD^^  # Switch to 2 commit ago</span>
+<span id="cb444-3"><a href="quick-reference.html#cb444-3" aria-hidden="true" tabindex="-1"></a>$ git switch --detach HEAD~3  # Switch to 3 commits ago</span>
+<span id="cb444-4"><a href="quick-reference.html#cb444-4" aria-hidden="true" tabindex="-1"></a>$ git switch --detach HEAD~99 # Switch to 99 commits ago</span></code></pre></div>
+<div class="sourceCode" id="cb445"><pre class="sourceCode default"><code class="sourceCode default"><span id="cb445-1"><a href="quick-reference.html#cb445-1" aria-hidden="true" tabindex="-1"></a>$ git switch main   # Reattach HEAD to main</span></code></pre></div>
+<p></p>
+<div class="sourceCode" id="cb446"><pre class="sourceCode default"><code class="sourceCode default"><span id="cb446-1"><a href="quick-reference.html#cb446-1" aria-hidden="true" tabindex="-1"></a>$ git branch -v   # List all branches</span>
+<span id="cb446-2"><a href="quick-reference.html#cb446-2" aria-hidden="true" tabindex="-1"></a>$ git branch -va  # List all including remote tracking branches</span></code></pre></div>
+<div class="sourceCode" id="cb447"><pre class="sourceCode default"><code class="sourceCode default"><span id="cb447-1"><a href="quick-reference.html#cb447-1" aria-hidden="true" tabindex="-1"></a>$ git switch -c BRANCH        # Create and switch to BRANCH</span>
+<span id="cb447-2"><a href="quick-reference.html#cb447-2" aria-hidden="true" tabindex="-1"></a>$ git branch BRANCH           # Create BRANCH at HEAD</span>
+<span id="cb447-3"><a href="quick-reference.html#cb447-3" aria-hidden="true" tabindex="-1"></a>$ git branch BRANCH1 BRANCH2  # Create BRANCH1 at BRANCH2</span></code></pre></div>
+<p></p>
+<div class="sourceCode" id="cb448"><pre class="sourceCode default"><code class="sourceCode default"><span id="cb448-1"><a href="quick-reference.html#cb448-1" aria-hidden="true" tabindex="-1"></a>$ git branch -d BRANCH   # Delete fully merged branch</span>
+<span id="cb448-2"><a href="quick-reference.html#cb448-2" aria-hidden="true" tabindex="-1"></a>$ git branch -D BRANCH   # Force delete unmerged branch</span></code></pre></div>
+<p></p>
+<p>Obsolete style (use <code>switch</code> if you can):</p>
+<p></p>
+<div class="sourceCode" id="cb449"><pre class="sourceCode default"><code class="sourceCode default"><span id="cb449-1"><a href="quick-reference.html#cb449-1" aria-hidden="true" tabindex="-1"></a>$ git checkout CMMT      # Detach HEAD to a commit</span>
+<span id="cb449-2"><a href="quick-reference.html#cb449-2" aria-hidden="true" tabindex="-1"></a>$ git checkout HEAD^     # Detach HEAD to previous commit</span>
+<span id="cb449-3"><a href="quick-reference.html#cb449-3" aria-hidden="true" tabindex="-1"></a>$ git checkout HEAD~2    # Detach HEAD to second previous commit</span></code></pre></div>
+<h2 data-number="38.9" id="pulling-and-pushing-and-fetching"><span class="header-section-number">38.9</span> Pulling and Pushing, and Fetching</h2>
+<p></p>
+<div class="sourceCode" id="cb450"><pre class="sourceCode default"><code class="sourceCode default"><span id="cb450-1"><a href="quick-reference.html#cb450-1" aria-hidden="true" tabindex="-1"></a>$ git pull               # Pull from remote and merge or rebase</span>
+<span id="cb450-2"><a href="quick-reference.html#cb450-2" aria-hidden="true" tabindex="-1"></a>$ git pull --ff-only     # Only allow fast-forward merges</span>
+<span id="cb450-3"><a href="quick-reference.html#cb450-3" aria-hidden="true" tabindex="-1"></a>$ git pull --rebase      # Force a rebase on pull</span>
+<span id="cb450-4"><a href="quick-reference.html#cb450-4" aria-hidden="true" tabindex="-1"></a>$ git pull --no-rebase   # Force a merge on pull</span></code></pre></div>
+<p></p>
+<div class="sourceCode" id="cb451"><pre class="sourceCode default"><code class="sourceCode default"><span id="cb451-1"><a href="quick-reference.html#cb451-1" aria-hidden="true" tabindex="-1"></a>$ git push                     # Push this branch to its remote</span>
+<span id="cb451-2"><a href="quick-reference.html#cb451-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb451-3"><a href="quick-reference.html#cb451-3" aria-hidden="true" tabindex="-1"></a>$ git push REMOTE BRANCH       # Create remote tracking branch and</span>
+<span id="cb451-4"><a href="quick-reference.html#cb451-4" aria-hidden="true" tabindex="-1"></a>                               # push to remote</span>
+<span id="cb451-5"><a href="quick-reference.html#cb451-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb451-6"><a href="quick-reference.html#cb451-6" aria-hidden="true" tabindex="-1"></a>$ git push -u REMOTE BRANCH    # Create remote tracking branch and</span>
+<span id="cb451-7"><a href="quick-reference.html#cb451-7" aria-hidden="true" tabindex="-1"></a>                               # push to remote, and use subsequent</span>
+<span id="cb451-8"><a href="quick-reference.html#cb451-8" aria-hidden="true" tabindex="-1"></a>                               # `git push` commands for this local</span>
+<span id="cb451-9"><a href="quick-reference.html#cb451-9" aria-hidden="true" tabindex="-1"></a>                               # branch</span>
+<span id="cb451-10"><a href="quick-reference.html#cb451-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb451-11"><a href="quick-reference.html#cb451-11" aria-hidden="true" tabindex="-1"></a>$ git push -u origin branch99  # Example</span>
+<span id="cb451-12"><a href="quick-reference.html#cb451-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb451-13"><a href="quick-reference.html#cb451-13" aria-hidden="true" tabindex="-1"></a>$ git push --tags              # Push all tags to origin</span>
+<span id="cb451-14"><a href="quick-reference.html#cb451-14" aria-hidden="true" tabindex="-1"></a>$ git push REMOTE --tags       # Push all tags to specific remote</span>
+<span id="cb451-15"><a href="quick-reference.html#cb451-15" aria-hidden="true" tabindex="-1"></a>$ git push REMOTE tag3.14      # Push single tag</span></code></pre></div>
+<p></p>
+<div class="sourceCode" id="cb452"><pre class="sourceCode default"><code class="sourceCode default"><span id="cb452-1"><a href="quick-reference.html#cb452-1" aria-hidden="true" tabindex="-1"></a>$ git fetch        # Get data from remote but don&#39;t merge or rebase</span>
+<span id="cb452-2"><a href="quick-reference.html#cb452-2" aria-hidden="true" tabindex="-1"></a>$ git fetch REMOTE # Same, for a specific remote</span></code></pre></div>
+<h2 data-number="38.10" id="merging"><span class="header-section-number">38.10</span> Merging</h2>
+<p></p>
+<div class="sourceCode" id="cb453"><pre class="sourceCode default"><code class="sourceCode default"><span id="cb453-1"><a href="quick-reference.html#cb453-1" aria-hidden="true" tabindex="-1"></a>$ git merge CMMT     # Merge commit or branch into HEAD</span>
+<span id="cb453-2"><a href="quick-reference.html#cb453-2" aria-hidden="true" tabindex="-1"></a>$ git merge --abort  # Rollback the current merge</span>
+<span id="cb453-3"><a href="quick-reference.html#cb453-3" aria-hidden="true" tabindex="-1"></a>$ git mergetool      # Run mergetool to resolve a conflict</span>
+<span id="cb453-4"><a href="quick-reference.html#cb453-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb453-5"><a href="quick-reference.html#cb453-5" aria-hidden="true" tabindex="-1"></a>$ git checkout --merged FILE   # Unstage resolved files</span></code></pre></div>
+<p>In a conflict occurs, you can always <code>--abort</code>. Otherwise:</p>
+<ol type="1">
+<li>Fix the conflict.</li>
+<li>Add the fixed files.</li>
+<li>Commit to complete the merge.</li>
+</ol>
+<h2 data-number="38.11" id="remotes"><span class="header-section-number">38.11</span> Remotes</h2>
+<p></p>
+<div class="sourceCode" id="cb454"><pre class="sourceCode default"><code class="sourceCode default"><span id="cb454-1"><a href="quick-reference.html#cb454-1" aria-hidden="true" tabindex="-1"></a>$ git remote -v                       # List remotes</span>
+<span id="cb454-2"><a href="quick-reference.html#cb454-2" aria-hidden="true" tabindex="-1"></a>$ git remote set-url REMOTE URL       # Change remote&#39;s URL</span>
+<span id="cb454-3"><a href="quick-reference.html#cb454-3" aria-hidden="true" tabindex="-1"></a>$ git remote add REMOTE URL           # Add a new remote</span>
+<span id="cb454-4"><a href="quick-reference.html#cb454-4" aria-hidden="true" tabindex="-1"></a>$ git remote rename REMOTE1 REMOTE2   # Rename REMOTE1 to REMOTE2</span>
+<span id="cb454-5"><a href="quick-reference.html#cb454-5" aria-hidden="true" tabindex="-1"></a>$ git remote remove REMOTE            # Delete REMOTE</span></code></pre></div>
+<h2 data-number="38.12" id="ignoring-files"><span class="header-section-number">38.12</span> Ignoring Files</h2>
+<p></p>
+<p>Add a <code>.gitignore</code> file to your repo. It applies to this directory and all non-submodule subdirectories below it. Add descriptions of files to ignore to this file. Comments behind <code>#</code> are allowed. Blank lines are ignored.</p>
+<p>Example <code>.gitignore</code>:</p>
+<div class="sourceCode" id="cb455"><pre class="sourceCode default"><code class="sourceCode default"><span id="cb455-1"><a href="quick-reference.html#cb455-1" aria-hidden="true" tabindex="-1"></a>foo.aux     # Ignore specific file &quot;foo.aux&quot;</span>
+<span id="cb455-2"><a href="quick-reference.html#cb455-2" aria-hidden="true" tabindex="-1"></a>foo.*       # Ignore all files that start with &quot;foo.&quot;</span>
+<span id="cb455-3"><a href="quick-reference.html#cb455-3" aria-hidden="true" tabindex="-1"></a>*.tmp       # Ignore all files that end with &quot;.tmp&quot;</span>
+<span id="cb455-4"><a href="quick-reference.html#cb455-4" aria-hidden="true" tabindex="-1"></a>frotz/      # Ignore all files in the &quot;frotz&quot; directory</span>
+<span id="cb455-5"><a href="quick-reference.html#cb455-5" aria-hidden="true" tabindex="-1"></a>foo[12].txt # Ignore &quot;foo1.txt&quot; and &quot;foo2.txt&quot;</span>
+<span id="cb455-6"><a href="quick-reference.html#cb455-6" aria-hidden="true" tabindex="-1"></a>foo?        # Ignore &quot;foo&quot; followed by any single character</span>
+<span id="cb455-7"><a href="quick-reference.html#cb455-7" aria-hidden="true" tabindex="-1"></a>frotz/bar   # Ignore file &quot;bar&quot; in directory &quot;frotz&quot;</span>
+<span id="cb455-8"><a href="quick-reference.html#cb455-8" aria-hidden="true" tabindex="-1"></a>*           # Ignore everything</span></code></pre></div>
+<p>Exceptions to earlier rules, also useful in <code>.gitignore</code> files in subdirectories to override rules from parent directories:</p>
+<div class="sourceCode" id="cb456"><pre class="sourceCode default"><code class="sourceCode default"><span id="cb456-1"><a href="quick-reference.html#cb456-1" aria-hidden="true" tabindex="-1"></a>*.txt       # Ignore all text files</span>
+<span id="cb456-2"><a href="quick-reference.html#cb456-2" aria-hidden="true" tabindex="-1"></a>!keep.txt   # Except &quot;keep.txt&quot;</span></code></pre></div>
+<p></p>
+<h2 data-number="38.13" id="rebasing"><span class="header-section-number">38.13</span> Rebasing</h2>
+<p></p>
+<div class="sourceCode" id="cb457"><pre class="sourceCode default"><code class="sourceCode default"><span id="cb457-1"><a href="quick-reference.html#cb457-1" aria-hidden="true" tabindex="-1"></a>$ git rebase CMMT        # Rebase changes onto commit</span>
+<span id="cb457-2"><a href="quick-reference.html#cb457-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb457-3"><a href="quick-reference.html#cb457-3" aria-hidden="true" tabindex="-1"></a>$ git rebase -i CMMT     # Interactive rebase (squashing commits)</span>
+<span id="cb457-4"><a href="quick-reference.html#cb457-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb457-5"><a href="quick-reference.html#cb457-5" aria-hidden="true" tabindex="-1"></a>$ git rebase --continue  # Continue processing from conflict</span>
+<span id="cb457-6"><a href="quick-reference.html#cb457-6" aria-hidden="true" tabindex="-1"></a>$ git rebase --skip      # Skip a conflicting commit</span>
+<span id="cb457-7"><a href="quick-reference.html#cb457-7" aria-hidden="true" tabindex="-1"></a>$ git rebase --abort     # Bail out of rebasing</span></code></pre></div>
+<p></p>
+<pre><code>$ git pull --rebase      # Force a rebase on pull
+$ git pull --no-rebase   # Force a merge on pull</code></pre>
+<h2 data-number="38.14" id="stashing"><span class="header-section-number">38.14</span> Stashing</h2>
+<p>Stashes are stored on a stack.</p>
+<p></p>
+<div class="sourceCode" id="cb459"><pre class="sourceCode default"><code class="sourceCode default"><span id="cb459-1"><a href="quick-reference.html#cb459-1" aria-hidden="true" tabindex="-1"></a>$ git stash push    # Stash changed files</span>
+<span id="cb459-2"><a href="quick-reference.html#cb459-2" aria-hidden="true" tabindex="-1"></a>$ git stash         # Effectively the same as &quot;push&quot;</span>
+<span id="cb459-3"><a href="quick-reference.html#cb459-3" aria-hidden="true" tabindex="-1"></a>$ git stash FILE    # Stash a specific file</span>
+<span id="cb459-4"><a href="quick-reference.html#cb459-4" aria-hidden="true" tabindex="-1"></a>$ git stash pop     # Replay stashed files on working tree</span>
+<span id="cb459-5"><a href="quick-reference.html#cb459-5" aria-hidden="true" tabindex="-1"></a>$ git stash list    # List stashed files</span>
+<span id="cb459-6"><a href="quick-reference.html#cb459-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb459-7"><a href="quick-reference.html#cb459-7" aria-hidden="true" tabindex="-1"></a>$ git stash pop &#39;stash@{1}&#39;   # Pop stash at index 1</span>
+<span id="cb459-8"><a href="quick-reference.html#cb459-8" aria-hidden="true" tabindex="-1"></a>$ git stash pop --index 1     # Same thing</span>
+<span id="cb459-9"><a href="quick-reference.html#cb459-9" aria-hidden="true" tabindex="-1"></a>$ git stash drop &#39;stash@{1}&#39;  # Drop stash at index 1</span>
+<span id="cb459-10"><a href="quick-reference.html#cb459-10" aria-hidden="true" tabindex="-1"></a>$ git stash drop --index 1    # Same thing</span></code></pre></div>
+<h2 data-number="38.15" id="reverting"><span class="header-section-number">38.15</span> Reverting</h2>
+<p></p>
+<div class="sourceCode" id="cb460"><pre class="sourceCode default"><code class="sourceCode default"><span id="cb460-1"><a href="quick-reference.html#cb460-1" aria-hidden="true" tabindex="-1"></a>$ git revert CMMT     # Revert a specific commit</span>
+<span id="cb460-2"><a href="quick-reference.html#cb460-2" aria-hidden="true" tabindex="-1"></a>$ git revert -n CMMT  # Revert but don&#39;t commit (yet)</span>
+<span id="cb460-3"><a href="quick-reference.html#cb460-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb460-4"><a href="quick-reference.html#cb460-4" aria-hidden="true" tabindex="-1"></a>$ git revert CMMT1 CMMT2    # Revert multiple commits</span>
+<span id="cb460-5"><a href="quick-reference.html#cb460-5" aria-hidden="true" tabindex="-1"></a>$ git revert CMMT1^..CMMT2  # Revert a range (oldeest first)</span>
+<span id="cb460-6"><a href="quick-reference.html#cb460-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb460-7"><a href="quick-reference.html#cb460-7" aria-hidden="true" tabindex="-1"></a>$ git revert --continue  # Continue processing from conflict</span>
+<span id="cb460-8"><a href="quick-reference.html#cb460-8" aria-hidden="true" tabindex="-1"></a>$ git revert --skip      # Skip a conflicting commit</span>
+<span id="cb460-9"><a href="quick-reference.html#cb460-9" aria-hidden="true" tabindex="-1"></a>$ git revert --abort     # Bail out of reverting</span></code></pre></div>
+<h2 data-number="38.16" id="resetting"><span class="header-section-number">38.16</span> Resetting</h2>
+<p> All resets move <code>HEAD</code> and the current checked out branch to the specified commit.</p>
+<div class="sourceCode" id="cb461"><pre class="sourceCode default"><code class="sourceCode default"><span id="cb461-1"><a href="quick-reference.html#cb461-1" aria-hidden="true" tabindex="-1"></a>$ git reset --mixed CMMT  # Set stage to CMMT, don&#39;t change WT</span>
+<span id="cb461-2"><a href="quick-reference.html#cb461-2" aria-hidden="true" tabindex="-1"></a>$ git reset CMMT          # Same as --mixed</span>
+<span id="cb461-3"><a href="quick-reference.html#cb461-3" aria-hidden="true" tabindex="-1"></a>$ git reset --soft CMMT   # Don&#39;t change stage or working tree</span>
+<span id="cb461-4"><a href="quick-reference.html#cb461-4" aria-hidden="true" tabindex="-1"></a>$ git reset --hard CMMT   # Set stage and WT to CMMT</span>
+<span id="cb461-5"><a href="quick-reference.html#cb461-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb461-6"><a href="quick-reference.html#cb461-6" aria-hidden="true" tabindex="-1"></a>$ git reset -p CMMT       # Reset file in patch mode</span></code></pre></div>
+<p>Obsolete usage:</p>
+<div class="sourceCode" id="cb462"><pre class="sourceCode default"><code class="sourceCode default"><span id="cb462-1"><a href="quick-reference.html#cb462-1" aria-hidden="true" tabindex="-1"></a>$ git reset FILE   # Same as &quot;git restore --staged FILE&quot;</span></code></pre></div>
+<h2 data-number="38.17" id="the-reflog"><span class="header-section-number">38.17</span> The Reflog</h2>
+<p></p>
+<div class="sourceCode" id="cb463"><pre class="sourceCode default"><code class="sourceCode default"><span id="cb463-1"><a href="quick-reference.html#cb463-1" aria-hidden="true" tabindex="-1"></a>$ git reflog      # Look at the reflog</span></code></pre></div>
+<p>…I admit this section could use a bit more information.</p>
+<h2 data-number="38.18" id="cherry-pick"><span class="header-section-number">38.18</span> Cherry-pick</h2>
+<p></p>
+<div class="sourceCode" id="cb464"><pre class="sourceCode default"><code class="sourceCode default"><span id="cb464-1"><a href="quick-reference.html#cb464-1" aria-hidden="true" tabindex="-1"></a>$ git cherry-pick CMMT   # Cherry-pick a particular commit</span></code></pre></div>
+<h2 data-number="38.19" id="blame"><span class="header-section-number">38.19</span> Blame</h2>
+<p></p>
+<div class="sourceCode" id="cb465"><pre class="sourceCode default"><code class="sourceCode default"><span id="cb465-1"><a href="quick-reference.html#cb465-1" aria-hidden="true" tabindex="-1"></a>$ git blame FILE                # Who is responsible for each line</span>
+<span id="cb465-2"><a href="quick-reference.html#cb465-2" aria-hidden="true" tabindex="-1"></a>$ git blame --date=short FILE   # Same, shorter date format</span></code></pre></div>
+<h2 data-number="38.20" id="submodules-1"><span class="header-section-number">38.20</span> Submodules</h2>
+<p></p>
+<div class="sourceCode" id="cb466"><pre class="sourceCode default"><code class="sourceCode default"><span id="cb466-1"><a href="quick-reference.html#cb466-1" aria-hidden="true" tabindex="-1"></a>$ git clone --recurse-submodules URL       # Clone with submodules</span>
+<span id="cb466-2"><a href="quick-reference.html#cb466-2" aria-hidden="true" tabindex="-1"></a>$ git submodule update --recursive --init  # If you cloned without</span>
+<span id="cb466-3"><a href="quick-reference.html#cb466-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb466-4"><a href="quick-reference.html#cb466-4" aria-hidden="true" tabindex="-1"></a>$ git submodule add URL              # Add submodule</span>
+<span id="cb466-5"><a href="quick-reference.html#cb466-5" aria-hidden="true" tabindex="-1"></a>$ git add DIR                        # Add to repo</span>
+<span id="cb466-6"><a href="quick-reference.html#cb466-6" aria-hidden="true" tabindex="-1"></a>$ git pull --recurse-submodules      # Pull including submodules</span>
+<span id="cb466-7"><a href="quick-reference.html#cb466-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb466-8"><a href="quick-reference.html#cb466-8" aria-hidden="true" tabindex="-1"></a>$ git submodule status               # Submodule status</span>
+<span id="cb466-9"><a href="quick-reference.html#cb466-9" aria-hidden="true" tabindex="-1"></a>$ git ls-tree HEAD DIR               # Show submod pinned commit</span>
+<span id="cb466-10"><a href="quick-reference.html#cb466-10" aria-hidden="true" tabindex="-1"></a>$ git submodule init                 # Set up bookeeeping</span>
+<span id="cb466-11"><a href="quick-reference.html#cb466-11" aria-hidden="true" tabindex="-1"></a>$ git submodule update               # Bring in missing submods</span>
+<span id="cb466-12"><a href="quick-reference.html#cb466-12" aria-hidden="true" tabindex="-1"></a>$ git submodule update --recursive   # Handle submods of submods</span></code></pre></div>
+<p> Deleting a submodule—do these in order. In this example, DIR is the name of the submodule directory.</p>
+<div class="sourceCode" id="cb467"><pre class="sourceCode default"><code class="sourceCode default"><span id="cb467-1"><a href="quick-reference.html#cb467-1" aria-hidden="true" tabindex="-1"></a>$ git submodule deinit DIR</span>
+<span id="cb467-2"><a href="quick-reference.html#cb467-2" aria-hidden="true" tabindex="-1"></a>$ rm -rf .git/modules/DIR</span>
+<span id="cb467-3"><a href="quick-reference.html#cb467-3" aria-hidden="true" tabindex="-1"></a>$ git config -f .gitmodules --remove-section submodule.DIR</span>
+<span id="cb467-4"><a href="quick-reference.html#cb467-4" aria-hidden="true" tabindex="-1"></a>$ git add .gitmodules</span>
+<span id="cb467-5"><a href="quick-reference.html#cb467-5" aria-hidden="true" tabindex="-1"></a>$ git rm --cached DIR</span>
+<span id="cb467-6"><a href="quick-reference.html#cb467-6" aria-hidden="true" tabindex="-1"></a>$ git commit -m &quot;remove DIR submodule&quot;</span></code></pre></div>
+<p></p>
+<h2 data-number="38.21" id="tags-1"><span class="header-section-number">38.21</span> Tags</h2>
+<p></p>
+<div class="sourceCode" id="cb468"><pre class="sourceCode default"><code class="sourceCode default"><span id="cb468-1"><a href="quick-reference.html#cb468-1" aria-hidden="true" tabindex="-1"></a>$ git tag     # List tags</span>
+<span id="cb468-2"><a href="quick-reference.html#cb468-2" aria-hidden="true" tabindex="-1"></a>$ git tag -l  # List tags</span></code></pre></div>
+<div class="sourceCode" id="cb469"><pre class="sourceCode default"><code class="sourceCode default"><span id="cb469-1"><a href="quick-reference.html#cb469-1" aria-hidden="true" tabindex="-1"></a>$ git tag TAG          # Create a tag on HEAD</span>
+<span id="cb469-2"><a href="quick-reference.html#cb469-2" aria-hidden="true" tabindex="-1"></a>$ git tag TAG CMMT     # Create a tag on a specific commit</span>
+<span id="cb469-3"><a href="quick-reference.html#cb469-3" aria-hidden="true" tabindex="-1"></a>$ git tag -a TAG       # Create an annotated tag</span>
+<span id="cb469-4"><a href="quick-reference.html#cb469-4" aria-hidden="true" tabindex="-1"></a>$ git tag -a TAG CMMT  # On a specific commit</span>
+<span id="cb469-5"><a href="quick-reference.html#cb469-5" aria-hidden="true" tabindex="-1"></a>$ git tag -a TAG -m &quot;message&quot; # Add a message to the tag</span></code></pre></div>
+<div class="sourceCode" id="cb470"><pre class="sourceCode default"><code class="sourceCode default"><span id="cb470-1"><a href="quick-reference.html#cb470-1" aria-hidden="true" tabindex="-1"></a>$ git push --tags          # Push all tags to origin</span>
+<span id="cb470-2"><a href="quick-reference.html#cb470-2" aria-hidden="true" tabindex="-1"></a>$ git push REMOTE --tags   # Push all tags to specific remote</span>
+<span id="cb470-3"><a href="quick-reference.html#cb470-3" aria-hidden="true" tabindex="-1"></a>$ git push REMOTE tag3.14  # Push specific tag</span></code></pre></div>
+<div class="sourceCode" id="cb471"><pre class="sourceCode default"><code class="sourceCode default"><span id="cb471-1"><a href="quick-reference.html#cb471-1" aria-hidden="true" tabindex="-1"></a>$ git tag -d tagname          # Delete a tag locally</span>
+<span id="cb471-2"><a href="quick-reference.html#cb471-2" aria-hidden="true" tabindex="-1"></a>$ git push REMOTE -d tagname  # Delete a tag on a remote</span></code></pre></div>
+<p></p>
+<h2 data-number="38.22" id="worktrees-1"><span class="header-section-number">38.22</span> Worktrees</h2>
+<p></p>
+<div class="sourceCode" id="cb472"><pre class="sourceCode default"><code class="sourceCode default"><span id="cb472-1"><a href="quick-reference.html#cb472-1" aria-hidden="true" tabindex="-1"></a>$ git worktree list   # List worktrees</span>
+<span id="cb472-2"><a href="quick-reference.html#cb472-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb472-3"><a href="quick-reference.html#cb472-3" aria-hidden="true" tabindex="-1"></a>$ git worktree add DIR CMMT            # Add worktree at CMMT</span>
+<span id="cb472-4"><a href="quick-reference.html#cb472-4" aria-hidden="true" tabindex="-1"></a>$ git worktree add --detach DIR CMMT   # Add, detach head at CMMT</span>
+<span id="cb472-5"><a href="quick-reference.html#cb472-5" aria-hidden="true" tabindex="-1"></a>$ git worktree add DIR HASH            # Add, detach head at HASH</span>
+<span id="cb472-6"><a href="quick-reference.html#cb472-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb472-7"><a href="quick-reference.html#cb472-7" aria-hidden="true" tabindex="-1"></a>$ git worktree remove DIR          # Remove worktree</span>
+<span id="cb472-8"><a href="quick-reference.html#cb472-8" aria-hidden="true" tabindex="-1"></a>$ git worktree remove --force DIR  # Remove, lose uncommitted mods</span></code></pre></div>
+<p></p>
+<section id="footnotes" class="footnotes footnotes-end-of-document" role="doc-endnotes">
+<hr />
+<ol>
+<li id="fn1"><p>https://learn.microsoft.com/en-us/windows/wsl/<a href="foreword.html#fnref1" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+<li id="fn2"><p>https://beej.us/guide/bggit/<a href="foreword.html#fnref2" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+<li id="fn3"><p>https://github.com/<a href="git-basics.html#fnref3" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+<li id="fn4"><p>https://gitlab.com<a href="git-basics.html#fnref4" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+<li id="fn5"><p>https://docs.gitea.com/<a href="git-basics.html#fnref5" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+<li id="fn6"><p>https://learn.microsoft.com/en-us/windows/wsl/<a href="git-basics.html#fnref6" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+<li id="fn7"><p>We’re glazing over an important topic here that we’ll come back to later called <em>remote tracking branches</em>.<a href="git-basics.html#fnref7" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+<li id="fn8"><p>And again we’re doing some hand-waving. There are actually three branches. Two of them, <code>main</code> and <code>origin/main</code> are on your local clone. And there’s a third <code>main</code> on the remote <code>origin</code> that your <code>origin/main</code> is <em>tracking</em>. Feel free to ignore this detail until we get to the remote tracking branch chapter.<a href="git-basics.html#fnref8" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+<li id="fn9"><p>https://www.vim.org/<a href="git-basics.html#fnref9" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+<li id="fn10"><p>https://github.com/<a href="github-how-to-use-it.html#fnref10" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+<li id="fn11"><p>https://cli.github.com/<a href="github-how-to-use-it.html#fnref11" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+<li id="fn12"><p>https://github.com/cli/cli#installation<a href="github-how-to-use-it.html#fnref12" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+<li id="fn13"><p>https://docs.github.com/en/authentication/connecting-to-github-with-ssh/generating-a-new-ssh-key-and-adding-it-to-the-ssh-agent<a href="github-how-to-use-it.html#fnref13" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+<li id="fn14"><p>https://www.baeldung.com/linux/ssh-private-key-git-command<a href="github-how-to-use-it.html#fnref14" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+<li id="fn15"><p>https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/managing-your-personal-access-tokens<a href="github-how-to-use-it.html#fnref15" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+<li id="fn16"><p>https://en.wikipedia.org/wiki/Hexadecimal<a href="the-git-log-and-head.html#fnref16" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+<li id="fn17"><p>I’m stretching it a bit, here. <code>HEAD</code> looks at the commit you’ve switched to. This might not be quite the same as what’s in your project subdirectory if you’ve modified some of the files since the moving <code>HEAD</code> to that commit. The commit is a snapshot, but that snapshot doesn’t include modifications to files until you make another commit that contains them.<a href="the-git-log-and-head.html#fnref17" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+<li id="fn18"><p>https://learngitbranching.js.org/<a href="branches-and-fast-forward-merges.html#fnref18" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+<li id="fn19"><p>All Git enthusiasts collectively, that is.<a href="using-subdirectories-with-git.html#fnref19" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+<li id="fn20"><p>https://github.com/github/gitignore<a href="ignoring-files-with-.gitignore.html#fnref20" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+<li id="fn21"><p>The <code>--staged</code> flag is more modern. Older versions of Git used <code>git diff --cached</code>.<a href="diff.html#fnref21" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+<li id="fn22"><p>A dot-env (<code>.env</code>) file is one that contains secret information (like login credentials) that is never committed to the repo. It’s usually in the <code>.gitignore</code> just to be sure. Someone related to the project will use a side channel to tell you what to put in it so you can authenticate properly. Support for <code>.env</code> files exists for a variety of languages and frameworks. I’m using my serious voice because this is a serious matter!<a href="renaming-and-removing-files.html#fnref22" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+<li id="fn23"><p>https://tinyurl.com/y5kzpeyk<a href="collaboration-across-branches.html#fnref23" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+<li id="fn24"><p>https://git-scm.com/book/en/v2/Git-Tools-Rerere<a href="rebase.html#fnref24" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+<li id="fn25"><p>https://en.wikipedia.org/wiki/Stack_(abstract_data_type)<a href="stash.html#fnref25" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+<li id="fn26"><p>https://github.com/beejjorgensen/git-example-repo<a href="github-forking-and-pull-requests.html#fnref26" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+<li id="fn27"><p>https://en.wikipedia.org/wiki/XZ_Utils_backdoor<a href="github-forking-and-pull-requests.html#fnref27" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+<li id="fn28"><p>https://en.wikipedia.org/wiki/Social_Security_number#SSNs_used_in_advertising<a href="github-forking-and-pull-requests.html#fnref28" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+<li id="fn29"><p>https://support.github.com/request?q=pull+request+removals<a href="github-forking-and-pull-requests.html#fnref29" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+<li id="fn30"><p>Git cleans up “unreachable” commits after some time has elapsed, so they won’t be <em>instantly</em> destroyed. But they’re on borrowed time unless you create a new branch to hold them.<a href="reset.html#fnref30" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+<li id="fn31"><p>Who knows what it really does under the hood, but we’re going to use this as a mental model for how things work.<a href="reset.html#fnref31" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+<li id="fn32"><p>You can leave off the <code>--mixed</code> since it’s the default.<a href="reset.html#fnref32" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+<li id="fn33"><p>No guarantees. You shouldn’t rewrite commit history that is already public!! It makes a big mess!<a href="reset.html#fnref33" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+<li id="fn34"><p>Perhaps using <code>git reflog</code> and <code>git cherry-pick</code> or <code>git cherry-pick -n</code> and potentially <code>git add -p</code>, all of which are covered in later chapters. Along with judicious use of rebase, old commits or parts of old commits can be applied while keeping the commit history clean.<a href="reset.html#fnref34" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+<li id="fn35"><p>https://en.wikipedia.org/wiki/Battle_of_Mobile_Bay#“Damn_the_torpedoes”<a href="reset.html#fnref35" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+<li id="fn36"><p>By default it’s 90 days. You can configure this with the <code>gc.reflogExpire</code> config option.<a href="the-reference-log-reflog.html#fnref36" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+<li id="fn37"><p>Keeping in mind to never rewrite history on anything you’ve pushed, of course.<a href="the-reference-log-reflog.html#fnref37" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+<li id="fn38"><p>Even if the changes were identical, the commit hash would still be different because the hash takes all kinds of other metadata into account.<a href="cherry-pick-bringing-in-specific-commits.html#fnref38" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+<li id="fn39"><p>https://git-scm.com/book/en/v2/Git-Tools-Signing-Your-Work<a href="configuration.html#fnref39" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+<li id="fn40"><p>https://git-scm.com/docs/git-config#_variables<a href="configuration.html#fnref40" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+<li id="fn41"><p>https://git-scm.com/docs/git-config#_conditional_includes<a href="configuration.html#fnref41" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+<li id="fn42"><p>https://git-scm.com/docs/git-config#_deprecated_modes<a href="configuration.html#fnref42" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+<li id="fn43"><p>https://git-scm.com/docs/git-log#_pretty_formats<a href="git-aliases.html#fnref43" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+<li id="fn44"><p>https://superuser.com/questions/232373/how-to-tell-git-which-private-key-to-use<a href="changing-identity.html#fnref44" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+<li id="fn45"><p>https://www.gnupg.org/<a href="changing-identity.html#fnref45" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+<li id="fn46"><p>Setting the <code>PATH</code> is outside the scope of this tutorial, but the short of it is if you can run the diff tool command on the command line (e.g. by running <code>vimdiff</code>), then it is in the <code>PATH</code>. If it says <code>command not found</code> or some such, then it is <strong>not</strong> in the <code>PATH</code>. Search the Intertubes for how to add something to the <code>PATH</code> in Bash. Or set the Git path config explicitly, as shown in the following paragraph.<a href="difftool-1.html#fnref46" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+<li id="fn47"><p>https://www.araxis.com/merge/index.en<a href="difftool-1.html#fnref47" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+<li id="fn48"><p>https://www.scootersoftware.com/<a href="difftool-1.html#fnref48" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+<li id="fn49"><p>https://sourcegear.com/diffmerge/<a href="difftool-1.html#fnref49" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+<li id="fn50"><p>https://kdiff3.sourceforge.net/<a href="difftool-1.html#fnref50" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+<li id="fn51"><p>https://apps.kde.org/kompare/<a href="difftool-1.html#fnref51" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+<li id="fn52"><p>https://meldmerge.org/<a href="difftool-1.html#fnref52" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+<li id="fn53"><p>https://www.perforce.com/products/helix-core-apps/merge-diff-tool-p4merge<a href="difftool-1.html#fnref53" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+<li id="fn54"><p>https://www.vim.org/<a href="difftool-1.html#fnref54" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+<li id="fn55"><p>https://winmerge.org/?lang=en<a href="difftool-1.html#fnref55" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+<li id="fn56"><p>https://www.araxis.com/merge/index.en<a href="mergetool.html#fnref56" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+<li id="fn57"><p>https://www.scootersoftware.com/<a href="mergetool.html#fnref57" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+<li id="fn58"><p>https://www.devart.com/codecompare/<a href="mergetool.html#fnref58" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+<li id="fn59"><p>https://invent.kde.org/sdk/kdiff3<a href="mergetool.html#fnref59" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+<li id="fn60"><p>https://meldmerge.org/<a href="mergetool.html#fnref60" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+<li id="fn61"><p>https://www.perforce.com/products/helix-core-apps/merge-diff-tool-p4merge<a href="mergetool.html#fnref61" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+<li id="fn62"><p>https://www.vim.org/<a href="mergetool.html#fnref62" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+<li id="fn63"><p>https://winmerge.org/<a href="mergetool.html#fnref63" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+<li id="fn64"><p>https://www.vim.org/<a href="vim-tutorial.html#fnref64" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+<li id="fn65"><p>https://vimhelp.org/index.txt.html#normal-index<a href="vim-tutorial.html#fnref65" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+<li id="fn66"><p>https://openvim.com/<a href="vim-tutorial.html#fnref66" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+<li id="fn67"><p>https://chatgpt.com/<a href="vim-tutorial.html#fnref67" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+<li id="fn68"><p>https://git-scm.com/book/en/v2<a href="appendix-other-references.html#fnref68" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+<li id="fn69"><p>https://git-scm.com/docs<a href="appendix-other-references.html#fnref69" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+<li id="fn70"><p>https://shafiul.github.io/gitbook/index.html<a href="appendix-other-references.html#fnref70" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+<li id="fn71"><p>https://wizardzines.com/git-cheat-sheet.pdf<a href="appendix-other-references.html#fnref71" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+<li id="fn72"><p>https://ohshitgit.com/<a href="appendix-other-references.html#fnref72" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+<li id="fn73"><p>https://learngitbranching.js.org/<a href="appendix-other-references.html#fnref73" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+<li id="fn74"><p>https://github.com/apps/github-learning-lab<a href="appendix-other-references.html#fnref74" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+<li id="fn75"><p>https://www.codecademy.com/learn/learn-git<a href="appendix-other-references.html#fnref75" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+<li id="fn76"><p>https://www.atlassian.com/git/tutorials<a href="appendix-other-references.html#fnref76" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+<li id="fn77"><p>https://gitimmersion.com/<a href="appendix-other-references.html#fnref77" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+<li id="fn78"><p>https://github.com/pluralsight/git-internals-pdf?tab=readme-ov-file<a href="appendix-other-references.html#fnref78" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+<li id="fn79"><p>http://sethrobertson.github.io/GitPostProduction/gpp.html<a href="appendix-other-references.html#fnref79" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+<li id="fn80"><p>https://wizardzines.com/zines/git/<a href="appendix-other-references.html#fnref80" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+<li id="fn81"><p>https://wizardzines.com/zines/oh-shit-git/<a href="appendix-other-references.html#fnref81" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+<li id="fn82"><p>https://www.manning.com/books/learn-git-in-a-month-of-lunches<a href="appendix-other-references.html#fnref82" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+<li id="fn83"><p>https://www.amazon.com/Introducing-GitHub-Non-Technical-Peter-Bell/dp/1491949740<a href="appendix-other-references.html#fnref83" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+<li id="fn84"><p>https://www.amazon.com/Git-Pocket-Guide-Working-Introduction/dp/1449325866<a href="appendix-other-references.html#fnref84" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+<li id="fn85"><p>https://www.amazon.com/Version-Control-Git-collaborative-development/dp/1449316387<a href="appendix-other-references.html#fnref85" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+<li id="fn86"><p>https://www.amazon.com/Git-Practice-Techniques-Mike-McQuaid/dp/1617291978<a href="appendix-other-references.html#fnref86" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+<li id="fn87"><p>https://www.amazon.com/Git-Teams-User-Centered-Efficient-Workflows/dp/1491911182<a href="appendix-other-references.html#fnref87" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+<li id="fn88"><p>https://pragprog.com/titles/tsgit/pragmatic-version-control-using-git/<a href="appendix-other-references.html#fnref88" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+<li id="fn89"><p>https://www.amazon.com/Mastering-Git-proficiency-productivity-collaboration/dp/1783553758<a href="appendix-other-references.html#fnref89" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+</ol>
+</section>
+</body>
+<hr><div style="text-align:center"><span><a href="appendix-other-references.html" rel="prev">Prev</a> | </span><a href="index.html">Contents</a><span style="visibility: hidden"> | <a href="" rel="next">Next</a></span></div></body>
+</html>

@@ -1,0 +1,5 @@
+look for 'Developer Command Prompt for VS 2022' in start menu.
+open that
+type code
+open actual file from there
+profit

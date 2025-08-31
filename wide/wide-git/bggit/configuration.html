@@ -1,0 +1,694 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <title>Beej's Guide to Git</title>
+  <style>
+    html {
+      color: #1a1a1a;
+      background-color: #fdfdfd;
+    }
+    body {
+      margin: 0 auto;
+      max-width: 36em;
+      padding-left: 50px;
+      padding-right: 50px;
+      padding-top: 50px;
+      padding-bottom: 50px;
+      hyphens: auto;
+      overflow-wrap: break-word;
+      text-rendering: optimizeLegibility;
+      font-kerning: normal;
+    }
+    @media (max-width: 600px) {
+      body {
+        font-size: 0.9em;
+        padding: 12px;
+      }
+      h1 {
+        font-size: 1.8em;
+      }
+    }
+    @media print {
+      html {
+        background-color: white;
+      }
+      body {
+        background-color: transparent;
+        color: black;
+        font-size: 12pt;
+      }
+      p, h2, h3 {
+        orphans: 3;
+        widows: 3;
+      }
+      h2, h3, h4 {
+        page-break-after: avoid;
+      }
+    }
+    p {
+      margin: 1em 0;
+    }
+    a {
+      color: #1a1a1a;
+    }
+    a:visited {
+      color: #1a1a1a;
+    }
+    img {
+      max-width: 100%;
+    }
+    svg {
+      height: auto;
+      max-width: 100%;
+    }
+    h1, h2, h3, h4, h5, h6 {
+      margin-top: 1.4em;
+    }
+    h5, h6 {
+      font-size: 1em;
+      font-style: italic;
+    }
+    h6 {
+      font-weight: normal;
+    }
+    ol, ul {
+      padding-left: 1.7em;
+      margin-top: 1em;
+    }
+    li > ol, li > ul {
+      margin-top: 0;
+    }
+    blockquote {
+      margin: 1em 0 1em 1.7em;
+      padding-left: 1em;
+      border-left: 2px solid #e6e6e6;
+      color: #606060;
+    }
+    code {
+      font-family: Menlo, Monaco, Consolas, 'Lucida Console', monospace;
+      font-size: 85%;
+      margin: 0;
+      hyphens: manual;
+    }
+    pre {
+      margin: 1em 0;
+      overflow: auto;
+    }
+    pre code {
+      padding: 0;
+      overflow: visible;
+      overflow-wrap: normal;
+    }
+    .sourceCode {
+     background-color: transparent;
+     overflow: visible;
+    }
+    hr {
+      background-color: #1a1a1a;
+      border: none;
+      height: 1px;
+      margin: 1em 0;
+    }
+    table {
+      margin: 1em 0;
+      border-collapse: collapse;
+      width: 100%;
+      overflow-x: auto;
+      display: block;
+      font-variant-numeric: lining-nums tabular-nums;
+    }
+    table caption {
+      margin-bottom: 0.75em;
+    }
+    tbody {
+      margin-top: 0.5em;
+      border-top: 1px solid #1a1a1a;
+      border-bottom: 1px solid #1a1a1a;
+    }
+    th {
+      border-top: 1px solid #1a1a1a;
+      padding: 0.25em 0.5em 0.25em 0.5em;
+    }
+    td {
+      padding: 0.125em 0.5em 0.25em 0.5em;
+    }
+    header {
+      margin-bottom: 4em;
+      text-align: center;
+    }
+    #TOC li {
+      list-style: none;
+    }
+    #TOC ul {
+      padding-left: 1.3em;
+    }
+    #TOC > ul {
+      padding-left: 0;
+    }
+    #TOC a:not(:hover) {
+      text-decoration: none;
+    }
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+    /* CSS for syntax highlighting */
+    html { -webkit-text-size-adjust: 100%; }
+    pre > code.sourceCode { white-space: pre; position: relative; }
+    pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+    pre > code.sourceCode > span:empty { height: 1.2em; }
+    .sourceCode { overflow: visible; }
+    code.sourceCode > span { color: inherit; text-decoration: inherit; }
+    div.sourceCode { margin: 1em 0; }
+    pre.sourceCode { margin: 0; }
+    @media screen {
+    div.sourceCode { overflow: auto; }
+    }
+    @media print {
+    pre > code.sourceCode { white-space: pre-wrap; }
+    pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+    }
+    pre.numberSource code
+      { counter-reset: source-line 0; }
+    pre.numberSource code > span
+      { position: relative; left: -4em; counter-increment: source-line; }
+    pre.numberSource code > span > a:first-child::before
+      { content: counter(source-line);
+        position: relative; left: -1em; text-align: right; vertical-align: baseline;
+        border: none; display: inline-block;
+        -webkit-touch-callout: none; -webkit-user-select: none;
+        -khtml-user-select: none; -moz-user-select: none;
+        -ms-user-select: none; user-select: none;
+        padding: 0 4px; width: 4em;
+        color: #aaaaaa;
+      }
+    pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+    div.sourceCode
+      {   }
+    @media screen {
+    pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+    }
+    code span.al { color: #ff0000; font-weight: bold; } /* Alert */
+    code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+    code span.at { color: #7d9029; } /* Attribute */
+    code span.bn { color: #40a070; } /* BaseN */
+    code span.bu { color: #008000; } /* BuiltIn */
+    code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+    code span.ch { color: #4070a0; } /* Char */
+    code span.cn { color: #880000; } /* Constant */
+    code span.co { color: #60a0b0; font-style: italic; } /* Comment */
+    code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+    code span.do { color: #ba2121; font-style: italic; } /* Documentation */
+    code span.dt { color: #902000; } /* DataType */
+    code span.dv { color: #40a070; } /* DecVal */
+    code span.er { color: #ff0000; font-weight: bold; } /* Error */
+    code span.ex { } /* Extension */
+    code span.fl { color: #40a070; } /* Float */
+    code span.fu { color: #06287e; } /* Function */
+    code span.im { color: #008000; font-weight: bold; } /* Import */
+    code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+    code span.kw { color: #007020; font-weight: bold; } /* Keyword */
+    code span.op { color: #666666; } /* Operator */
+    code span.ot { color: #007020; } /* Other */
+    code span.pp { color: #bc7a00; } /* Preprocessor */
+    code span.sc { color: #4070a0; } /* SpecialChar */
+    code span.ss { color: #bb6688; } /* SpecialString */
+    code span.st { color: #4070a0; } /* String */
+    code span.va { color: #19177c; } /* Variable */
+    code span.vs { color: #4070a0; } /* VerbatimString */
+    code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+  </style>
+  <!-- BG custom styling -->
+  <style type="text/css">
+  /* Fix for line numbers not visible */
+  pre.numberSource code > span {
+      left: -1em;
+  }
+  pre.numberSource {
+      margin-left: initial;
+  }
+
+  /* Put some space after the section numbers */
+  span.toc-section-number::after {
+      content: "\a0\a0\a0";  /* non-breaking whitespace */
+  }
+
+  /* Hide underlines on code number links */
+  pre > code.sourceCode > span > a:first-child::before {
+      text-decoration: none;
+  }
+
+  /* Color the source blocks */
+  div.sourceCode {
+      background-color: #f0f0f0;
+  }
+
+  /* Fix iOS big text rendering issue */
+  pre > code.sourceCode > span {
+      display: initial;
+  }
+
+
+  /* Color the inline code */
+  code:not(.sourceCode) {
+      background: #f0f0f0;
+      padding-left: 0.2em;
+      padding-right: 0.2em;
+      border-radius: 0.2em;
+  }
+
+  pre.sourceCode {
+      border: 1px solid #ccc;
+      padding: 0.5em;
+      border-radius: 0.2em;
+  }
+
+  /* Keep code tags from wrapping in tables */
+  tbody code {
+      white-space: nowrap;
+  }
+
+  /* Prevent hyphenation and hyphen breaks in code*/
+  code {
+      word-break: keep-all;
+  }
+
+  td {
+      vertical-align: top;
+  }
+
+  body {
+      font-size: 12pt;
+      max-width: 43em;
+      font-family: sans-serif;
+  }
+
+  html {
+      background: #f9f9f9;
+  }
+
+  figure > embed {
+      max-width: 100%;
+  }
+
+  figure {
+      text-align: center;
+      margin-top: 2em;
+      margin-bottom: 2em;
+  }
+
+  figcaption {
+      font-size: 0.9em;
+      font-style: italic;
+      margin-top: 0.6em;
+  }
+
+  body {
+      counter-reset: figure-counter-major;
+      counter-reset: figure-counter-minor;
+  }
+
+  figure {
+      counter-increment: figure-counter-minor;
+  }
+
+  figcaption::before {
+      content: "Figure " counter(figure-counter-major) "." counter(figure-counter-minor) ": ";
+  }
+
+  blockquote {
+      border-left: 2px solid #bbb;
+      color: #444;
+  }
+
+  /* Contents */
+
+  nav[role="doc-toc"] > ul > li {
+    font-weight: bold;
+    margin-top: 1.2em;
+  }
+
+  nav[role="doc-toc"] > ul > li:first {
+    font-weight: bold;
+    margin-top: initial;
+  }
+
+  nav[role="doc-toc"] > ul > li > ul {
+    font-weight: normal;
+    margin-top: 0.3em;
+  }
+
+  /*
+  In multipage, we need to reset the figure counter to the chapter
+  number. Luckily, this is in the <h1 data-number> attribute. Unluckily,
+  there is no way to get this in a general way.
+
+  This doesn't work:
+
+    h1[data-number] {
+      counter-set: figure-counter-major attr(data-number);
+    }
+
+  Nor this:
+
+    h1[data-number] {
+      --figure-counter-major-value: attr(data-number);
+      counter-set: figure-counter-major var(--figure-counter-major-value);
+    }
+
+  So, dumbly, we have a bunch of rules for all these sections, up to the
+  maximum possible section.
+
+  Here's a program to generate them:
+
+    for (let i = 1; i < 100; i++)
+        console.log(`h1[data-number="${i}"]{counter-set:figure-counter-major ${i};counter-reset:figure-counter-minor;}`);
+
+  Note to self: never write a book with more than 99 frickin' chapters.
+  */
+
+  h1[data-number="1"]{counter-set:figure-counter-major 1;counter-reset:figure-counter-minor;}
+  h1[data-number="2"]{counter-set:figure-counter-major 2;counter-reset:figure-counter-minor;}
+  h1[data-number="3"]{counter-set:figure-counter-major 3;counter-reset:figure-counter-minor;}
+  h1[data-number="4"]{counter-set:figure-counter-major 4;counter-reset:figure-counter-minor;}
+  h1[data-number="5"]{counter-set:figure-counter-major 5;counter-reset:figure-counter-minor;}
+  h1[data-number="6"]{counter-set:figure-counter-major 6;counter-reset:figure-counter-minor;}
+  h1[data-number="7"]{counter-set:figure-counter-major 7;counter-reset:figure-counter-minor;}
+  h1[data-number="8"]{counter-set:figure-counter-major 8;counter-reset:figure-counter-minor;}
+  h1[data-number="9"]{counter-set:figure-counter-major 9;counter-reset:figure-counter-minor;}
+  h1[data-number="10"]{counter-set:figure-counter-major 10;counter-reset:figure-counter-minor;}
+  h1[data-number="11"]{counter-set:figure-counter-major 11;counter-reset:figure-counter-minor;}
+  h1[data-number="12"]{counter-set:figure-counter-major 12;counter-reset:figure-counter-minor;}
+  h1[data-number="13"]{counter-set:figure-counter-major 13;counter-reset:figure-counter-minor;}
+  h1[data-number="14"]{counter-set:figure-counter-major 14;counter-reset:figure-counter-minor;}
+  h1[data-number="15"]{counter-set:figure-counter-major 15;counter-reset:figure-counter-minor;}
+  h1[data-number="16"]{counter-set:figure-counter-major 16;counter-reset:figure-counter-minor;}
+  h1[data-number="17"]{counter-set:figure-counter-major 17;counter-reset:figure-counter-minor;}
+  h1[data-number="18"]{counter-set:figure-counter-major 18;counter-reset:figure-counter-minor;}
+  h1[data-number="19"]{counter-set:figure-counter-major 19;counter-reset:figure-counter-minor;}
+  h1[data-number="20"]{counter-set:figure-counter-major 20;counter-reset:figure-counter-minor;}
+  h1[data-number="21"]{counter-set:figure-counter-major 21;counter-reset:figure-counter-minor;}
+  h1[data-number="22"]{counter-set:figure-counter-major 22;counter-reset:figure-counter-minor;}
+  h1[data-number="23"]{counter-set:figure-counter-major 23;counter-reset:figure-counter-minor;}
+  h1[data-number="24"]{counter-set:figure-counter-major 24;counter-reset:figure-counter-minor;}
+  h1[data-number="25"]{counter-set:figure-counter-major 25;counter-reset:figure-counter-minor;}
+  h1[data-number="26"]{counter-set:figure-counter-major 26;counter-reset:figure-counter-minor;}
+  h1[data-number="27"]{counter-set:figure-counter-major 27;counter-reset:figure-counter-minor;}
+  h1[data-number="28"]{counter-set:figure-counter-major 28;counter-reset:figure-counter-minor;}
+  h1[data-number="29"]{counter-set:figure-counter-major 29;counter-reset:figure-counter-minor;}
+  h1[data-number="30"]{counter-set:figure-counter-major 30;counter-reset:figure-counter-minor;}
+  h1[data-number="31"]{counter-set:figure-counter-major 31;counter-reset:figure-counter-minor;}
+  h1[data-number="32"]{counter-set:figure-counter-major 32;counter-reset:figure-counter-minor;}
+  h1[data-number="33"]{counter-set:figure-counter-major 33;counter-reset:figure-counter-minor;}
+  h1[data-number="34"]{counter-set:figure-counter-major 34;counter-reset:figure-counter-minor;}
+  h1[data-number="35"]{counter-set:figure-counter-major 35;counter-reset:figure-counter-minor;}
+  h1[data-number="36"]{counter-set:figure-counter-major 36;counter-reset:figure-counter-minor;}
+  h1[data-number="37"]{counter-set:figure-counter-major 37;counter-reset:figure-counter-minor;}
+  h1[data-number="38"]{counter-set:figure-counter-major 38;counter-reset:figure-counter-minor;}
+  h1[data-number="39"]{counter-set:figure-counter-major 39;counter-reset:figure-counter-minor;}
+  h1[data-number="40"]{counter-set:figure-counter-major 40;counter-reset:figure-counter-minor;}
+  h1[data-number="41"]{counter-set:figure-counter-major 41;counter-reset:figure-counter-minor;}
+  h1[data-number="42"]{counter-set:figure-counter-major 42;counter-reset:figure-counter-minor;}
+  h1[data-number="43"]{counter-set:figure-counter-major 43;counter-reset:figure-counter-minor;}
+  h1[data-number="44"]{counter-set:figure-counter-major 44;counter-reset:figure-counter-minor;}
+  h1[data-number="45"]{counter-set:figure-counter-major 45;counter-reset:figure-counter-minor;}
+  h1[data-number="46"]{counter-set:figure-counter-major 46;counter-reset:figure-counter-minor;}
+  h1[data-number="47"]{counter-set:figure-counter-major 47;counter-reset:figure-counter-minor;}
+  h1[data-number="48"]{counter-set:figure-counter-major 48;counter-reset:figure-counter-minor;}
+  h1[data-number="49"]{counter-set:figure-counter-major 49;counter-reset:figure-counter-minor;}
+  h1[data-number="50"]{counter-set:figure-counter-major 50;counter-reset:figure-counter-minor;}
+  h1[data-number="51"]{counter-set:figure-counter-major 51;counter-reset:figure-counter-minor;}
+  h1[data-number="52"]{counter-set:figure-counter-major 52;counter-reset:figure-counter-minor;}
+  h1[data-number="53"]{counter-set:figure-counter-major 53;counter-reset:figure-counter-minor;}
+  h1[data-number="54"]{counter-set:figure-counter-major 54;counter-reset:figure-counter-minor;}
+  h1[data-number="55"]{counter-set:figure-counter-major 55;counter-reset:figure-counter-minor;}
+  h1[data-number="56"]{counter-set:figure-counter-major 56;counter-reset:figure-counter-minor;}
+  h1[data-number="57"]{counter-set:figure-counter-major 57;counter-reset:figure-counter-minor;}
+  h1[data-number="58"]{counter-set:figure-counter-major 58;counter-reset:figure-counter-minor;}
+  h1[data-number="59"]{counter-set:figure-counter-major 59;counter-reset:figure-counter-minor;}
+  h1[data-number="60"]{counter-set:figure-counter-major 60;counter-reset:figure-counter-minor;}
+  h1[data-number="61"]{counter-set:figure-counter-major 61;counter-reset:figure-counter-minor;}
+  h1[data-number="62"]{counter-set:figure-counter-major 62;counter-reset:figure-counter-minor;}
+  h1[data-number="63"]{counter-set:figure-counter-major 63;counter-reset:figure-counter-minor;}
+  h1[data-number="64"]{counter-set:figure-counter-major 64;counter-reset:figure-counter-minor;}
+  h1[data-number="65"]{counter-set:figure-counter-major 65;counter-reset:figure-counter-minor;}
+  h1[data-number="66"]{counter-set:figure-counter-major 66;counter-reset:figure-counter-minor;}
+  h1[data-number="67"]{counter-set:figure-counter-major 67;counter-reset:figure-counter-minor;}
+  h1[data-number="68"]{counter-set:figure-counter-major 68;counter-reset:figure-counter-minor;}
+  h1[data-number="69"]{counter-set:figure-counter-major 69;counter-reset:figure-counter-minor;}
+  h1[data-number="70"]{counter-set:figure-counter-major 70;counter-reset:figure-counter-minor;}
+  h1[data-number="71"]{counter-set:figure-counter-major 71;counter-reset:figure-counter-minor;}
+  h1[data-number="72"]{counter-set:figure-counter-major 72;counter-reset:figure-counter-minor;}
+  h1[data-number="73"]{counter-set:figure-counter-major 73;counter-reset:figure-counter-minor;}
+  h1[data-number="74"]{counter-set:figure-counter-major 74;counter-reset:figure-counter-minor;}
+  h1[data-number="75"]{counter-set:figure-counter-major 75;counter-reset:figure-counter-minor;}
+  h1[data-number="76"]{counter-set:figure-counter-major 76;counter-reset:figure-counter-minor;}
+  h1[data-number="77"]{counter-set:figure-counter-major 77;counter-reset:figure-counter-minor;}
+  h1[data-number="78"]{counter-set:figure-counter-major 78;counter-reset:figure-counter-minor;}
+  h1[data-number="79"]{counter-set:figure-counter-major 79;counter-reset:figure-counter-minor;}
+  h1[data-number="80"]{counter-set:figure-counter-major 80;counter-reset:figure-counter-minor;}
+  h1[data-number="81"]{counter-set:figure-counter-major 81;counter-reset:figure-counter-minor;}
+  h1[data-number="82"]{counter-set:figure-counter-major 82;counter-reset:figure-counter-minor;}
+  h1[data-number="83"]{counter-set:figure-counter-major 83;counter-reset:figure-counter-minor;}
+  h1[data-number="84"]{counter-set:figure-counter-major 84;counter-reset:figure-counter-minor;}
+  h1[data-number="85"]{counter-set:figure-counter-major 85;counter-reset:figure-counter-minor;}
+  h1[data-number="86"]{counter-set:figure-counter-major 86;counter-reset:figure-counter-minor;}
+  h1[data-number="87"]{counter-set:figure-counter-major 87;counter-reset:figure-counter-minor;}
+  h1[data-number="88"]{counter-set:figure-counter-major 88;counter-reset:figure-counter-minor;}
+  h1[data-number="89"]{counter-set:figure-counter-major 89;counter-reset:figure-counter-minor;}
+  h1[data-number="90"]{counter-set:figure-counter-major 90;counter-reset:figure-counter-minor;}
+  h1[data-number="91"]{counter-set:figure-counter-major 91;counter-reset:figure-counter-minor;}
+  h1[data-number="92"]{counter-set:figure-counter-major 92;counter-reset:figure-counter-minor;}
+  h1[data-number="93"]{counter-set:figure-counter-major 93;counter-reset:figure-counter-minor;}
+  h1[data-number="94"]{counter-set:figure-counter-major 94;counter-reset:figure-counter-minor;}
+  h1[data-number="95"]{counter-set:figure-counter-major 95;counter-reset:figure-counter-minor;}
+  h1[data-number="96"]{counter-set:figure-counter-major 96;counter-reset:figure-counter-minor;}
+  h1[data-number="97"]{counter-set:figure-counter-major 97;counter-reset:figure-counter-minor;}
+  h1[data-number="98"]{counter-set:figure-counter-major 98;counter-reset:figure-counter-minor;}
+  h1[data-number="99"]{counter-set:figure-counter-major 99;counter-reset:figure-counter-minor;}
+
+
+  </style>
+  <!-- BG custom styling for the wide body variant -->
+  <!-- Gets appended after bg-css.html -->
+
+  <style type="text/css">
+  body {
+      max-width: inherit;
+  }
+  </style>
+</head>
+<body>
+<div style="text-align:center"><span><a href="whos-to-blame-for-this-code.html" rel="prev">Prev</a> | </span><a href="index.html">Contents</a><span> | <a href="git-aliases.html" rel="next">Next</a></span></div><hr>
+<h1 data-number="24" id="configuration"><span class="header-section-number">24</span> Configuration</h1>
+<p></p>
+<p>Waaaaay back at the beginning of this book, we did some Git configuration. We did this:</p>
+<div class="sourceCode" id="cb286"><pre class="sourceCode default"><code class="sourceCode default"><span id="cb286-1"><a href="configuration.html#cb286-1" aria-hidden="true" tabindex="-1"></a>$ git config set --global user.name &quot;Your Name&quot;</span>
+<span id="cb286-2"><a href="configuration.html#cb286-2" aria-hidden="true" tabindex="-1"></a>$ git config set --global user.email &quot;your-email@example.com&quot;</span></code></pre></div>
+<p>When we did, it added that configuration information to a file and the info in that file applies to all the Git repos on your system.</p>
+<p>Unless you override them with a local config, that is. But stay tuned for more on that later.</p>
+<blockquote>
+<p><strong>Some of you might be saying, “Hey, I’ve never written <code>set</code> before to set variables with <code>git config</code>!”</strong> And you’d be right. But that’s the old, deprecated way of using <code>git config</code>. If you’re using an older version of Git, the deprecated way might be the only way. So if you’re getting errors with the new usage, see <a href="configuration.html#config-old">Older Git Versions</a>, below.</p>
+</blockquote>
+<p>Let’s look at one of those lines again:</p>
+<div class="sourceCode" id="cb287"><pre class="sourceCode default"><code class="sourceCode default"><span id="cb287-1"><a href="configuration.html#cb287-1" aria-hidden="true" tabindex="-1"></a>$ git config set --global user.name &quot;Your Name&quot;</span>
+<span id="cb287-2"><a href="configuration.html#cb287-2" aria-hidden="true" tabindex="-1"></a>                              ↑          ↑</span>
+<span id="cb287-3"><a href="configuration.html#cb287-3" aria-hidden="true" tabindex="-1"></a>                          variable     value</span></code></pre></div>
+<p>There are two main things in this line.</p>
+<ol type="1">
+<li>A <em>variable</em>, that is, the thing we’re setting the value of.</li>
+<li>A <em>value</em>, the value we’re giving that variable.</li>
+</ol>
+<p>In that case, the variable is <code>user.name</code> and the value is <code>"Your Name"</code>.</p>
+<blockquote>
+<p><strong>What those two variables, <code>user.name</code> and <code>user.email</code>, are doing</strong> is they’re setting the values that will go in your commit messages! That’s your identity when you commit! A side note here it that it’s incredibly easy to impersonate anyone else in the world just by putting their name and email there. To mitigate this, one option is to <a href="https://git-scm.com/book/en/v2/Git-Tools-Signing-Your-Work">digitally sign your commits</a><a href="quick-reference.html#fn39" class="footnote-ref" id="fnref39" role="doc-noteref"><sup>39</sup></a>, something you can read a little bit more about in the <a href="changing-identity.html#changing-identity">Changing Identity</a> chapter.</p>
+</blockquote>
+<p>If the commands in this chapter are giving you errors, see the section on <a href="configuration.html#config-old">older Git versions</a>, below.</p>
+<h2 data-number="24.1" id="local-configuration"><span class="header-section-number">24.1</span> Local Configuration</h2>
+<p></p>
+<p>In those <code>git config</code> lines, above, you might have noticed the <code>--global</code> switch:</p>
+<div class="sourceCode" id="cb288"><pre class="sourceCode default"><code class="sourceCode default"><span id="cb288-1"><a href="configuration.html#cb288-1" aria-hidden="true" tabindex="-1"></a>$ git config set --global user.name &quot;Your Name&quot;</span></code></pre></div>
+<p>Unless you explicitly say <code>--global</code>, Git assumes you mean the local configuration.</p>
+<p>What is the local configuration? It’s the configuration that applies to the repo that you’re currently in, and no others.</p>
+<p><em>Configuration options in the local config override the global config!</em></p>
+<p>Here’s a practical example of why you might do this. Let’s say you have a personal email for your fun projects, and a contractor email that you use for work-for-hire. But since you’re an independent contractor, you have all these projects on one computer.</p>
+<p>However, you want to use your work identity (name and email) for your contract work and your hacker identify for your fun work.</p>
+<p>One thing you might do is set the following globally:</p>
+<div class="sourceCode" id="cb289"><pre class="sourceCode default"><code class="sourceCode default"><span id="cb289-1"><a href="configuration.html#cb289-1" aria-hidden="true" tabindex="-1"></a>$ git config set --global user.name &quot;HAx0rBYnit3&quot;</span>
+<span id="cb289-2"><a href="configuration.html#cb289-2" aria-hidden="true" tabindex="-1"></a>$ git config set --global user.email &quot;l333T@example.com&quot;</span></code></pre></div>
+<p>and that would be the default for all your repos. And then you might have a new repo for a job:</p>
+<div class="sourceCode" id="cb290"><pre class="sourceCode default"><code class="sourceCode default"><span id="cb290-1"><a href="configuration.html#cb290-1" aria-hidden="true" tabindex="-1"></a>$ git init corporate_job_12</span>
+<span id="cb290-2"><a href="configuration.html#cb290-2" aria-hidden="true" tabindex="-1"></a>  Initialized empty Git repository in /user/corporate_job_12/.git/</span></code></pre></div>
+<p>And we pop in there, and we set the local config just for that repo (it’s local because we’re not specifying <code>--global</code>):</p>
+<div class="sourceCode" id="cb291"><pre class="sourceCode default"><code class="sourceCode default"><span id="cb291-1"><a href="configuration.html#cb291-1" aria-hidden="true" tabindex="-1"></a>$ cd corporate_job_12</span>
+<span id="cb291-2"><a href="configuration.html#cb291-2" aria-hidden="true" tabindex="-1"></a>$ git config set user.name &quot;Professional Name&quot;</span>
+<span id="cb291-3"><a href="configuration.html#cb291-3" aria-hidden="true" tabindex="-1"></a>$ git config set user.email &quot;professional@example.com&quot;</span></code></pre></div>
+<p>And now, just in the <code>corporate_job_12</code> directory, we’ll be using our professional name and email in our commits. Everywhere else we’ll be using our elite hacker name.</p>
+<p>You can override all the global configs on a per-repo basis by specifying local configs.</p>
+<p>Finally, the local config for a repo is found in the <code>.git/config</code> file out of the repo’s root directory.</p>
+<p></p>
+<h2 data-number="24.2" id="listing-the-current-config"><span class="header-section-number">24.2</span> Listing the Current Config</h2>
+<p></p>
+<p>You can view the current config with <code>git config list</code>. Add the <code>--global</code> flag if you want to see the global config.</p>
+<div class="sourceCode" id="cb292"><pre class="sourceCode default"><code class="sourceCode default"><span id="cb292-1"><a href="configuration.html#cb292-1" aria-hidden="true" tabindex="-1"></a>$ git config list</span>
+<span id="cb292-2"><a href="configuration.html#cb292-2" aria-hidden="true" tabindex="-1"></a>  user.name=HAx0rBYnit3</span>
+<span id="cb292-3"><a href="configuration.html#cb292-3" aria-hidden="true" tabindex="-1"></a>  user.email=l333T@example.com</span>
+<span id="cb292-4"><a href="configuration.html#cb292-4" aria-hidden="true" tabindex="-1"></a>  init.defaultbranch=main</span>
+<span id="cb292-5"><a href="configuration.html#cb292-5" aria-hidden="true" tabindex="-1"></a>  core.repositoryformatversion=0</span>
+<span id="cb292-6"><a href="configuration.html#cb292-6" aria-hidden="true" tabindex="-1"></a>  core.filemode=true</span>
+<span id="cb292-7"><a href="configuration.html#cb292-7" aria-hidden="true" tabindex="-1"></a>  core.bare=false</span>
+<span id="cb292-8"><a href="configuration.html#cb292-8" aria-hidden="true" tabindex="-1"></a>  core.logallrefupdates=true</span>
+<span id="cb292-9"><a href="configuration.html#cb292-9" aria-hidden="true" tabindex="-1"></a>  user.name=Professional Name</span>
+<span id="cb292-10"><a href="configuration.html#cb292-10" aria-hidden="true" tabindex="-1"></a>  user.email=professional@example.com</span></code></pre></div>
+<p>You can see in there that <code>user.name</code> and <code>user.email</code> appear twice. The first is from the global config, which is overridden later by the value in the local config.</p>
+<p></p>
+<h2 data-number="24.3" id="getting-setting-and-deleting-variables"><span class="header-section-number">24.3</span> Getting, Setting, and Deleting Variables</h2>
+<p> An example “get”:</p>
+<div class="sourceCode" id="cb293"><pre class="sourceCode default"><code class="sourceCode default"><span id="cb293-1"><a href="configuration.html#cb293-1" aria-hidden="true" tabindex="-1"></a>$ git config get user.name</span>
+<span id="cb293-2"><a href="configuration.html#cb293-2" aria-hidden="true" tabindex="-1"></a>  Professional Name</span></code></pre></div>
+<p>Note that it is only giving the active value (the local one in this case) even though we saw with <code>git config list</code> that both the global and local values were there.</p>
+<p> And we’ve already seen a “set”:</p>
+<div class="sourceCode" id="cb294"><pre class="sourceCode default"><code class="sourceCode default"><span id="cb294-1"><a href="configuration.html#cb294-1" aria-hidden="true" tabindex="-1"></a>$ git config set user.name &quot;Harvey Manfrengensenton&quot;</span></code></pre></div>
+<p>The double quotes are there so that the shell delivers the name as a single argument. Normally it splits all arguments on spaces. You could also use single quotes which is useful if the value has special shell characters in it. The grotesquely oversimplified rule, with apologies to shell enthusiasts, is to use quotes around the value if it has a space in it.</p>
+<p>Set will overwrite any previously-existing value of the name variable name.</p>
+<p> And last but not least, we can delete a variable with <code>unset</code>:</p>
+<div class="sourceCode" id="cb295"><pre class="sourceCode default"><code class="sourceCode default"><span id="cb295-1"><a href="configuration.html#cb295-1" aria-hidden="true" tabindex="-1"></a>$ git config unset user.name</span></code></pre></div>
+<h2 data-number="24.4" id="some-popular-variables"><span class="header-section-number">24.4</span> Some Popular Variables</h2>
+<p></p>
+<p>To see which variables you can set, look in the manual page for the appropriate command. You can usually get there by looking at the first hit on your favorite search engine for <code>man git whatever</code>. For example, you might find configuration variables for <code>git pull</code> by searching for <code>man git pull</code> and bringing up the first hit.</p>
+<p>That said, there’s a <a href="https://git-scm.com/docs/git-config#_variables">big ol’ list of them in the <code>git config</code> manual page that you can peruse</a><a href="quick-reference.html#fn40" class="footnote-ref" id="fnref40" role="doc-noteref"><sup>40</sup></a>.</p>
+<p>But here are some fun, common ones.</p>
+<table>
+<colgroup>
+<col style="width: 21%" />
+<col style="width: 78%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th>Variable</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>user.name</code></td>
+<td>Your name</td>
+</tr>
+<tr class="even">
+<td><code>user.email</code></td>
+<td>Your email</td>
+</tr>
+<tr class="odd">
+<td><code>pull.rebase</code></td>
+<td>Set to <code>true</code> to have a pull try to rebase. Set to <code>false</code> to have it try to merge.</td>
+</tr>
+<tr class="even">
+<td><code>core.editor</code></td>
+<td>Your default editor for commit messages, etc. Set to <code>vim</code>, <code>nano</code>, <code>code</code>, <code>emacs</code>, or whatever.</td>
+</tr>
+<tr class="odd">
+<td><code>merge.tool</code></td>
+<td>Your default merge tool, e.g. <code>meld</code> or whatever.</td>
+</tr>
+<tr class="even">
+<td><code>diff.tool</code></td>
+<td>Your default diff tool, e.g. <code>vimdiff</code></td>
+</tr>
+<tr class="odd">
+<td><code>difftool.prompt</code></td>
+<td>Set to <code>false</code> to stop Git from always asking you if you want to launch your difftool.</td>
+</tr>
+<tr class="even">
+<td><code>color.ui</code></td>
+<td>Set to <code>true</code> for more colorful Git output</td>
+</tr>
+<tr class="odd">
+<td><code>core.autocrlf</code></td>
+<td>Set to <code>true</code> if you’re on Windows <strong>and</strong> not in WSL <strong>and</strong> the remote repo has Unix-style newlines <strong>and</strong> you want to use Windows-style newlines in your working directory. On other systems, set to <code>input</code>. This is all about working around Window’s ancient newlines.</td>
+</tr>
+<tr class="even">
+<td><code>commit.gpgsign</code></td>
+<td>Set to <code>true</code> if you’ve configured <a href="changing-identity.html#gpg-signing">GPG commit signing</a> and want to always sign.</td>
+</tr>
+<tr class="odd">
+<td><code>help.autocorrect</code></td>
+<td>Set to <code>0</code> to show the command Git thinks you meant to type if you misspelled it. Set to <code>immediate</code> to have it run the corrected command right now. Set to <code>prompt</code> to ask you if you want to run it.</td>
+</tr>
+</tbody>
+</table>
+<p>Again, there are a <em>lot</em> more of these. Peruse the docs for more.</p>
+<p></p>
+<h2 data-number="24.5" id="editing-the-config-directly"><span class="header-section-number">24.5</span> Editing the Config Directly</h2>
+<p></p>
+<p>You can launch an editor (the one specified in the <code>core.editor</code> variable) to edit the config file directly. Some people might find this easier.</p>
+<p>I can launch the editor like this:</p>
+<div class="sourceCode" id="cb296"><pre class="sourceCode default"><code class="sourceCode default"><span id="cb296-1"><a href="configuration.html#cb296-1" aria-hidden="true" tabindex="-1"></a>$ git config edit</span></code></pre></div>
+<p>Add the <code>--global</code> flag to edit the global config file.</p>
+<p>When you get into the editor, you’ll see a config file that might look something like this:</p>
+<div class="sourceCode" id="cb297"><pre class="sourceCode numberSource default numberLines"><code class="sourceCode default"><span id="cb297-1"><a href="configuration.html#cb297-1"></a>[core]</span>
+<span id="cb297-2"><a href="configuration.html#cb297-2"></a>    repositoryformatversion = 0</span>
+<span id="cb297-3"><a href="configuration.html#cb297-3"></a>    filemode = true</span>
+<span id="cb297-4"><a href="configuration.html#cb297-4"></a>    bare = false</span>
+<span id="cb297-5"><a href="configuration.html#cb297-5"></a>    logallrefupdates = true</span>
+<span id="cb297-6"><a href="configuration.html#cb297-6"></a></span>
+<span id="cb297-7"><a href="configuration.html#cb297-7"></a>[user]</span>
+<span id="cb297-8"><a href="configuration.html#cb297-8"></a>    name = Your Name</span>
+<span id="cb297-9"><a href="configuration.html#cb297-9"></a>    email = user@example.com</span></code></pre></div>
+<p>If you look, you can see where <code>user.name</code> and <code>user.email</code> ended up. That’s how the config file is organized.</p>
+<p>So you can edit it here and save those changes. Some people might find this easier than adding or modifying variables on the command line.</p>
+<blockquote>
+<p><strong>If you corrupt your config with sloppy editing, you’re in for an interesting time.</strong> You won’t be able to run <code>git config edit</code> again. You’ll have to manually fix the config file in your favorite text editor.</p>
+<p>The local config file can be found relative to the root directory for the repo in question in <code>.git/config</code>.</p>
+<p>The global config file can be found at <code>~/.gitconfig</code> on Unix-like systems and <code>C:\Users\YourName\.gitconfig</code> on Windows.</p>
+<p>Bring the appropriate file up in your editor, fix the mistake, save it, and then <code>git config edit</code> should work again.</p>
+</blockquote>
+<p></p>
+<h2 data-number="24.6" id="conditional-configuration"><span class="header-section-number">24.6</span> Conditional Configuration</h2>
+<p></p>
+<p>This is more than I want to talk about, but it’s neat enough to point out.</p>
+<p>In Git config files, you can <em>include</em> other config files. This gives you a way, if your config files are bananas, to break them apart logically.</p>
+<p>You can also do <em>conditional includes</em>. That is, you can choose to include a file based on some condition being true.</p>
+<p>Testable conditions are:</p>
+<ul>
+<li>Which directory this repo is in</li>
+<li>If you’re on a particular branch</li>
+<li>If there is a particular remote configured</li>
+</ul>
+<p>This gives you all kinds of power. Personally, all of it is more than I need, and I’ve never used this feature, but that’s just me.</p>
+<p><a href="https://git-scm.com/docs/git-config#_conditional_includes">Get more info and examples in the official book</a><a href="quick-reference.html#fn41" class="footnote-ref" id="fnref41" role="doc-noteref"><sup>41</sup></a>.</p>
+<p></p>
+<h2 data-number="24.7" id="config-old"><span class="header-section-number">24.7</span> Older Git Versions</h2>
+<p></p>
+<p>I’m assuming you have a recent version of Git installed. But if you don’t, these commands might be different.</p>
+<p>The <a href="https://git-scm.com/docs/git-config#_deprecated_modes">Git manual page for <code>git config</code> has a complete summary of the changes</a><a href="quick-reference.html#fn42" class="footnote-ref" id="fnref42" role="doc-noteref"><sup>42</sup></a>.</p>
+<p>And here are the modern commands we used in this chapter:</p>
+<div class="sourceCode" id="cb298"><pre class="sourceCode default"><code class="sourceCode default"><span id="cb298-1"><a href="configuration.html#cb298-1" aria-hidden="true" tabindex="-1"></a>git config get user.email                     # Get</span>
+<span id="cb298-2"><a href="configuration.html#cb298-2" aria-hidden="true" tabindex="-1"></a>git config set user.email &quot;user@example.com&quot;  # Set</span>
+<span id="cb298-3"><a href="configuration.html#cb298-3" aria-hidden="true" tabindex="-1"></a>git config unset user.email                   # Delete</span>
+<span id="cb298-4"><a href="configuration.html#cb298-4" aria-hidden="true" tabindex="-1"></a>git config list                               # List</span>
+<span id="cb298-5"><a href="configuration.html#cb298-5" aria-hidden="true" tabindex="-1"></a>git config edit                               # Edit</span></code></pre></div>
+<p>And here are the older equivalents:</p>
+<div class="sourceCode" id="cb299"><pre class="sourceCode default"><code class="sourceCode default"><span id="cb299-1"><a href="configuration.html#cb299-1" aria-hidden="true" tabindex="-1"></a>git config user.email                     # Get</span>
+<span id="cb299-2"><a href="configuration.html#cb299-2" aria-hidden="true" tabindex="-1"></a>git config user.email &quot;user@example.com&quot;  # Set</span>
+<span id="cb299-3"><a href="configuration.html#cb299-3" aria-hidden="true" tabindex="-1"></a>git config --unset user.email             # Delete</span>
+<span id="cb299-4"><a href="configuration.html#cb299-4" aria-hidden="true" tabindex="-1"></a>git config --list                         # List</span>
+<span id="cb299-5"><a href="configuration.html#cb299-5" aria-hidden="true" tabindex="-1"></a>git config --edit                         # Edit</span></code></pre></div>
+<p>Use the new ones if you can!</p>
+<p></p>
+<p></p>
+<!-- BG_NEW_CHAPTER -->
+<hr><div style="text-align:center"><span><a href="whos-to-blame-for-this-code.html" rel="prev">Prev</a> | </span><a href="index.html">Contents</a><span> | <a href="git-aliases.html" rel="next">Next</a></span></div></body>
+</html>

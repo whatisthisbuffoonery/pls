@@ -1,0 +1,667 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <title>Beej's Guide to Git</title>
+  <style>
+    html {
+      color: #1a1a1a;
+      background-color: #fdfdfd;
+    }
+    body {
+      margin: 0 auto;
+      max-width: 36em;
+      padding-left: 50px;
+      padding-right: 50px;
+      padding-top: 50px;
+      padding-bottom: 50px;
+      hyphens: auto;
+      overflow-wrap: break-word;
+      text-rendering: optimizeLegibility;
+      font-kerning: normal;
+    }
+    @media (max-width: 600px) {
+      body {
+        font-size: 0.9em;
+        padding: 12px;
+      }
+      h1 {
+        font-size: 1.8em;
+      }
+    }
+    @media print {
+      html {
+        background-color: white;
+      }
+      body {
+        background-color: transparent;
+        color: black;
+        font-size: 12pt;
+      }
+      p, h2, h3 {
+        orphans: 3;
+        widows: 3;
+      }
+      h2, h3, h4 {
+        page-break-after: avoid;
+      }
+    }
+    p {
+      margin: 1em 0;
+    }
+    a {
+      color: #1a1a1a;
+    }
+    a:visited {
+      color: #1a1a1a;
+    }
+    img {
+      max-width: 100%;
+    }
+    svg {
+      height: auto;
+      max-width: 100%;
+    }
+    h1, h2, h3, h4, h5, h6 {
+      margin-top: 1.4em;
+    }
+    h5, h6 {
+      font-size: 1em;
+      font-style: italic;
+    }
+    h6 {
+      font-weight: normal;
+    }
+    ol, ul {
+      padding-left: 1.7em;
+      margin-top: 1em;
+    }
+    li > ol, li > ul {
+      margin-top: 0;
+    }
+    blockquote {
+      margin: 1em 0 1em 1.7em;
+      padding-left: 1em;
+      border-left: 2px solid #e6e6e6;
+      color: #606060;
+    }
+    code {
+      font-family: Menlo, Monaco, Consolas, 'Lucida Console', monospace;
+      font-size: 85%;
+      margin: 0;
+      hyphens: manual;
+    }
+    pre {
+      margin: 1em 0;
+      overflow: auto;
+    }
+    pre code {
+      padding: 0;
+      overflow: visible;
+      overflow-wrap: normal;
+    }
+    .sourceCode {
+     background-color: transparent;
+     overflow: visible;
+    }
+    hr {
+      background-color: #1a1a1a;
+      border: none;
+      height: 1px;
+      margin: 1em 0;
+    }
+    table {
+      margin: 1em 0;
+      border-collapse: collapse;
+      width: 100%;
+      overflow-x: auto;
+      display: block;
+      font-variant-numeric: lining-nums tabular-nums;
+    }
+    table caption {
+      margin-bottom: 0.75em;
+    }
+    tbody {
+      margin-top: 0.5em;
+      border-top: 1px solid #1a1a1a;
+      border-bottom: 1px solid #1a1a1a;
+    }
+    th {
+      border-top: 1px solid #1a1a1a;
+      padding: 0.25em 0.5em 0.25em 0.5em;
+    }
+    td {
+      padding: 0.125em 0.5em 0.25em 0.5em;
+    }
+    header {
+      margin-bottom: 4em;
+      text-align: center;
+    }
+    #TOC li {
+      list-style: none;
+    }
+    #TOC ul {
+      padding-left: 1.3em;
+    }
+    #TOC > ul {
+      padding-left: 0;
+    }
+    #TOC a:not(:hover) {
+      text-decoration: none;
+    }
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+    /* CSS for syntax highlighting */
+    html { -webkit-text-size-adjust: 100%; }
+    pre > code.sourceCode { white-space: pre; position: relative; }
+    pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+    pre > code.sourceCode > span:empty { height: 1.2em; }
+    .sourceCode { overflow: visible; }
+    code.sourceCode > span { color: inherit; text-decoration: inherit; }
+    div.sourceCode { margin: 1em 0; }
+    pre.sourceCode { margin: 0; }
+    @media screen {
+    div.sourceCode { overflow: auto; }
+    }
+    @media print {
+    pre > code.sourceCode { white-space: pre-wrap; }
+    pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+    }
+    pre.numberSource code
+      { counter-reset: source-line 0; }
+    pre.numberSource code > span
+      { position: relative; left: -4em; counter-increment: source-line; }
+    pre.numberSource code > span > a:first-child::before
+      { content: counter(source-line);
+        position: relative; left: -1em; text-align: right; vertical-align: baseline;
+        border: none; display: inline-block;
+        -webkit-touch-callout: none; -webkit-user-select: none;
+        -khtml-user-select: none; -moz-user-select: none;
+        -ms-user-select: none; user-select: none;
+        padding: 0 4px; width: 4em;
+        color: #aaaaaa;
+      }
+    pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+    div.sourceCode
+      {   }
+    @media screen {
+    pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+    }
+    code span.al { color: #ff0000; font-weight: bold; } /* Alert */
+    code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+    code span.at { color: #7d9029; } /* Attribute */
+    code span.bn { color: #40a070; } /* BaseN */
+    code span.bu { color: #008000; } /* BuiltIn */
+    code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+    code span.ch { color: #4070a0; } /* Char */
+    code span.cn { color: #880000; } /* Constant */
+    code span.co { color: #60a0b0; font-style: italic; } /* Comment */
+    code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+    code span.do { color: #ba2121; font-style: italic; } /* Documentation */
+    code span.dt { color: #902000; } /* DataType */
+    code span.dv { color: #40a070; } /* DecVal */
+    code span.er { color: #ff0000; font-weight: bold; } /* Error */
+    code span.ex { } /* Extension */
+    code span.fl { color: #40a070; } /* Float */
+    code span.fu { color: #06287e; } /* Function */
+    code span.im { color: #008000; font-weight: bold; } /* Import */
+    code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+    code span.kw { color: #007020; font-weight: bold; } /* Keyword */
+    code span.op { color: #666666; } /* Operator */
+    code span.ot { color: #007020; } /* Other */
+    code span.pp { color: #bc7a00; } /* Preprocessor */
+    code span.sc { color: #4070a0; } /* SpecialChar */
+    code span.ss { color: #bb6688; } /* SpecialString */
+    code span.st { color: #4070a0; } /* String */
+    code span.va { color: #19177c; } /* Variable */
+    code span.vs { color: #4070a0; } /* VerbatimString */
+    code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+  </style>
+  <!-- BG custom styling -->
+  <style type="text/css">
+  /* Fix for line numbers not visible */
+  pre.numberSource code > span {
+      left: -1em;
+  }
+  pre.numberSource {
+      margin-left: initial;
+  }
+
+  /* Put some space after the section numbers */
+  span.toc-section-number::after {
+      content: "\a0\a0\a0";  /* non-breaking whitespace */
+  }
+
+  /* Hide underlines on code number links */
+  pre > code.sourceCode > span > a:first-child::before {
+      text-decoration: none;
+  }
+
+  /* Color the source blocks */
+  div.sourceCode {
+      background-color: #f0f0f0;
+  }
+
+  /* Fix iOS big text rendering issue */
+  pre > code.sourceCode > span {
+      display: initial;
+  }
+
+
+  /* Color the inline code */
+  code:not(.sourceCode) {
+      background: #f0f0f0;
+      padding-left: 0.2em;
+      padding-right: 0.2em;
+      border-radius: 0.2em;
+  }
+
+  pre.sourceCode {
+      border: 1px solid #ccc;
+      padding: 0.5em;
+      border-radius: 0.2em;
+  }
+
+  /* Keep code tags from wrapping in tables */
+  tbody code {
+      white-space: nowrap;
+  }
+
+  /* Prevent hyphenation and hyphen breaks in code*/
+  code {
+      word-break: keep-all;
+  }
+
+  td {
+      vertical-align: top;
+  }
+
+  body {
+      font-size: 12pt;
+      max-width: 43em;
+      font-family: sans-serif;
+  }
+
+  html {
+      background: #f9f9f9;
+  }
+
+  figure > embed {
+      max-width: 100%;
+  }
+
+  figure {
+      text-align: center;
+      margin-top: 2em;
+      margin-bottom: 2em;
+  }
+
+  figcaption {
+      font-size: 0.9em;
+      font-style: italic;
+      margin-top: 0.6em;
+  }
+
+  body {
+      counter-reset: figure-counter-major;
+      counter-reset: figure-counter-minor;
+  }
+
+  figure {
+      counter-increment: figure-counter-minor;
+  }
+
+  figcaption::before {
+      content: "Figure " counter(figure-counter-major) "." counter(figure-counter-minor) ": ";
+  }
+
+  blockquote {
+      border-left: 2px solid #bbb;
+      color: #444;
+  }
+
+  /* Contents */
+
+  nav[role="doc-toc"] > ul > li {
+    font-weight: bold;
+    margin-top: 1.2em;
+  }
+
+  nav[role="doc-toc"] > ul > li:first {
+    font-weight: bold;
+    margin-top: initial;
+  }
+
+  nav[role="doc-toc"] > ul > li > ul {
+    font-weight: normal;
+    margin-top: 0.3em;
+  }
+
+  /*
+  In multipage, we need to reset the figure counter to the chapter
+  number. Luckily, this is in the <h1 data-number> attribute. Unluckily,
+  there is no way to get this in a general way.
+
+  This doesn't work:
+
+    h1[data-number] {
+      counter-set: figure-counter-major attr(data-number);
+    }
+
+  Nor this:
+
+    h1[data-number] {
+      --figure-counter-major-value: attr(data-number);
+      counter-set: figure-counter-major var(--figure-counter-major-value);
+    }
+
+  So, dumbly, we have a bunch of rules for all these sections, up to the
+  maximum possible section.
+
+  Here's a program to generate them:
+
+    for (let i = 1; i < 100; i++)
+        console.log(`h1[data-number="${i}"]{counter-set:figure-counter-major ${i};counter-reset:figure-counter-minor;}`);
+
+  Note to self: never write a book with more than 99 frickin' chapters.
+  */
+
+  h1[data-number="1"]{counter-set:figure-counter-major 1;counter-reset:figure-counter-minor;}
+  h1[data-number="2"]{counter-set:figure-counter-major 2;counter-reset:figure-counter-minor;}
+  h1[data-number="3"]{counter-set:figure-counter-major 3;counter-reset:figure-counter-minor;}
+  h1[data-number="4"]{counter-set:figure-counter-major 4;counter-reset:figure-counter-minor;}
+  h1[data-number="5"]{counter-set:figure-counter-major 5;counter-reset:figure-counter-minor;}
+  h1[data-number="6"]{counter-set:figure-counter-major 6;counter-reset:figure-counter-minor;}
+  h1[data-number="7"]{counter-set:figure-counter-major 7;counter-reset:figure-counter-minor;}
+  h1[data-number="8"]{counter-set:figure-counter-major 8;counter-reset:figure-counter-minor;}
+  h1[data-number="9"]{counter-set:figure-counter-major 9;counter-reset:figure-counter-minor;}
+  h1[data-number="10"]{counter-set:figure-counter-major 10;counter-reset:figure-counter-minor;}
+  h1[data-number="11"]{counter-set:figure-counter-major 11;counter-reset:figure-counter-minor;}
+  h1[data-number="12"]{counter-set:figure-counter-major 12;counter-reset:figure-counter-minor;}
+  h1[data-number="13"]{counter-set:figure-counter-major 13;counter-reset:figure-counter-minor;}
+  h1[data-number="14"]{counter-set:figure-counter-major 14;counter-reset:figure-counter-minor;}
+  h1[data-number="15"]{counter-set:figure-counter-major 15;counter-reset:figure-counter-minor;}
+  h1[data-number="16"]{counter-set:figure-counter-major 16;counter-reset:figure-counter-minor;}
+  h1[data-number="17"]{counter-set:figure-counter-major 17;counter-reset:figure-counter-minor;}
+  h1[data-number="18"]{counter-set:figure-counter-major 18;counter-reset:figure-counter-minor;}
+  h1[data-number="19"]{counter-set:figure-counter-major 19;counter-reset:figure-counter-minor;}
+  h1[data-number="20"]{counter-set:figure-counter-major 20;counter-reset:figure-counter-minor;}
+  h1[data-number="21"]{counter-set:figure-counter-major 21;counter-reset:figure-counter-minor;}
+  h1[data-number="22"]{counter-set:figure-counter-major 22;counter-reset:figure-counter-minor;}
+  h1[data-number="23"]{counter-set:figure-counter-major 23;counter-reset:figure-counter-minor;}
+  h1[data-number="24"]{counter-set:figure-counter-major 24;counter-reset:figure-counter-minor;}
+  h1[data-number="25"]{counter-set:figure-counter-major 25;counter-reset:figure-counter-minor;}
+  h1[data-number="26"]{counter-set:figure-counter-major 26;counter-reset:figure-counter-minor;}
+  h1[data-number="27"]{counter-set:figure-counter-major 27;counter-reset:figure-counter-minor;}
+  h1[data-number="28"]{counter-set:figure-counter-major 28;counter-reset:figure-counter-minor;}
+  h1[data-number="29"]{counter-set:figure-counter-major 29;counter-reset:figure-counter-minor;}
+  h1[data-number="30"]{counter-set:figure-counter-major 30;counter-reset:figure-counter-minor;}
+  h1[data-number="31"]{counter-set:figure-counter-major 31;counter-reset:figure-counter-minor;}
+  h1[data-number="32"]{counter-set:figure-counter-major 32;counter-reset:figure-counter-minor;}
+  h1[data-number="33"]{counter-set:figure-counter-major 33;counter-reset:figure-counter-minor;}
+  h1[data-number="34"]{counter-set:figure-counter-major 34;counter-reset:figure-counter-minor;}
+  h1[data-number="35"]{counter-set:figure-counter-major 35;counter-reset:figure-counter-minor;}
+  h1[data-number="36"]{counter-set:figure-counter-major 36;counter-reset:figure-counter-minor;}
+  h1[data-number="37"]{counter-set:figure-counter-major 37;counter-reset:figure-counter-minor;}
+  h1[data-number="38"]{counter-set:figure-counter-major 38;counter-reset:figure-counter-minor;}
+  h1[data-number="39"]{counter-set:figure-counter-major 39;counter-reset:figure-counter-minor;}
+  h1[data-number="40"]{counter-set:figure-counter-major 40;counter-reset:figure-counter-minor;}
+  h1[data-number="41"]{counter-set:figure-counter-major 41;counter-reset:figure-counter-minor;}
+  h1[data-number="42"]{counter-set:figure-counter-major 42;counter-reset:figure-counter-minor;}
+  h1[data-number="43"]{counter-set:figure-counter-major 43;counter-reset:figure-counter-minor;}
+  h1[data-number="44"]{counter-set:figure-counter-major 44;counter-reset:figure-counter-minor;}
+  h1[data-number="45"]{counter-set:figure-counter-major 45;counter-reset:figure-counter-minor;}
+  h1[data-number="46"]{counter-set:figure-counter-major 46;counter-reset:figure-counter-minor;}
+  h1[data-number="47"]{counter-set:figure-counter-major 47;counter-reset:figure-counter-minor;}
+  h1[data-number="48"]{counter-set:figure-counter-major 48;counter-reset:figure-counter-minor;}
+  h1[data-number="49"]{counter-set:figure-counter-major 49;counter-reset:figure-counter-minor;}
+  h1[data-number="50"]{counter-set:figure-counter-major 50;counter-reset:figure-counter-minor;}
+  h1[data-number="51"]{counter-set:figure-counter-major 51;counter-reset:figure-counter-minor;}
+  h1[data-number="52"]{counter-set:figure-counter-major 52;counter-reset:figure-counter-minor;}
+  h1[data-number="53"]{counter-set:figure-counter-major 53;counter-reset:figure-counter-minor;}
+  h1[data-number="54"]{counter-set:figure-counter-major 54;counter-reset:figure-counter-minor;}
+  h1[data-number="55"]{counter-set:figure-counter-major 55;counter-reset:figure-counter-minor;}
+  h1[data-number="56"]{counter-set:figure-counter-major 56;counter-reset:figure-counter-minor;}
+  h1[data-number="57"]{counter-set:figure-counter-major 57;counter-reset:figure-counter-minor;}
+  h1[data-number="58"]{counter-set:figure-counter-major 58;counter-reset:figure-counter-minor;}
+  h1[data-number="59"]{counter-set:figure-counter-major 59;counter-reset:figure-counter-minor;}
+  h1[data-number="60"]{counter-set:figure-counter-major 60;counter-reset:figure-counter-minor;}
+  h1[data-number="61"]{counter-set:figure-counter-major 61;counter-reset:figure-counter-minor;}
+  h1[data-number="62"]{counter-set:figure-counter-major 62;counter-reset:figure-counter-minor;}
+  h1[data-number="63"]{counter-set:figure-counter-major 63;counter-reset:figure-counter-minor;}
+  h1[data-number="64"]{counter-set:figure-counter-major 64;counter-reset:figure-counter-minor;}
+  h1[data-number="65"]{counter-set:figure-counter-major 65;counter-reset:figure-counter-minor;}
+  h1[data-number="66"]{counter-set:figure-counter-major 66;counter-reset:figure-counter-minor;}
+  h1[data-number="67"]{counter-set:figure-counter-major 67;counter-reset:figure-counter-minor;}
+  h1[data-number="68"]{counter-set:figure-counter-major 68;counter-reset:figure-counter-minor;}
+  h1[data-number="69"]{counter-set:figure-counter-major 69;counter-reset:figure-counter-minor;}
+  h1[data-number="70"]{counter-set:figure-counter-major 70;counter-reset:figure-counter-minor;}
+  h1[data-number="71"]{counter-set:figure-counter-major 71;counter-reset:figure-counter-minor;}
+  h1[data-number="72"]{counter-set:figure-counter-major 72;counter-reset:figure-counter-minor;}
+  h1[data-number="73"]{counter-set:figure-counter-major 73;counter-reset:figure-counter-minor;}
+  h1[data-number="74"]{counter-set:figure-counter-major 74;counter-reset:figure-counter-minor;}
+  h1[data-number="75"]{counter-set:figure-counter-major 75;counter-reset:figure-counter-minor;}
+  h1[data-number="76"]{counter-set:figure-counter-major 76;counter-reset:figure-counter-minor;}
+  h1[data-number="77"]{counter-set:figure-counter-major 77;counter-reset:figure-counter-minor;}
+  h1[data-number="78"]{counter-set:figure-counter-major 78;counter-reset:figure-counter-minor;}
+  h1[data-number="79"]{counter-set:figure-counter-major 79;counter-reset:figure-counter-minor;}
+  h1[data-number="80"]{counter-set:figure-counter-major 80;counter-reset:figure-counter-minor;}
+  h1[data-number="81"]{counter-set:figure-counter-major 81;counter-reset:figure-counter-minor;}
+  h1[data-number="82"]{counter-set:figure-counter-major 82;counter-reset:figure-counter-minor;}
+  h1[data-number="83"]{counter-set:figure-counter-major 83;counter-reset:figure-counter-minor;}
+  h1[data-number="84"]{counter-set:figure-counter-major 84;counter-reset:figure-counter-minor;}
+  h1[data-number="85"]{counter-set:figure-counter-major 85;counter-reset:figure-counter-minor;}
+  h1[data-number="86"]{counter-set:figure-counter-major 86;counter-reset:figure-counter-minor;}
+  h1[data-number="87"]{counter-set:figure-counter-major 87;counter-reset:figure-counter-minor;}
+  h1[data-number="88"]{counter-set:figure-counter-major 88;counter-reset:figure-counter-minor;}
+  h1[data-number="89"]{counter-set:figure-counter-major 89;counter-reset:figure-counter-minor;}
+  h1[data-number="90"]{counter-set:figure-counter-major 90;counter-reset:figure-counter-minor;}
+  h1[data-number="91"]{counter-set:figure-counter-major 91;counter-reset:figure-counter-minor;}
+  h1[data-number="92"]{counter-set:figure-counter-major 92;counter-reset:figure-counter-minor;}
+  h1[data-number="93"]{counter-set:figure-counter-major 93;counter-reset:figure-counter-minor;}
+  h1[data-number="94"]{counter-set:figure-counter-major 94;counter-reset:figure-counter-minor;}
+  h1[data-number="95"]{counter-set:figure-counter-major 95;counter-reset:figure-counter-minor;}
+  h1[data-number="96"]{counter-set:figure-counter-major 96;counter-reset:figure-counter-minor;}
+  h1[data-number="97"]{counter-set:figure-counter-major 97;counter-reset:figure-counter-minor;}
+  h1[data-number="98"]{counter-set:figure-counter-major 98;counter-reset:figure-counter-minor;}
+  h1[data-number="99"]{counter-set:figure-counter-major 99;counter-reset:figure-counter-minor;}
+
+
+  </style>
+  <!-- BG custom styling for the wide body variant -->
+  <!-- Gets appended after bg-css.html -->
+
+  <style type="text/css">
+  body {
+      max-width: inherit;
+  }
+  </style>
+</head>
+<body>
+<div style="text-align:center"><span><a href="worktrees.html" rel="prev">Prev</a> | </span><a href="index.html">Contents</a><span> | <a href="editor-get-out.html" rel="next">Next</a></span></div><hr>
+<h1 data-number="33" id="making-playground"><span class="header-section-number">33</span> Appendix: Making a Playground</h1>
+<p></p>
+<p>In programming circles in general, a <em>playground</em> is a place you can go to mess with code and tech and not worry about messing up your production system.</p>
+<p>And there are places you can go online to find these, but with Git, I find it’s just as easy to make your own local repo.</p>
+<p>Here’s a way to make a new local repo called <code>playground</code> out of the current directory. (You should <strong>not</strong> be under a Git repo at this time; create the playground outside other existing repos.)</p>
+<div class="sourceCode" id="cb395"><pre class="sourceCode default"><code class="sourceCode default"><span id="cb395-1"><a href="making-playground.html#cb395-1" aria-hidden="true" tabindex="-1"></a>$ git init playground</span>
+<span id="cb395-2"><a href="making-playground.html#cb395-2" aria-hidden="true" tabindex="-1"></a>  Initialized empty Git repository in /user/playground/.git/</span></code></pre></div>
+<p><code>playground</code> isn’t a special name. You can call it <code>foo</code> or anything. I’ll just use it for this example.</p>
+<p>What that command did was create a new subdirectory called <code>playground</code> and create a Git repo in it.</p>
+<p>Let’s continue at the end: how do you delete the repo? You just remove the directory.</p>
+<pre><code>$ rm -rf playground   # delete the playground repo</code></pre>
+<p>And let’s create it again:</p>
+<div class="sourceCode" id="cb397"><pre class="sourceCode default"><code class="sourceCode default"><span id="cb397-1"><a href="making-playground.html#cb397-1" aria-hidden="true" tabindex="-1"></a>$ git init playground</span></code></pre></div>
+<p>We have all the power!</p>
+<blockquote>
+<p><strong>This repo only exists on this computer</strong>; it has no remotes and no way to push. You could add that stuff later, if you wanted, but playgrounds tend to be temporary areas where you’re just trying things out.</p>
+</blockquote>
+<p>Let’s go into the playground and check it out.</p>
+<div class="sourceCode" id="cb398"><pre class="sourceCode default"><code class="sourceCode default"><span id="cb398-1"><a href="making-playground.html#cb398-1" aria-hidden="true" tabindex="-1"></a>$ cd playground</span>
+<span id="cb398-2"><a href="making-playground.html#cb398-2" aria-hidden="true" tabindex="-1"></a>$ ls -la</span>
+<span id="cb398-3"><a href="making-playground.html#cb398-3" aria-hidden="true" tabindex="-1"></a>  total 4</span>
+<span id="cb398-4"><a href="making-playground.html#cb398-4" aria-hidden="true" tabindex="-1"></a>  drwxr-xr-x  3 user group   18 Jul 13 14:43 .</span>
+<span id="cb398-5"><a href="making-playground.html#cb398-5" aria-hidden="true" tabindex="-1"></a>  drwxr-xr-x 22 user group 4096 Jul 13 14:43 ..</span>
+<span id="cb398-6"><a href="making-playground.html#cb398-6" aria-hidden="true" tabindex="-1"></a>  drwxr-xr-x  7 user group  119 Jul 13 14:43 .git</span></code></pre></div>
+<p>There’s a directory there called <code>.git</code> that has all the metadata in it.</p>
+<blockquote>
+<p><strong>If we wanted to change this directory from a Git repo to just a normal directory</strong>, we could run this:</p>
+<div class="sourceCode" id="cb399"><pre class="sourceCode default"><code class="sourceCode default"><span id="cb399-1"><a href="making-playground.html#cb399-1" aria-hidden="true" tabindex="-1"></a>$ rm -rf .git       # Delete the .git directory</span></code></pre></div>
+<!-- ` -->
+<p>Again, we have all the power! But let’s show some restraint and not do that yet.</p>
+</blockquote>
+<p>What can we do?</p>
+<p>What <em>can’t</em> we do? Let’s make a file and see where we stand:</p>
+<div class="sourceCode" id="cb400"><pre class="sourceCode default"><code class="sourceCode default"><span id="cb400-1"><a href="making-playground.html#cb400-1" aria-hidden="true" tabindex="-1"></a>$ echo &quot;Hello, world&quot; &gt; hello.txt   # Create a file</span>
+<span id="cb400-2"><a href="making-playground.html#cb400-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb400-3"><a href="making-playground.html#cb400-3" aria-hidden="true" tabindex="-1"></a>$ ls -l</span>
+<span id="cb400-4"><a href="making-playground.html#cb400-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb400-5"><a href="making-playground.html#cb400-5" aria-hidden="true" tabindex="-1"></a>  total 4</span>
+<span id="cb400-6"><a href="making-playground.html#cb400-6" aria-hidden="true" tabindex="-1"></a>  -rw-r--r-- 1 user group 13 Jul 13 14:47 hello.txt</span>
+<span id="cb400-7"><a href="making-playground.html#cb400-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb400-8"><a href="making-playground.html#cb400-8" aria-hidden="true" tabindex="-1"></a>$ git status</span>
+<span id="cb400-9"><a href="making-playground.html#cb400-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb400-10"><a href="making-playground.html#cb400-10" aria-hidden="true" tabindex="-1"></a>  On branch main</span>
+<span id="cb400-11"><a href="making-playground.html#cb400-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb400-12"><a href="making-playground.html#cb400-12" aria-hidden="true" tabindex="-1"></a>  No commits yet</span>
+<span id="cb400-13"><a href="making-playground.html#cb400-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb400-14"><a href="making-playground.html#cb400-14" aria-hidden="true" tabindex="-1"></a>  Untracked files:</span>
+<span id="cb400-15"><a href="making-playground.html#cb400-15" aria-hidden="true" tabindex="-1"></a>    (use &quot;git add &lt;file&gt;...&quot; to include in what will be committed)</span>
+<span id="cb400-16"><a href="making-playground.html#cb400-16" aria-hidden="true" tabindex="-1"></a>      hello.txt</span>
+<span id="cb400-17"><a href="making-playground.html#cb400-17" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb400-18"><a href="making-playground.html#cb400-18" aria-hidden="true" tabindex="-1"></a>  nothing added to commit but untracked files present (use &quot;git</span>
+<span id="cb400-19"><a href="making-playground.html#cb400-19" aria-hidden="true" tabindex="-1"></a>  add&quot; to track)</span></code></pre></div>
+<p>Now we have an untracked file.</p>
+<p>We can <code>git add</code> it, we can <code>git commit</code> it, we can create branches, we can merge them and make conflicts and resolve them and <code>git rebase</code> and <code>git reset</code> and all kinds of stuff.</p>
+<p>We don’t have a remote, so the only things we can’t do involve pushing and pulling.</p>
+<p>But it turns out we can even make that happen! Let’s see how.</p>
+<h2 data-number="33.1" id="cloning-bare-repos"><span class="header-section-number">33.1</span> Cloning Bare Repos</h2>
+<p> </p>
+<p>A <em>bare repo</em> is one without a working tree. You can’t go in there to see files, because they don’t exist in there in a normal sense. The only thing that’s there is metadata and the commit snapshots.</p>
+<p></p>
+<p>You can clone, push, and pull bare repos.</p>
+<p>Let’s make one (again, you could name it anything you want), noting the <code>--bare</code> command line option:</p>
+<div class="sourceCode" id="cb401"><pre class="sourceCode default"><code class="sourceCode default"><span id="cb401-1"><a href="making-playground.html#cb401-1" aria-hidden="true" tabindex="-1"></a>$ git init --bare origin_repo</span>
+<span id="cb401-2"><a href="making-playground.html#cb401-2" aria-hidden="true" tabindex="-1"></a>  Initialized empty Git repository in /user/origin_repo/</span></code></pre></div>
+<p>If you look in there (to be clear, you have no reason to) you’ll just see metadata and directories.</p>
+<p>Before we can use it, we’d better clone it. For ease, we’ll do this from the same directory we created it.</p>
+<div class="sourceCode" id="cb402"><pre class="sourceCode default"><code class="sourceCode default"><span id="cb402-1"><a href="making-playground.html#cb402-1" aria-hidden="true" tabindex="-1"></a>$ git clone origin_repo playground</span>
+<span id="cb402-2"><a href="making-playground.html#cb402-2" aria-hidden="true" tabindex="-1"></a>  Cloning into &#39;playground&#39;...</span>
+<span id="cb402-3"><a href="making-playground.html#cb402-3" aria-hidden="true" tabindex="-1"></a>  warning: You appear to have cloned an empty repository.</span>
+<span id="cb402-4"><a href="making-playground.html#cb402-4" aria-hidden="true" tabindex="-1"></a>  done.</span></code></pre></div>
+<p>It is empty, naturally. We haven’t made any commits.</p>
+<p>Now we have two repos in this directory:</p>
+<ul>
+<li><code>origin_repo</code>: the bare repo we cloned, and:</li>
+<li><code>playground</code>: the repo we cloned from it.</li>
+</ul>
+<p>Let’s jump in there and see what’s up:</p>
+<div class="sourceCode" id="cb403"><pre class="sourceCode default"><code class="sourceCode default"><span id="cb403-1"><a href="making-playground.html#cb403-1" aria-hidden="true" tabindex="-1"></a>$ cd playground</span>
+<span id="cb403-2"><a href="making-playground.html#cb403-2" aria-hidden="true" tabindex="-1"></a>$ git remote -v</span>
+<span id="cb403-3"><a href="making-playground.html#cb403-3" aria-hidden="true" tabindex="-1"></a>  origin    /user/origin_repo (fetch)</span>
+<span id="cb403-4"><a href="making-playground.html#cb403-4" aria-hidden="true" tabindex="-1"></a>  origin    /user/origin_repo (push)</span></code></pre></div>
+<p>We have remotes! Of course we do. We cloned this repo, and Git automatically sets up the <code>origin</code> remote.</p>
+<p>And remember that <code>origin</code> is just an alias for some remote that’s identified somehow. We’re used to seeing remotes that start with <code>https</code> or <code>ssh</code>, but here’s an example of a remote that’s just another subdirectory on your disk.</p>
+<p></p>
+<p>Let’s make a file and commit it, and see if we can push!</p>
+<div class="sourceCode" id="cb404"><pre class="sourceCode default"><code class="sourceCode default"><span id="cb404-1"><a href="making-playground.html#cb404-1" aria-hidden="true" tabindex="-1"></a>$ echo &quot;Hello, world&quot; &gt; hello.txt</span>
+<span id="cb404-2"><a href="making-playground.html#cb404-2" aria-hidden="true" tabindex="-1"></a>$ git add hello.txt</span>
+<span id="cb404-3"><a href="making-playground.html#cb404-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb404-4"><a href="making-playground.html#cb404-4" aria-hidden="true" tabindex="-1"></a>$ git commit -m added</span>
+<span id="cb404-5"><a href="making-playground.html#cb404-5" aria-hidden="true" tabindex="-1"></a>  [main (root-commit) 4a82a14] added</span>
+<span id="cb404-6"><a href="making-playground.html#cb404-6" aria-hidden="true" tabindex="-1"></a>   1 file changed, 1 insertion(+)</span>
+<span id="cb404-7"><a href="making-playground.html#cb404-7" aria-hidden="true" tabindex="-1"></a>   create mode 100644 hello.txt</span>
+<span id="cb404-8"><a href="making-playground.html#cb404-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb404-9"><a href="making-playground.html#cb404-9" aria-hidden="true" tabindex="-1"></a>$ git push</span>
+<span id="cb404-10"><a href="making-playground.html#cb404-10" aria-hidden="true" tabindex="-1"></a>  Enumerating objects: 3, done.</span>
+<span id="cb404-11"><a href="making-playground.html#cb404-11" aria-hidden="true" tabindex="-1"></a>  Counting objects: 100% (3/3), done.</span>
+<span id="cb404-12"><a href="making-playground.html#cb404-12" aria-hidden="true" tabindex="-1"></a>  Writing objects: 100% (3/3), 907 bytes | 907.00 KiB/s, done.</span>
+<span id="cb404-13"><a href="making-playground.html#cb404-13" aria-hidden="true" tabindex="-1"></a>  Total 3 (delta 0), reused 0 (delta 0), pack-reused 0 (from 0)</span>
+<span id="cb404-14"><a href="making-playground.html#cb404-14" aria-hidden="true" tabindex="-1"></a>  To /user/origin_repo</span>
+<span id="cb404-15"><a href="making-playground.html#cb404-15" aria-hidden="true" tabindex="-1"></a>   * [new branch]      main -&gt; main</span>
+<span id="cb404-16"><a href="making-playground.html#cb404-16" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb404-17"><a href="making-playground.html#cb404-17" aria-hidden="true" tabindex="-1"></a>$ git branch -va</span>
+<span id="cb404-18"><a href="making-playground.html#cb404-18" aria-hidden="true" tabindex="-1"></a>  * main                4a82a14 added</span>
+<span id="cb404-19"><a href="making-playground.html#cb404-19" aria-hidden="true" tabindex="-1"></a>    remotes/origin/main 4a82a14 added</span></code></pre></div>
+<p>And we’ve successfully pushed our file up to <code>origin</code>.</p>
+<p>Finally, let’s make another clone. First we’ll <code>cd</code> back down to where <code>origin_repo</code> is and clone again this time into <code>playground2</code>:</p>
+<div class="sourceCode" id="cb405"><pre class="sourceCode default"><code class="sourceCode default"><span id="cb405-1"><a href="making-playground.html#cb405-1" aria-hidden="true" tabindex="-1"></a>$ git clone origin_repo playground2</span>
+<span id="cb405-2"><a href="making-playground.html#cb405-2" aria-hidden="true" tabindex="-1"></a>  Cloning into &#39;playground2&#39;...</span>
+<span id="cb405-3"><a href="making-playground.html#cb405-3" aria-hidden="true" tabindex="-1"></a>  done.</span></code></pre></div>
+<p>Let’s <code>cd</code> in there and see what we have. It’s a clone of the repo, so we’d better see the <code>hello.txt</code> we pushed in there from <code>playground</code> earlier.</p>
+<div class="sourceCode" id="cb406"><pre class="sourceCode default"><code class="sourceCode default"><span id="cb406-1"><a href="making-playground.html#cb406-1" aria-hidden="true" tabindex="-1"></a>$ cd playground2 </span>
+<span id="cb406-2"><a href="making-playground.html#cb406-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb406-3"><a href="making-playground.html#cb406-3" aria-hidden="true" tabindex="-1"></a>$ ls</span>
+<span id="cb406-4"><a href="making-playground.html#cb406-4" aria-hidden="true" tabindex="-1"></a>  hello.txt</span>
+<span id="cb406-5"><a href="making-playground.html#cb406-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb406-6"><a href="making-playground.html#cb406-6" aria-hidden="true" tabindex="-1"></a>$ cat hello.txt </span>
+<span id="cb406-7"><a href="making-playground.html#cb406-7" aria-hidden="true" tabindex="-1"></a>  Hello, world</span></code></pre></div>
+<p><em>Voila!</em> It’s there!</p>
+<p>Since <code>playground</code> and <code>playground2</code> are both clones of the same repo, you can push from one and pull from the other to get the changes.</p>
+<p></p>
+<p>You can even make conflicting changes and try to <code>git pull</code> or <code>git pull --rebase</code> and see how things go wrong and how to fix them.</p>
+<p>And if everything goes completely off the rails, you can just delete the directories and start again. It’s a playground!</p>
+<h2 data-number="33.2" id="automating-playground-builds"><span class="header-section-number">33.2</span> Automating Playground Builds</h2>
+<p> </p>
+<p>It can be tedious to continually destroy and recreate repos that you’re trying to learn from. I suggest putting your commands in a <em>shell script</em>, which is just a text file that contains the commands to run.</p>
+<p>Let’s say you make a new text file called <code>buildrepo.sh</code> and you put the following text in it:</p>
+<div class="sourceCode" id="cb407"><pre class="sourceCode default"><code class="sourceCode default"><span id="cb407-1"><a href="making-playground.html#cb407-1" aria-hidden="true" tabindex="-1"></a>rm -rf playground    # Remove old playground</span>
+<span id="cb407-2"><a href="making-playground.html#cb407-2" aria-hidden="true" tabindex="-1"></a>git init playground  # Create a new one</span>
+<span id="cb407-3"><a href="making-playground.html#cb407-3" aria-hidden="true" tabindex="-1"></a>cd playground</span>
+<span id="cb407-4"><a href="making-playground.html#cb407-4" aria-hidden="true" tabindex="-1"></a>echo &quot;Hello, world!&quot; &gt; hello.txt   # Create hello.txt</span>
+<span id="cb407-5"><a href="making-playground.html#cb407-5" aria-hidden="true" tabindex="-1"></a>echo &quot;foobar&quot; &gt; foobar.txt         # Create foobar.txt</span>
+<span id="cb407-6"><a href="making-playground.html#cb407-6" aria-hidden="true" tabindex="-1"></a>git add hello.txt foobar.txt</span>
+<span id="cb407-7"><a href="making-playground.html#cb407-7" aria-hidden="true" tabindex="-1"></a>git commit -m added</span>
+<span id="cb407-8"><a href="making-playground.html#cb407-8" aria-hidden="true" tabindex="-1"></a>echo &quot;foobar again&quot; &gt;&gt; foobar.txt  # Append text</span>
+<span id="cb407-9"><a href="making-playground.html#cb407-9" aria-hidden="true" tabindex="-1"></a>git add foobar.txt</span>
+<span id="cb407-10"><a href="making-playground.html#cb407-10" aria-hidden="true" tabindex="-1"></a>git commit -m updated</span></code></pre></div>
+<p>That’s just a bunch of shell commands. But here’s the fun bit: if you run <code>sh</code> (the shell) with <code>buildrepo.sh</code> as an argument, it will run all those commands in order!</p>
+<div class="sourceCode" id="cb408"><pre class="sourceCode default"><code class="sourceCode default"><span id="cb408-1"><a href="making-playground.html#cb408-1" aria-hidden="true" tabindex="-1"></a>$ sh buildrepo.sh</span>
+<span id="cb408-2"><a href="making-playground.html#cb408-2" aria-hidden="true" tabindex="-1"></a>  Initialized empty Git repository in /user/playground/.git/</span>
+<span id="cb408-3"><a href="making-playground.html#cb408-3" aria-hidden="true" tabindex="-1"></a>  [main (root-commit) 2239237] added</span>
+<span id="cb408-4"><a href="making-playground.html#cb408-4" aria-hidden="true" tabindex="-1"></a>   2 files changed, 2 insertions(+)</span>
+<span id="cb408-5"><a href="making-playground.html#cb408-5" aria-hidden="true" tabindex="-1"></a>   create mode 100644 foobar.txt</span>
+<span id="cb408-6"><a href="making-playground.html#cb408-6" aria-hidden="true" tabindex="-1"></a>   create mode 100644 hello.txt</span>
+<span id="cb408-7"><a href="making-playground.html#cb408-7" aria-hidden="true" tabindex="-1"></a>  [main 0533186] updated</span>
+<span id="cb408-8"><a href="making-playground.html#cb408-8" aria-hidden="true" tabindex="-1"></a>   1 file changed, 1 insertion(+)</span></code></pre></div>
+<blockquote>
+<p><strong>To debug a shell script</strong> you can run it like this: <code>sh -x buildrepo.sh</code> and it will show you the commands it is running.</p>
+</blockquote>
+<p>After that, we can <code>cd</code> in there and see what happened:</p>
+<div class="sourceCode" id="cb409"><pre class="sourceCode default"><code class="sourceCode default"><span id="cb409-1"><a href="making-playground.html#cb409-1" aria-hidden="true" tabindex="-1"></a>$ cd playground</span>
+<span id="cb409-2"><a href="making-playground.html#cb409-2" aria-hidden="true" tabindex="-1"></a>$ git log</span>
+<span id="cb409-3"><a href="making-playground.html#cb409-3" aria-hidden="true" tabindex="-1"></a>  commit 05331869d77973dfbac38a31c40a44f99225e85d</span>
+<span id="cb409-4"><a href="making-playground.html#cb409-4" aria-hidden="true" tabindex="-1"></a>  Author: User Name &lt;user@example.com&gt;</span>
+<span id="cb409-5"><a href="making-playground.html#cb409-5" aria-hidden="true" tabindex="-1"></a>  Date:   Sat Jul 13 15:19:42 2024 -0700</span>
+<span id="cb409-6"><a href="making-playground.html#cb409-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb409-7"><a href="making-playground.html#cb409-7" aria-hidden="true" tabindex="-1"></a>      updated</span>
+<span id="cb409-8"><a href="making-playground.html#cb409-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb409-9"><a href="making-playground.html#cb409-9" aria-hidden="true" tabindex="-1"></a>  commit 2239237cc44d11e9479dcc610e5d02ad283766ce</span>
+<span id="cb409-10"><a href="making-playground.html#cb409-10" aria-hidden="true" tabindex="-1"></a>  Author: User Name &lt;user@example.com&gt;</span>
+<span id="cb409-11"><a href="making-playground.html#cb409-11" aria-hidden="true" tabindex="-1"></a>  Date:   Sat Jul 13 15:19:41 2024 -0700</span>
+<span id="cb409-12"><a href="making-playground.html#cb409-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb409-13"><a href="making-playground.html#cb409-13" aria-hidden="true" tabindex="-1"></a>      added</span>
+<span id="cb409-14"><a href="making-playground.html#cb409-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb409-15"><a href="making-playground.html#cb409-15" aria-hidden="true" tabindex="-1"></a>$ cat foobar.txt </span>
+<span id="cb409-16"><a href="making-playground.html#cb409-16" aria-hidden="true" tabindex="-1"></a>  foobar</span>
+<span id="cb409-17"><a href="making-playground.html#cb409-17" aria-hidden="true" tabindex="-1"></a>  foobar again</span></code></pre></div>
+<p>By putting the initialization commands in a shell script, it’s almost like having a “saved game” at that point. You can just rerun the shell script any time you want the same playground set up.</p>
+<p></p>
+<p></p>
+<!-- BG_NEW_CHAPTER -->
+<hr><div style="text-align:center"><span><a href="worktrees.html" rel="prev">Prev</a> | </span><a href="index.html">Contents</a><span> | <a href="editor-get-out.html" rel="next">Next</a></span></div></body>
+</html>

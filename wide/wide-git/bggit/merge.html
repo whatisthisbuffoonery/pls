@@ -1,0 +1,711 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <title>Beej's Guide to Git</title>
+  <style>
+    html {
+      color: #1a1a1a;
+      background-color: #fdfdfd;
+    }
+    body {
+      margin: 0 auto;
+      max-width: 36em;
+      padding-left: 50px;
+      padding-right: 50px;
+      padding-top: 50px;
+      padding-bottom: 50px;
+      hyphens: auto;
+      overflow-wrap: break-word;
+      text-rendering: optimizeLegibility;
+      font-kerning: normal;
+    }
+    @media (max-width: 600px) {
+      body {
+        font-size: 0.9em;
+        padding: 12px;
+      }
+      h1 {
+        font-size: 1.8em;
+      }
+    }
+    @media print {
+      html {
+        background-color: white;
+      }
+      body {
+        background-color: transparent;
+        color: black;
+        font-size: 12pt;
+      }
+      p, h2, h3 {
+        orphans: 3;
+        widows: 3;
+      }
+      h2, h3, h4 {
+        page-break-after: avoid;
+      }
+    }
+    p {
+      margin: 1em 0;
+    }
+    a {
+      color: #1a1a1a;
+    }
+    a:visited {
+      color: #1a1a1a;
+    }
+    img {
+      max-width: 100%;
+    }
+    svg {
+      height: auto;
+      max-width: 100%;
+    }
+    h1, h2, h3, h4, h5, h6 {
+      margin-top: 1.4em;
+    }
+    h5, h6 {
+      font-size: 1em;
+      font-style: italic;
+    }
+    h6 {
+      font-weight: normal;
+    }
+    ol, ul {
+      padding-left: 1.7em;
+      margin-top: 1em;
+    }
+    li > ol, li > ul {
+      margin-top: 0;
+    }
+    blockquote {
+      margin: 1em 0 1em 1.7em;
+      padding-left: 1em;
+      border-left: 2px solid #e6e6e6;
+      color: #606060;
+    }
+    code {
+      font-family: Menlo, Monaco, Consolas, 'Lucida Console', monospace;
+      font-size: 85%;
+      margin: 0;
+      hyphens: manual;
+    }
+    pre {
+      margin: 1em 0;
+      overflow: auto;
+    }
+    pre code {
+      padding: 0;
+      overflow: visible;
+      overflow-wrap: normal;
+    }
+    .sourceCode {
+     background-color: transparent;
+     overflow: visible;
+    }
+    hr {
+      background-color: #1a1a1a;
+      border: none;
+      height: 1px;
+      margin: 1em 0;
+    }
+    table {
+      margin: 1em 0;
+      border-collapse: collapse;
+      width: 100%;
+      overflow-x: auto;
+      display: block;
+      font-variant-numeric: lining-nums tabular-nums;
+    }
+    table caption {
+      margin-bottom: 0.75em;
+    }
+    tbody {
+      margin-top: 0.5em;
+      border-top: 1px solid #1a1a1a;
+      border-bottom: 1px solid #1a1a1a;
+    }
+    th {
+      border-top: 1px solid #1a1a1a;
+      padding: 0.25em 0.5em 0.25em 0.5em;
+    }
+    td {
+      padding: 0.125em 0.5em 0.25em 0.5em;
+    }
+    header {
+      margin-bottom: 4em;
+      text-align: center;
+    }
+    #TOC li {
+      list-style: none;
+    }
+    #TOC ul {
+      padding-left: 1.3em;
+    }
+    #TOC > ul {
+      padding-left: 0;
+    }
+    #TOC a:not(:hover) {
+      text-decoration: none;
+    }
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+    /* CSS for syntax highlighting */
+    html { -webkit-text-size-adjust: 100%; }
+    pre > code.sourceCode { white-space: pre; position: relative; }
+    pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+    pre > code.sourceCode > span:empty { height: 1.2em; }
+    .sourceCode { overflow: visible; }
+    code.sourceCode > span { color: inherit; text-decoration: inherit; }
+    div.sourceCode { margin: 1em 0; }
+    pre.sourceCode { margin: 0; }
+    @media screen {
+    div.sourceCode { overflow: auto; }
+    }
+    @media print {
+    pre > code.sourceCode { white-space: pre-wrap; }
+    pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+    }
+    pre.numberSource code
+      { counter-reset: source-line 0; }
+    pre.numberSource code > span
+      { position: relative; left: -4em; counter-increment: source-line; }
+    pre.numberSource code > span > a:first-child::before
+      { content: counter(source-line);
+        position: relative; left: -1em; text-align: right; vertical-align: baseline;
+        border: none; display: inline-block;
+        -webkit-touch-callout: none; -webkit-user-select: none;
+        -khtml-user-select: none; -moz-user-select: none;
+        -ms-user-select: none; user-select: none;
+        padding: 0 4px; width: 4em;
+        color: #aaaaaa;
+      }
+    pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+    div.sourceCode
+      {   }
+    @media screen {
+    pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+    }
+    code span.al { color: #ff0000; font-weight: bold; } /* Alert */
+    code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+    code span.at { color: #7d9029; } /* Attribute */
+    code span.bn { color: #40a070; } /* BaseN */
+    code span.bu { color: #008000; } /* BuiltIn */
+    code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+    code span.ch { color: #4070a0; } /* Char */
+    code span.cn { color: #880000; } /* Constant */
+    code span.co { color: #60a0b0; font-style: italic; } /* Comment */
+    code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+    code span.do { color: #ba2121; font-style: italic; } /* Documentation */
+    code span.dt { color: #902000; } /* DataType */
+    code span.dv { color: #40a070; } /* DecVal */
+    code span.er { color: #ff0000; font-weight: bold; } /* Error */
+    code span.ex { } /* Extension */
+    code span.fl { color: #40a070; } /* Float */
+    code span.fu { color: #06287e; } /* Function */
+    code span.im { color: #008000; font-weight: bold; } /* Import */
+    code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+    code span.kw { color: #007020; font-weight: bold; } /* Keyword */
+    code span.op { color: #666666; } /* Operator */
+    code span.ot { color: #007020; } /* Other */
+    code span.pp { color: #bc7a00; } /* Preprocessor */
+    code span.sc { color: #4070a0; } /* SpecialChar */
+    code span.ss { color: #bb6688; } /* SpecialString */
+    code span.st { color: #4070a0; } /* String */
+    code span.va { color: #19177c; } /* Variable */
+    code span.vs { color: #4070a0; } /* VerbatimString */
+    code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+  </style>
+  <!-- BG custom styling -->
+  <style type="text/css">
+  /* Fix for line numbers not visible */
+  pre.numberSource code > span {
+      left: -1em;
+  }
+  pre.numberSource {
+      margin-left: initial;
+  }
+
+  /* Put some space after the section numbers */
+  span.toc-section-number::after {
+      content: "\a0\a0\a0";  /* non-breaking whitespace */
+  }
+
+  /* Hide underlines on code number links */
+  pre > code.sourceCode > span > a:first-child::before {
+      text-decoration: none;
+  }
+
+  /* Color the source blocks */
+  div.sourceCode {
+      background-color: #f0f0f0;
+  }
+
+  /* Fix iOS big text rendering issue */
+  pre > code.sourceCode > span {
+      display: initial;
+  }
+
+
+  /* Color the inline code */
+  code:not(.sourceCode) {
+      background: #f0f0f0;
+      padding-left: 0.2em;
+      padding-right: 0.2em;
+      border-radius: 0.2em;
+  }
+
+  pre.sourceCode {
+      border: 1px solid #ccc;
+      padding: 0.5em;
+      border-radius: 0.2em;
+  }
+
+  /* Keep code tags from wrapping in tables */
+  tbody code {
+      white-space: nowrap;
+  }
+
+  /* Prevent hyphenation and hyphen breaks in code*/
+  code {
+      word-break: keep-all;
+  }
+
+  td {
+      vertical-align: top;
+  }
+
+  body {
+      font-size: 12pt;
+      max-width: 43em;
+      font-family: sans-serif;
+  }
+
+  html {
+      background: #f9f9f9;
+  }
+
+  figure > embed {
+      max-width: 100%;
+  }
+
+  figure {
+      text-align: center;
+      margin-top: 2em;
+      margin-bottom: 2em;
+  }
+
+  figcaption {
+      font-size: 0.9em;
+      font-style: italic;
+      margin-top: 0.6em;
+  }
+
+  body {
+      counter-reset: figure-counter-major;
+      counter-reset: figure-counter-minor;
+  }
+
+  figure {
+      counter-increment: figure-counter-minor;
+  }
+
+  figcaption::before {
+      content: "Figure " counter(figure-counter-major) "." counter(figure-counter-minor) ": ";
+  }
+
+  blockquote {
+      border-left: 2px solid #bbb;
+      color: #444;
+  }
+
+  /* Contents */
+
+  nav[role="doc-toc"] > ul > li {
+    font-weight: bold;
+    margin-top: 1.2em;
+  }
+
+  nav[role="doc-toc"] > ul > li:first {
+    font-weight: bold;
+    margin-top: initial;
+  }
+
+  nav[role="doc-toc"] > ul > li > ul {
+    font-weight: normal;
+    margin-top: 0.3em;
+  }
+
+  /*
+  In multipage, we need to reset the figure counter to the chapter
+  number. Luckily, this is in the <h1 data-number> attribute. Unluckily,
+  there is no way to get this in a general way.
+
+  This doesn't work:
+
+    h1[data-number] {
+      counter-set: figure-counter-major attr(data-number);
+    }
+
+  Nor this:
+
+    h1[data-number] {
+      --figure-counter-major-value: attr(data-number);
+      counter-set: figure-counter-major var(--figure-counter-major-value);
+    }
+
+  So, dumbly, we have a bunch of rules for all these sections, up to the
+  maximum possible section.
+
+  Here's a program to generate them:
+
+    for (let i = 1; i < 100; i++)
+        console.log(`h1[data-number="${i}"]{counter-set:figure-counter-major ${i};counter-reset:figure-counter-minor;}`);
+
+  Note to self: never write a book with more than 99 frickin' chapters.
+  */
+
+  h1[data-number="1"]{counter-set:figure-counter-major 1;counter-reset:figure-counter-minor;}
+  h1[data-number="2"]{counter-set:figure-counter-major 2;counter-reset:figure-counter-minor;}
+  h1[data-number="3"]{counter-set:figure-counter-major 3;counter-reset:figure-counter-minor;}
+  h1[data-number="4"]{counter-set:figure-counter-major 4;counter-reset:figure-counter-minor;}
+  h1[data-number="5"]{counter-set:figure-counter-major 5;counter-reset:figure-counter-minor;}
+  h1[data-number="6"]{counter-set:figure-counter-major 6;counter-reset:figure-counter-minor;}
+  h1[data-number="7"]{counter-set:figure-counter-major 7;counter-reset:figure-counter-minor;}
+  h1[data-number="8"]{counter-set:figure-counter-major 8;counter-reset:figure-counter-minor;}
+  h1[data-number="9"]{counter-set:figure-counter-major 9;counter-reset:figure-counter-minor;}
+  h1[data-number="10"]{counter-set:figure-counter-major 10;counter-reset:figure-counter-minor;}
+  h1[data-number="11"]{counter-set:figure-counter-major 11;counter-reset:figure-counter-minor;}
+  h1[data-number="12"]{counter-set:figure-counter-major 12;counter-reset:figure-counter-minor;}
+  h1[data-number="13"]{counter-set:figure-counter-major 13;counter-reset:figure-counter-minor;}
+  h1[data-number="14"]{counter-set:figure-counter-major 14;counter-reset:figure-counter-minor;}
+  h1[data-number="15"]{counter-set:figure-counter-major 15;counter-reset:figure-counter-minor;}
+  h1[data-number="16"]{counter-set:figure-counter-major 16;counter-reset:figure-counter-minor;}
+  h1[data-number="17"]{counter-set:figure-counter-major 17;counter-reset:figure-counter-minor;}
+  h1[data-number="18"]{counter-set:figure-counter-major 18;counter-reset:figure-counter-minor;}
+  h1[data-number="19"]{counter-set:figure-counter-major 19;counter-reset:figure-counter-minor;}
+  h1[data-number="20"]{counter-set:figure-counter-major 20;counter-reset:figure-counter-minor;}
+  h1[data-number="21"]{counter-set:figure-counter-major 21;counter-reset:figure-counter-minor;}
+  h1[data-number="22"]{counter-set:figure-counter-major 22;counter-reset:figure-counter-minor;}
+  h1[data-number="23"]{counter-set:figure-counter-major 23;counter-reset:figure-counter-minor;}
+  h1[data-number="24"]{counter-set:figure-counter-major 24;counter-reset:figure-counter-minor;}
+  h1[data-number="25"]{counter-set:figure-counter-major 25;counter-reset:figure-counter-minor;}
+  h1[data-number="26"]{counter-set:figure-counter-major 26;counter-reset:figure-counter-minor;}
+  h1[data-number="27"]{counter-set:figure-counter-major 27;counter-reset:figure-counter-minor;}
+  h1[data-number="28"]{counter-set:figure-counter-major 28;counter-reset:figure-counter-minor;}
+  h1[data-number="29"]{counter-set:figure-counter-major 29;counter-reset:figure-counter-minor;}
+  h1[data-number="30"]{counter-set:figure-counter-major 30;counter-reset:figure-counter-minor;}
+  h1[data-number="31"]{counter-set:figure-counter-major 31;counter-reset:figure-counter-minor;}
+  h1[data-number="32"]{counter-set:figure-counter-major 32;counter-reset:figure-counter-minor;}
+  h1[data-number="33"]{counter-set:figure-counter-major 33;counter-reset:figure-counter-minor;}
+  h1[data-number="34"]{counter-set:figure-counter-major 34;counter-reset:figure-counter-minor;}
+  h1[data-number="35"]{counter-set:figure-counter-major 35;counter-reset:figure-counter-minor;}
+  h1[data-number="36"]{counter-set:figure-counter-major 36;counter-reset:figure-counter-minor;}
+  h1[data-number="37"]{counter-set:figure-counter-major 37;counter-reset:figure-counter-minor;}
+  h1[data-number="38"]{counter-set:figure-counter-major 38;counter-reset:figure-counter-minor;}
+  h1[data-number="39"]{counter-set:figure-counter-major 39;counter-reset:figure-counter-minor;}
+  h1[data-number="40"]{counter-set:figure-counter-major 40;counter-reset:figure-counter-minor;}
+  h1[data-number="41"]{counter-set:figure-counter-major 41;counter-reset:figure-counter-minor;}
+  h1[data-number="42"]{counter-set:figure-counter-major 42;counter-reset:figure-counter-minor;}
+  h1[data-number="43"]{counter-set:figure-counter-major 43;counter-reset:figure-counter-minor;}
+  h1[data-number="44"]{counter-set:figure-counter-major 44;counter-reset:figure-counter-minor;}
+  h1[data-number="45"]{counter-set:figure-counter-major 45;counter-reset:figure-counter-minor;}
+  h1[data-number="46"]{counter-set:figure-counter-major 46;counter-reset:figure-counter-minor;}
+  h1[data-number="47"]{counter-set:figure-counter-major 47;counter-reset:figure-counter-minor;}
+  h1[data-number="48"]{counter-set:figure-counter-major 48;counter-reset:figure-counter-minor;}
+  h1[data-number="49"]{counter-set:figure-counter-major 49;counter-reset:figure-counter-minor;}
+  h1[data-number="50"]{counter-set:figure-counter-major 50;counter-reset:figure-counter-minor;}
+  h1[data-number="51"]{counter-set:figure-counter-major 51;counter-reset:figure-counter-minor;}
+  h1[data-number="52"]{counter-set:figure-counter-major 52;counter-reset:figure-counter-minor;}
+  h1[data-number="53"]{counter-set:figure-counter-major 53;counter-reset:figure-counter-minor;}
+  h1[data-number="54"]{counter-set:figure-counter-major 54;counter-reset:figure-counter-minor;}
+  h1[data-number="55"]{counter-set:figure-counter-major 55;counter-reset:figure-counter-minor;}
+  h1[data-number="56"]{counter-set:figure-counter-major 56;counter-reset:figure-counter-minor;}
+  h1[data-number="57"]{counter-set:figure-counter-major 57;counter-reset:figure-counter-minor;}
+  h1[data-number="58"]{counter-set:figure-counter-major 58;counter-reset:figure-counter-minor;}
+  h1[data-number="59"]{counter-set:figure-counter-major 59;counter-reset:figure-counter-minor;}
+  h1[data-number="60"]{counter-set:figure-counter-major 60;counter-reset:figure-counter-minor;}
+  h1[data-number="61"]{counter-set:figure-counter-major 61;counter-reset:figure-counter-minor;}
+  h1[data-number="62"]{counter-set:figure-counter-major 62;counter-reset:figure-counter-minor;}
+  h1[data-number="63"]{counter-set:figure-counter-major 63;counter-reset:figure-counter-minor;}
+  h1[data-number="64"]{counter-set:figure-counter-major 64;counter-reset:figure-counter-minor;}
+  h1[data-number="65"]{counter-set:figure-counter-major 65;counter-reset:figure-counter-minor;}
+  h1[data-number="66"]{counter-set:figure-counter-major 66;counter-reset:figure-counter-minor;}
+  h1[data-number="67"]{counter-set:figure-counter-major 67;counter-reset:figure-counter-minor;}
+  h1[data-number="68"]{counter-set:figure-counter-major 68;counter-reset:figure-counter-minor;}
+  h1[data-number="69"]{counter-set:figure-counter-major 69;counter-reset:figure-counter-minor;}
+  h1[data-number="70"]{counter-set:figure-counter-major 70;counter-reset:figure-counter-minor;}
+  h1[data-number="71"]{counter-set:figure-counter-major 71;counter-reset:figure-counter-minor;}
+  h1[data-number="72"]{counter-set:figure-counter-major 72;counter-reset:figure-counter-minor;}
+  h1[data-number="73"]{counter-set:figure-counter-major 73;counter-reset:figure-counter-minor;}
+  h1[data-number="74"]{counter-set:figure-counter-major 74;counter-reset:figure-counter-minor;}
+  h1[data-number="75"]{counter-set:figure-counter-major 75;counter-reset:figure-counter-minor;}
+  h1[data-number="76"]{counter-set:figure-counter-major 76;counter-reset:figure-counter-minor;}
+  h1[data-number="77"]{counter-set:figure-counter-major 77;counter-reset:figure-counter-minor;}
+  h1[data-number="78"]{counter-set:figure-counter-major 78;counter-reset:figure-counter-minor;}
+  h1[data-number="79"]{counter-set:figure-counter-major 79;counter-reset:figure-counter-minor;}
+  h1[data-number="80"]{counter-set:figure-counter-major 80;counter-reset:figure-counter-minor;}
+  h1[data-number="81"]{counter-set:figure-counter-major 81;counter-reset:figure-counter-minor;}
+  h1[data-number="82"]{counter-set:figure-counter-major 82;counter-reset:figure-counter-minor;}
+  h1[data-number="83"]{counter-set:figure-counter-major 83;counter-reset:figure-counter-minor;}
+  h1[data-number="84"]{counter-set:figure-counter-major 84;counter-reset:figure-counter-minor;}
+  h1[data-number="85"]{counter-set:figure-counter-major 85;counter-reset:figure-counter-minor;}
+  h1[data-number="86"]{counter-set:figure-counter-major 86;counter-reset:figure-counter-minor;}
+  h1[data-number="87"]{counter-set:figure-counter-major 87;counter-reset:figure-counter-minor;}
+  h1[data-number="88"]{counter-set:figure-counter-major 88;counter-reset:figure-counter-minor;}
+  h1[data-number="89"]{counter-set:figure-counter-major 89;counter-reset:figure-counter-minor;}
+  h1[data-number="90"]{counter-set:figure-counter-major 90;counter-reset:figure-counter-minor;}
+  h1[data-number="91"]{counter-set:figure-counter-major 91;counter-reset:figure-counter-minor;}
+  h1[data-number="92"]{counter-set:figure-counter-major 92;counter-reset:figure-counter-minor;}
+  h1[data-number="93"]{counter-set:figure-counter-major 93;counter-reset:figure-counter-minor;}
+  h1[data-number="94"]{counter-set:figure-counter-major 94;counter-reset:figure-counter-minor;}
+  h1[data-number="95"]{counter-set:figure-counter-major 95;counter-reset:figure-counter-minor;}
+  h1[data-number="96"]{counter-set:figure-counter-major 96;counter-reset:figure-counter-minor;}
+  h1[data-number="97"]{counter-set:figure-counter-major 97;counter-reset:figure-counter-minor;}
+  h1[data-number="98"]{counter-set:figure-counter-major 98;counter-reset:figure-counter-minor;}
+  h1[data-number="99"]{counter-set:figure-counter-major 99;counter-reset:figure-counter-minor;}
+
+
+  </style>
+  <!-- BG custom styling for the wide body variant -->
+  <!-- Gets appended after bg-css.html -->
+
+  <style type="text/css">
+  body {
+      max-width: inherit;
+  }
+  </style>
+</head>
+<body>
+<div style="text-align:center"><span><a href="branches-and-fast-forward-merges.html" rel="prev">Prev</a> | </span><a href="index.html">Contents</a><span> | <a href="using-subdirectories-with-git.html" rel="next">Next</a></span></div><hr>
+<h1 data-number="6" id="merge"><span class="header-section-number">6</span> Merging and Conflicts</h1>
+<p></p>
+<p>We’ve seen how a fast-forward merge can bring two branches into sync with no possibility of conflict.</p>
+<p>But what if we can’t fast-forward because two branches are not direct ancestors? In other words, what if the branches have <em>diverged</em>? What if a change in one branch <em>conflicts</em> with a change in the other?</p>
+<h2 data-number="6.1" id="an-example-of-divergent-branches"><span class="header-section-number">6.1</span> An Example of Divergent Branches</h2>
+<p></p>
+<p>Let’s look at a commit graph where things are still OK to fast-forward in Figure 6.1.</p>
+<figure>
+<embed src="img_040_010.svg" title="[A direct ancestor branch.]" />
+<figcaption aria-hidden="true">A direct ancestor branch.</figcaption>
+</figure>
+<!--
+``` {.default}
+         [main]
+           |
+           v          [somebranch]
+    (1)---(2)            |
+            \            v
+            (3)---(5)---(6)
+```
+-->
+<p>Yes, I’ve bent the graph a bit there, but we can merge <code>somebranch</code> into <code>main</code> as a fast-forward because <code>main</code> is a direct ancestor and <code>somebranch</code> is therefore a direct descendant.</p>
+<p>But what if, <strong>before</strong> we merged, someone made another commit on the <code>main</code> branch? And now it looks like it does in Figure 6.2.</p>
+<!--
+``` {.default}
+               [main]
+                 |
+                 v    [somebranch]
+    (1)---(2)---(7)      |
+            \            v
+            (3)---(5)---(6)
+```
+-->
+<figure>
+<embed src="img_040_020.svg" title="[Not a direct ancestor branch.]" />
+<figcaption aria-hidden="true">Not a direct ancestor branch.</figcaption>
+</figure>
+<p>There’s a common ancestor at commit <code>(2)</code>, but there’s no direct line of descent. <code>main</code> and <code>somebranch</code> have diverged.</p>
+<p>Is all hope lost? How can we merge?</p>
+<h2 data-number="6.2" id="merging-divergent-branches"><span class="header-section-number">6.2</span> Merging Divergent Branches</h2>
+<p>Turns out you do it the exact same way as always.</p>
+<ol type="1">
+<li>Check out the branch you want to merge <em>into</em>.</li>
+<li><code>git merge</code> the branch you want to merge <em>from</em>.</li>
+</ol>
+<p>In our Figure 6.2 example above, let’s say we’ve done this:</p>
+<div class="sourceCode" id="cb71"><pre class="sourceCode default"><code class="sourceCode default"><span id="cb71-1"><a href="merge.html#cb71-1" aria-hidden="true" tabindex="-1"></a>$ git switch main</span>
+<span id="cb71-2"><a href="merge.html#cb71-2" aria-hidden="true" tabindex="-1"></a>$ git merge somebranch    # into main</span></code></pre></div>
+<blockquote>
+<p>The <code>#</code> is a shell comment delimiter. You can paste that in if you want, but it does nothing.</p>
+</blockquote>
+<p>The difference here is that Git can’t simply fast-forward. It has to somehow, magically, bring together the changes from commit <code>(6)</code> <strong>and</strong> commit <code>(7)</code> even if they’re radically different than one other.</p>
+<p>This means that after we bring those two commits together, the code will look like it’s never looked before, a combination of two sets of changes.</p>
+<p>And because it looks like it hasn’t before, we need <em>another commit</em> (another snapshot of the working tree) to represent the joining of both sets of changes.</p>
+<p>We call this the <em>merge commit</em>, and Git will automatically make it for you. (When this happens, you’ll see an editor pop up with some text in it. This text is the commit message. Edit it (or just accept it as-is) and save the file and exit the editor. See <a href="editor-get-out.html#editor-get-out">Getting Out of Editors</a> if you need help with this.)</p>
+<p>So after our merge, we end up with Figure 6.3.</p>
+<figure>
+<embed src="img_040_030.svg" title="[Creating a merge commit.]" />
+<figcaption aria-hidden="true">Creating a merge commit.</figcaption>
+</figure>
+<!--
+
+``` {.default}
+                         [main]
+                           |
+                           v    
+    (1)---(2)---(7)-------(8)
+            \             /
+            (3)---(5)---(6)
+                         ^
+                         |
+                      [somebranch]
+```
+-->
+<p>Commit labeled <code>(8)</code> is the merge commit. It contains both the changes from <code>(7)</code> and <code>(6)</code>. And has the commit message you saved in the editor.</p>
+<p>And we see <code>main</code> has been updated to point to it. And that <code>somebranch</code> is unaffected.</p>
+<p>Importantly, we see that commit <code>(8)</code> has <strong>two parents</strong>, the commits that were merged together to make it.</p>
+<p>And look! If we want, we can now fast-forward <code>somebranch</code> to <code>main</code> because it’s now a direct ancestor!</p>
+<p>In this example, Git was able to determine how to do the merge automatically. But there are some cases where it cannot, and this results in a <em>merge conflict</em> that requires manual intervention. By you.</p>
+<h2 data-number="6.3" id="merge-conflicts"><span class="header-section-number">6.3</span> Merge Conflicts</h2>
+<p></p>
+<p>If two branches have changes that are “far apart” from one another, Git can figure it out. If I edit line 20 of a file in one branch, and you edit line 3490 of the same file in another, Git can bring both edits in automatically.</p>
+<p>But let’s say I edit line 20 in one commit, and you edit line 20 (the same line) in another commit.</p>
+<p>Which one is “right”? Git has no idea because it’s just dumb software and doesn’t know our business needs.</p>
+<p>So it asks us, during the merge, to fix it. After we fix it, Git can complete the merge.</p>
+<blockquote>
+<p><strong>When you’re merging, if a conflict occurs, <em>you’re still merging</em></strong>. Git is in the “merge” state, waiting for more merge-specific commands.</p>
+<p>You can resolve the conflict then commit the changes to complete the merge. Or you can back out of the merge making as if you’d never started it in the first place.</p>
+<p>The important point is that you’re aware Git is in a special state and you have to either complete or abort the merge to get back to normal before you continue to use it.</p>
+</blockquote>
+<p>Let’s have an example where both <code>main</code> and <code>newbranch</code> have added a line to end of file, i.e. they both added line 4. Git doesn’t know which one is correct, so there’s a conflict.</p>
+<div class="sourceCode" id="cb72"><pre class="sourceCode default"><code class="sourceCode default"><span id="cb72-1"><a href="merge.html#cb72-1" aria-hidden="true" tabindex="-1"></a>$ git merge newbranch</span>
+<span id="cb72-2"><a href="merge.html#cb72-2" aria-hidden="true" tabindex="-1"></a>  Auto-merging foo.py</span>
+<span id="cb72-3"><a href="merge.html#cb72-3" aria-hidden="true" tabindex="-1"></a>  CONFLICT (content): Merge conflict in foo.py</span>
+<span id="cb72-4"><a href="merge.html#cb72-4" aria-hidden="true" tabindex="-1"></a>  Automatic merge failed; fix conflicts and then commit the result.</span></code></pre></div>
+<p>Now if I look at my status, I see we’re in merge state, as noted by <code>You have unmerged paths</code>. We’re in the middle of merge; we have to either go out the front or back out the back to get back to normal.</p>
+<div class="sourceCode" id="cb73"><pre class="sourceCode default"><code class="sourceCode default"><span id="cb73-1"><a href="merge.html#cb73-1" aria-hidden="true" tabindex="-1"></a>$ git status</span>
+<span id="cb73-2"><a href="merge.html#cb73-2" aria-hidden="true" tabindex="-1"></a>  On branch main</span>
+<span id="cb73-3"><a href="merge.html#cb73-3" aria-hidden="true" tabindex="-1"></a>  You have unmerged paths.</span>
+<span id="cb73-4"><a href="merge.html#cb73-4" aria-hidden="true" tabindex="-1"></a>    (fix conflicts and run &quot;git commit&quot;)</span>
+<span id="cb73-5"><a href="merge.html#cb73-5" aria-hidden="true" tabindex="-1"></a>    (use &quot;git merge --abort&quot; to abort the merge)</span>
+<span id="cb73-6"><a href="merge.html#cb73-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb73-7"><a href="merge.html#cb73-7" aria-hidden="true" tabindex="-1"></a>  Unmerged paths:</span>
+<span id="cb73-8"><a href="merge.html#cb73-8" aria-hidden="true" tabindex="-1"></a>    (use &quot;git add &lt;file&gt;...&quot; to mark resolution)</span>
+<span id="cb73-9"><a href="merge.html#cb73-9" aria-hidden="true" tabindex="-1"></a>      both modified:   foo.py</span>
+<span id="cb73-10"><a href="merge.html#cb73-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb73-11"><a href="merge.html#cb73-11" aria-hidden="true" tabindex="-1"></a>  no changes added to commit (use &quot;git add&quot; and/or &quot;git commit -a&quot;)</span></code></pre></div>
+<p>It’s also hinting that I can do one of two things:</p>
+<ol type="1">
+<li>Fix conflicts and run <code>git commit</code>.</li>
+<li>Use <code>git merge --abort</code> to abort the merge.</li>
+</ol>
+<p>The second just rolls back the merge making it as if I hadn’t run <code>git merge</code> in the first place.</p>
+<p>So let’s focus on the first. What are these conflicts and how do I resolve them?</p>
+<h2 data-number="6.4" id="what-a-conflict-looks-like"><span class="header-section-number">6.4</span> What a Conflict Looks Like</h2>
+<p>My error message above is telling me that <code>foo.py</code> has unmerged paths. So look at what’s happened with that file.</p>
+<p>Before I started any of this, the file <code>foo.py</code> only had this in it on branch <code>main</code>:</p>
+<div class="sourceCode" id="cb74"><pre class="sourceCode default"><code class="sourceCode default"><span id="cb74-1"><a href="merge.html#cb74-1" aria-hidden="true" tabindex="-1"></a>print(&quot;Commit 1&quot;)</span></code></pre></div>
+<p>And I added a line so it looked like this:</p>
+<div class="sourceCode" id="cb75"><pre class="sourceCode default"><code class="sourceCode default"><span id="cb75-1"><a href="merge.html#cb75-1" aria-hidden="true" tabindex="-1"></a>print(&quot;Commit 1&quot;)</span>
+<span id="cb75-2"><a href="merge.html#cb75-2" aria-hidden="true" tabindex="-1"></a>print(&quot;Commit 4&quot;)</span></code></pre></div>
+<p>And committed it.</p>
+<p>But what I didn’t realize was that my teammate had also made another commit on <code>newbranch</code> that added different lines to the bottom of the file.</p>
+<p>So when I went to merge <code>newbranch</code> into <code>main</code>, I got this conflict. Git doesn’t know which additional lines are correct.</p>
+<p><strong>Here’s where the fun begins.</strong> Let’s edit <code>foo.py</code> here in the middle of the merge and see what it looks like:</p>
+<div class="sourceCode" id="cb76"><pre class="sourceCode default"><code class="sourceCode default"><span id="cb76-1"><a href="merge.html#cb76-1" aria-hidden="true" tabindex="-1"></a>print(&quot;Commit 1&quot;)</span>
+<span id="cb76-2"><a href="merge.html#cb76-2" aria-hidden="true" tabindex="-1"></a>&lt;&lt;&lt;&lt;&lt;&lt;&lt; HEAD</span>
+<span id="cb76-3"><a href="merge.html#cb76-3" aria-hidden="true" tabindex="-1"></a>print(&quot;Commit 4&quot;)</span>
+<span id="cb76-4"><a href="merge.html#cb76-4" aria-hidden="true" tabindex="-1"></a>=======</span>
+<span id="cb76-5"><a href="merge.html#cb76-5" aria-hidden="true" tabindex="-1"></a>print(&quot;Commit 2&quot;)</span>
+<span id="cb76-6"><a href="merge.html#cb76-6" aria-hidden="true" tabindex="-1"></a>print(&quot;Commit 3&quot;)</span>
+<span id="cb76-7"><a href="merge.html#cb76-7" aria-hidden="true" tabindex="-1"></a>&gt;&gt;&gt;&gt;&gt;&gt;&gt; newbranch</span></code></pre></div>
+<p>What the giblets is all that? Git has totally screwed with the contents of my file!</p>
+<p>Yes, it has! But not for no reason; let’s examine what’s in there.</p>
+<p>We have three delimiters: <code>&lt;&lt;&lt;&lt;&lt;&lt;</code>, <code>======</code>, and <code>&gt;&gt;&gt;&gt;&gt;&gt;</code>.</p>
+<p>Everything from the top delimiter to the middle one is what’s in <code>HEAD</code> (the branch you’re on and merging <em>into</em>).</p>
+<p>Everything from the middle delimiter to the bottom one is what’s in <code>newbranch</code> (the branch you’re merging <em>from</em>).</p>
+<p>So Git has “helpfully” given us the information we need to make a semi-informed decision about what to do.</p>
+<p>And here’s exactly the steps we must follow:</p>
+<ol type="1">
+<li>Edit the conflicting file(s), remove all those extra lines, and <strong>make the file(s) Right</strong>.</li>
+<li>Do a <code>git add</code> to add the file(s).</li>
+<li>Do a <code>git commit</code> to finalize the merge.</li>
+</ol>
+<p>Now, when I say “make the file <em>Right</em>”, what does that mean? It means that I need to have a chat with my teammate and figure out what this code is supposed to do. We clearly have different ideas, and only one of them is right.</p>
+<p>So we have a chat and hash it out. We finally decide the file should look like this:</p>
+<div class="sourceCode" id="cb77"><pre class="sourceCode default"><code class="sourceCode default"><span id="cb77-1"><a href="merge.html#cb77-1" aria-hidden="true" tabindex="-1"></a>print(&quot;Commit 1&quot;)</span>
+<span id="cb77-2"><a href="merge.html#cb77-2" aria-hidden="true" tabindex="-1"></a>print(&quot;Commit 4&quot;)</span>
+<span id="cb77-3"><a href="merge.html#cb77-3" aria-hidden="true" tabindex="-1"></a>print(&quot;Commit 3&quot;)</span></code></pre></div>
+<p>And then I (since I’m the one doing the merge), edit <code>foo.py</code> and remove all the merge delimiters and everything else, and make it look exactly like we agreed upon. I make it look <em>Right</em>.</p>
+<p>Then I add the file to the stage:</p>
+<div class="sourceCode" id="cb78"><pre class="sourceCode default"><code class="sourceCode default"><span id="cb78-1"><a href="merge.html#cb78-1" aria-hidden="true" tabindex="-1"></a>$ git add foo.py</span>
+<span id="cb78-2"><a href="merge.html#cb78-2" aria-hidden="true" tabindex="-1"></a>$ git status</span>
+<span id="cb78-3"><a href="merge.html#cb78-3" aria-hidden="true" tabindex="-1"></a>  On branch main</span>
+<span id="cb78-4"><a href="merge.html#cb78-4" aria-hidden="true" tabindex="-1"></a>  All conflicts fixed but you are still merging.</span>
+<span id="cb78-5"><a href="merge.html#cb78-5" aria-hidden="true" tabindex="-1"></a>    (use &quot;git commit&quot; to conclude merge)</span>
+<span id="cb78-6"><a href="merge.html#cb78-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb78-7"><a href="merge.html#cb78-7" aria-hidden="true" tabindex="-1"></a>  Changes to be committed:</span>
+<span id="cb78-8"><a href="merge.html#cb78-8" aria-hidden="true" tabindex="-1"></a>      modified:   foo.py</span></code></pre></div>
+<p>Notice that <code>git status</code> is telling me we’re still in the merging state, but I’ve resolved the conflicts. It tells me to <code>git commit</code> to finish the merge.</p>
+<blockquote>
+<p><strong>What if I added the conflict file too soon?</strong> For example, what if you add it but then you realize there are still unresolved conflicts or the file isn’t <em>Right</em>? If you haven’t committed yet, you have a couple options. (If you have committed, all you can do is <a href="reset.html#reset">reset</a> or <a href="revert.html#revert">revert</a>.)</p>
+<p>One option is to just edit the file again, and re-add it when it’s done. (After editing the file will show up as a “change not staged for commit” until you add it again.)</p>
+<p>Another option is to move the file off the stage with <code>git checkout --merge</code> on the file to get it back to the “both modified” state. Helpfully, this won’t delete the changes you already added. This is especially useful if you’re using a <a href="mergetool.html#mergetool">merge tool</a>.</p>
+</blockquote>
+<p>So now that we’ve added the file, let’s make the merge commit. Here we’re manually making the merge commit, unlike above where Git was able to automatically make it.</p>
+<div class="sourceCode" id="cb79"><pre class="sourceCode default"><code class="sourceCode default"><span id="cb79-1"><a href="merge.html#cb79-1" aria-hidden="true" tabindex="-1"></a>$ git commit -m &quot;Merged with newbranch&quot;</span>
+<span id="cb79-2"><a href="merge.html#cb79-2" aria-hidden="true" tabindex="-1"></a>  [main 668b506] Merged with newbranch</span></code></pre></div>
+<p>And that’s it! Let’s check status just to be sure:</p>
+<div class="sourceCode" id="cb80"><pre class="sourceCode default"><code class="sourceCode default"><span id="cb80-1"><a href="merge.html#cb80-1" aria-hidden="true" tabindex="-1"></a>$ git status</span>
+<span id="cb80-2"><a href="merge.html#cb80-2" aria-hidden="true" tabindex="-1"></a>  On branch main</span>
+<span id="cb80-3"><a href="merge.html#cb80-3" aria-hidden="true" tabindex="-1"></a>  nothing to commit, working tree clean</span></code></pre></div>
+<p>Success!</p>
+<p>Just to wrap up, let’s take a look at the log at this point:</p>
+<div class="sourceCode" id="cb81"><pre class="sourceCode default"><code class="sourceCode default"><span id="cb81-1"><a href="merge.html#cb81-1" aria-hidden="true" tabindex="-1"></a>$ git log</span>
+<span id="cb81-2"><a href="merge.html#cb81-2" aria-hidden="true" tabindex="-1"></a>  commit 668b5065aa803fa496951b70159474e164d4d3d2 (HEAD -&gt; main)</span>
+<span id="cb81-3"><a href="merge.html#cb81-3" aria-hidden="true" tabindex="-1"></a>  Merge: e4b69af 81d6f58</span>
+<span id="cb81-4"><a href="merge.html#cb81-4" aria-hidden="true" tabindex="-1"></a>  Author: User Name &lt;user@example.com&gt;</span>
+<span id="cb81-5"><a href="merge.html#cb81-5" aria-hidden="true" tabindex="-1"></a>  Date:   Sun Feb 4 13:18:09 2024 -0800</span>
+<span id="cb81-6"><a href="merge.html#cb81-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb81-7"><a href="merge.html#cb81-7" aria-hidden="true" tabindex="-1"></a>      Merged with newbranch</span>
+<span id="cb81-8"><a href="merge.html#cb81-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb81-9"><a href="merge.html#cb81-9" aria-hidden="true" tabindex="-1"></a>  commit e4b69af05724dc4ef37594e06d0fd323ca1b8578</span>
+<span id="cb81-10"><a href="merge.html#cb81-10" aria-hidden="true" tabindex="-1"></a>  Author: User Name &lt;user@example.com&gt;</span>
+<span id="cb81-11"><a href="merge.html#cb81-11" aria-hidden="true" tabindex="-1"></a>  Date:   Sun Feb 4 13:16:32 2024 -0800</span>
+<span id="cb81-12"><a href="merge.html#cb81-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb81-13"><a href="merge.html#cb81-13" aria-hidden="true" tabindex="-1"></a>      Commit 4</span>
+<span id="cb81-14"><a href="merge.html#cb81-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb81-15"><a href="merge.html#cb81-15" aria-hidden="true" tabindex="-1"></a>  commit 81d6f58b5982d39a1d92af06b812777dbb452879 (newbranch)</span>
+<span id="cb81-16"><a href="merge.html#cb81-16" aria-hidden="true" tabindex="-1"></a>  Author: User Name &lt;user@example.com&gt;</span>
+<span id="cb81-17"><a href="merge.html#cb81-17" aria-hidden="true" tabindex="-1"></a>  Date:   Sun Feb 4 13:16:32 2024 -0800</span>
+<span id="cb81-18"><a href="merge.html#cb81-18" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb81-19"><a href="merge.html#cb81-19" aria-hidden="true" tabindex="-1"></a>      Commit 3</span>
+<span id="cb81-20"><a href="merge.html#cb81-20" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb81-21"><a href="merge.html#cb81-21" aria-hidden="true" tabindex="-1"></a>  commit 3ab961073374ec26734c933503a8aa988c94185b</span>
+<span id="cb81-22"><a href="merge.html#cb81-22" aria-hidden="true" tabindex="-1"></a>  Author: User Name &lt;user@example.com&gt;</span>
+<span id="cb81-23"><a href="merge.html#cb81-23" aria-hidden="true" tabindex="-1"></a>  Date:   Sun Feb 4 13:16:32 2024 -0800</span>
+<span id="cb81-24"><a href="merge.html#cb81-24" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb81-25"><a href="merge.html#cb81-25" aria-hidden="true" tabindex="-1"></a>      Commit 1</span></code></pre></div>
+<p>We see a few things. One is that our merge commit is pointed to by <code>main</code> (and <code>HEAD</code>). And looking down a couple commits, we see our now-direct ancestor, <code>newbranch</code> back on Commit 3.</p>
+<p>We also see a <code>Merge:</code> line on that top commit. It lists the commit hashes for the two commits that it came from (the first 7 digits, anyway), since the merge commit has two parents.</p>
+<h2 data-number="6.5" id="why-merge-conflicts-happen"><span class="header-section-number">6.5</span> Why Merge Conflicts Happen</h2>
+<p>Generally, it’s because you haven’t coordinated with your team about who is responsible for which pieces of code. Generally two people shouldn’t be editing the same lines of code in the same file at once.</p>
+<p>That said, there are absolutely cases where it does happen and is expected. The key is to communicate with your team when resolving the conflict if you don’t know what is <em>Right</em>.</p>
+<h2 data-number="6.6" id="merging-with-ides-or-other-merge-tools"><span class="header-section-number">6.6</span> Merging with IDEs or other Merge Tools</h2>
+<p>IDEs like VS Code might have a special merge mode where you can choose one set of changes or another, or both. Likely “both” is what you want, but make an informed decision on the matter.</p>
+<p>Also, even when selecting “both”, it could be that the editor puts them in the wrong order. It’s up to you to make sure the file is <em>Right</em> before making the final commit to complete the merge.</p>
+<p>You can do this by, after the tool has been used to resolve the conflict, opening the file again in a new window and making sure it’s as you want it, and editing it to be if it’s not.</p>
+<p>For more information about merge tools, see the <a href="mergetool.html#mergetool">Mergetool</a> chapter.</p>
+<h2 data-number="6.7" id="merge-big-ideas"><span class="header-section-number">6.7</span> Merge Big Ideas</h2>
+<p><strong><em>DON’T PANIC!</em></strong> If you have a merge conflict, you can totally work it out. They’re a common occurrence, and the more of them you do, the better at them you get.</p>
+<p>Nothing to worry about. Everything is in Git’s commit history, so even if you botch it, you can always get things back the way they were.</p>
+<p> </p>
+<!-- BG_NEW_CHAPTER -->
+<hr><div style="text-align:center"><span><a href="branches-and-fast-forward-merges.html" rel="prev">Prev</a> | </span><a href="index.html">Contents</a><span> | <a href="using-subdirectories-with-git.html" rel="next">Next</a></span></div></body>
+</html>

@@ -1,0 +1,702 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <title>Beej's Guide to Git</title>
+  <style>
+    html {
+      color: #1a1a1a;
+      background-color: #fdfdfd;
+    }
+    body {
+      margin: 0 auto;
+      max-width: 36em;
+      padding-left: 50px;
+      padding-right: 50px;
+      padding-top: 50px;
+      padding-bottom: 50px;
+      hyphens: auto;
+      overflow-wrap: break-word;
+      text-rendering: optimizeLegibility;
+      font-kerning: normal;
+    }
+    @media (max-width: 600px) {
+      body {
+        font-size: 0.9em;
+        padding: 12px;
+      }
+      h1 {
+        font-size: 1.8em;
+      }
+    }
+    @media print {
+      html {
+        background-color: white;
+      }
+      body {
+        background-color: transparent;
+        color: black;
+        font-size: 12pt;
+      }
+      p, h2, h3 {
+        orphans: 3;
+        widows: 3;
+      }
+      h2, h3, h4 {
+        page-break-after: avoid;
+      }
+    }
+    p {
+      margin: 1em 0;
+    }
+    a {
+      color: #1a1a1a;
+    }
+    a:visited {
+      color: #1a1a1a;
+    }
+    img {
+      max-width: 100%;
+    }
+    svg {
+      height: auto;
+      max-width: 100%;
+    }
+    h1, h2, h3, h4, h5, h6 {
+      margin-top: 1.4em;
+    }
+    h5, h6 {
+      font-size: 1em;
+      font-style: italic;
+    }
+    h6 {
+      font-weight: normal;
+    }
+    ol, ul {
+      padding-left: 1.7em;
+      margin-top: 1em;
+    }
+    li > ol, li > ul {
+      margin-top: 0;
+    }
+    blockquote {
+      margin: 1em 0 1em 1.7em;
+      padding-left: 1em;
+      border-left: 2px solid #e6e6e6;
+      color: #606060;
+    }
+    code {
+      font-family: Menlo, Monaco, Consolas, 'Lucida Console', monospace;
+      font-size: 85%;
+      margin: 0;
+      hyphens: manual;
+    }
+    pre {
+      margin: 1em 0;
+      overflow: auto;
+    }
+    pre code {
+      padding: 0;
+      overflow: visible;
+      overflow-wrap: normal;
+    }
+    .sourceCode {
+     background-color: transparent;
+     overflow: visible;
+    }
+    hr {
+      background-color: #1a1a1a;
+      border: none;
+      height: 1px;
+      margin: 1em 0;
+    }
+    table {
+      margin: 1em 0;
+      border-collapse: collapse;
+      width: 100%;
+      overflow-x: auto;
+      display: block;
+      font-variant-numeric: lining-nums tabular-nums;
+    }
+    table caption {
+      margin-bottom: 0.75em;
+    }
+    tbody {
+      margin-top: 0.5em;
+      border-top: 1px solid #1a1a1a;
+      border-bottom: 1px solid #1a1a1a;
+    }
+    th {
+      border-top: 1px solid #1a1a1a;
+      padding: 0.25em 0.5em 0.25em 0.5em;
+    }
+    td {
+      padding: 0.125em 0.5em 0.25em 0.5em;
+    }
+    header {
+      margin-bottom: 4em;
+      text-align: center;
+    }
+    #TOC li {
+      list-style: none;
+    }
+    #TOC ul {
+      padding-left: 1.3em;
+    }
+    #TOC > ul {
+      padding-left: 0;
+    }
+    #TOC a:not(:hover) {
+      text-decoration: none;
+    }
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+    /* CSS for syntax highlighting */
+    html { -webkit-text-size-adjust: 100%; }
+    pre > code.sourceCode { white-space: pre; position: relative; }
+    pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+    pre > code.sourceCode > span:empty { height: 1.2em; }
+    .sourceCode { overflow: visible; }
+    code.sourceCode > span { color: inherit; text-decoration: inherit; }
+    div.sourceCode { margin: 1em 0; }
+    pre.sourceCode { margin: 0; }
+    @media screen {
+    div.sourceCode { overflow: auto; }
+    }
+    @media print {
+    pre > code.sourceCode { white-space: pre-wrap; }
+    pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+    }
+    pre.numberSource code
+      { counter-reset: source-line 0; }
+    pre.numberSource code > span
+      { position: relative; left: -4em; counter-increment: source-line; }
+    pre.numberSource code > span > a:first-child::before
+      { content: counter(source-line);
+        position: relative; left: -1em; text-align: right; vertical-align: baseline;
+        border: none; display: inline-block;
+        -webkit-touch-callout: none; -webkit-user-select: none;
+        -khtml-user-select: none; -moz-user-select: none;
+        -ms-user-select: none; user-select: none;
+        padding: 0 4px; width: 4em;
+        color: #aaaaaa;
+      }
+    pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+    div.sourceCode
+      {   }
+    @media screen {
+    pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+    }
+    code span.al { color: #ff0000; font-weight: bold; } /* Alert */
+    code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+    code span.at { color: #7d9029; } /* Attribute */
+    code span.bn { color: #40a070; } /* BaseN */
+    code span.bu { color: #008000; } /* BuiltIn */
+    code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+    code span.ch { color: #4070a0; } /* Char */
+    code span.cn { color: #880000; } /* Constant */
+    code span.co { color: #60a0b0; font-style: italic; } /* Comment */
+    code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+    code span.do { color: #ba2121; font-style: italic; } /* Documentation */
+    code span.dt { color: #902000; } /* DataType */
+    code span.dv { color: #40a070; } /* DecVal */
+    code span.er { color: #ff0000; font-weight: bold; } /* Error */
+    code span.ex { } /* Extension */
+    code span.fl { color: #40a070; } /* Float */
+    code span.fu { color: #06287e; } /* Function */
+    code span.im { color: #008000; font-weight: bold; } /* Import */
+    code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+    code span.kw { color: #007020; font-weight: bold; } /* Keyword */
+    code span.op { color: #666666; } /* Operator */
+    code span.ot { color: #007020; } /* Other */
+    code span.pp { color: #bc7a00; } /* Preprocessor */
+    code span.sc { color: #4070a0; } /* SpecialChar */
+    code span.ss { color: #bb6688; } /* SpecialString */
+    code span.st { color: #4070a0; } /* String */
+    code span.va { color: #19177c; } /* Variable */
+    code span.vs { color: #4070a0; } /* VerbatimString */
+    code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+  </style>
+  <!-- BG custom styling -->
+  <style type="text/css">
+  /* Fix for line numbers not visible */
+  pre.numberSource code > span {
+      left: -1em;
+  }
+  pre.numberSource {
+      margin-left: initial;
+  }
+
+  /* Put some space after the section numbers */
+  span.toc-section-number::after {
+      content: "\a0\a0\a0";  /* non-breaking whitespace */
+  }
+
+  /* Hide underlines on code number links */
+  pre > code.sourceCode > span > a:first-child::before {
+      text-decoration: none;
+  }
+
+  /* Color the source blocks */
+  div.sourceCode {
+      background-color: #f0f0f0;
+  }
+
+  /* Fix iOS big text rendering issue */
+  pre > code.sourceCode > span {
+      display: initial;
+  }
+
+
+  /* Color the inline code */
+  code:not(.sourceCode) {
+      background: #f0f0f0;
+      padding-left: 0.2em;
+      padding-right: 0.2em;
+      border-radius: 0.2em;
+  }
+
+  pre.sourceCode {
+      border: 1px solid #ccc;
+      padding: 0.5em;
+      border-radius: 0.2em;
+  }
+
+  /* Keep code tags from wrapping in tables */
+  tbody code {
+      white-space: nowrap;
+  }
+
+  /* Prevent hyphenation and hyphen breaks in code*/
+  code {
+      word-break: keep-all;
+  }
+
+  td {
+      vertical-align: top;
+  }
+
+  body {
+      font-size: 12pt;
+      max-width: 43em;
+      font-family: sans-serif;
+  }
+
+  html {
+      background: #f9f9f9;
+  }
+
+  figure > embed {
+      max-width: 100%;
+  }
+
+  figure {
+      text-align: center;
+      margin-top: 2em;
+      margin-bottom: 2em;
+  }
+
+  figcaption {
+      font-size: 0.9em;
+      font-style: italic;
+      margin-top: 0.6em;
+  }
+
+  body {
+      counter-reset: figure-counter-major;
+      counter-reset: figure-counter-minor;
+  }
+
+  figure {
+      counter-increment: figure-counter-minor;
+  }
+
+  figcaption::before {
+      content: "Figure " counter(figure-counter-major) "." counter(figure-counter-minor) ": ";
+  }
+
+  blockquote {
+      border-left: 2px solid #bbb;
+      color: #444;
+  }
+
+  /* Contents */
+
+  nav[role="doc-toc"] > ul > li {
+    font-weight: bold;
+    margin-top: 1.2em;
+  }
+
+  nav[role="doc-toc"] > ul > li:first {
+    font-weight: bold;
+    margin-top: initial;
+  }
+
+  nav[role="doc-toc"] > ul > li > ul {
+    font-weight: normal;
+    margin-top: 0.3em;
+  }
+
+  /*
+  In multipage, we need to reset the figure counter to the chapter
+  number. Luckily, this is in the <h1 data-number> attribute. Unluckily,
+  there is no way to get this in a general way.
+
+  This doesn't work:
+
+    h1[data-number] {
+      counter-set: figure-counter-major attr(data-number);
+    }
+
+  Nor this:
+
+    h1[data-number] {
+      --figure-counter-major-value: attr(data-number);
+      counter-set: figure-counter-major var(--figure-counter-major-value);
+    }
+
+  So, dumbly, we have a bunch of rules for all these sections, up to the
+  maximum possible section.
+
+  Here's a program to generate them:
+
+    for (let i = 1; i < 100; i++)
+        console.log(`h1[data-number="${i}"]{counter-set:figure-counter-major ${i};counter-reset:figure-counter-minor;}`);
+
+  Note to self: never write a book with more than 99 frickin' chapters.
+  */
+
+  h1[data-number="1"]{counter-set:figure-counter-major 1;counter-reset:figure-counter-minor;}
+  h1[data-number="2"]{counter-set:figure-counter-major 2;counter-reset:figure-counter-minor;}
+  h1[data-number="3"]{counter-set:figure-counter-major 3;counter-reset:figure-counter-minor;}
+  h1[data-number="4"]{counter-set:figure-counter-major 4;counter-reset:figure-counter-minor;}
+  h1[data-number="5"]{counter-set:figure-counter-major 5;counter-reset:figure-counter-minor;}
+  h1[data-number="6"]{counter-set:figure-counter-major 6;counter-reset:figure-counter-minor;}
+  h1[data-number="7"]{counter-set:figure-counter-major 7;counter-reset:figure-counter-minor;}
+  h1[data-number="8"]{counter-set:figure-counter-major 8;counter-reset:figure-counter-minor;}
+  h1[data-number="9"]{counter-set:figure-counter-major 9;counter-reset:figure-counter-minor;}
+  h1[data-number="10"]{counter-set:figure-counter-major 10;counter-reset:figure-counter-minor;}
+  h1[data-number="11"]{counter-set:figure-counter-major 11;counter-reset:figure-counter-minor;}
+  h1[data-number="12"]{counter-set:figure-counter-major 12;counter-reset:figure-counter-minor;}
+  h1[data-number="13"]{counter-set:figure-counter-major 13;counter-reset:figure-counter-minor;}
+  h1[data-number="14"]{counter-set:figure-counter-major 14;counter-reset:figure-counter-minor;}
+  h1[data-number="15"]{counter-set:figure-counter-major 15;counter-reset:figure-counter-minor;}
+  h1[data-number="16"]{counter-set:figure-counter-major 16;counter-reset:figure-counter-minor;}
+  h1[data-number="17"]{counter-set:figure-counter-major 17;counter-reset:figure-counter-minor;}
+  h1[data-number="18"]{counter-set:figure-counter-major 18;counter-reset:figure-counter-minor;}
+  h1[data-number="19"]{counter-set:figure-counter-major 19;counter-reset:figure-counter-minor;}
+  h1[data-number="20"]{counter-set:figure-counter-major 20;counter-reset:figure-counter-minor;}
+  h1[data-number="21"]{counter-set:figure-counter-major 21;counter-reset:figure-counter-minor;}
+  h1[data-number="22"]{counter-set:figure-counter-major 22;counter-reset:figure-counter-minor;}
+  h1[data-number="23"]{counter-set:figure-counter-major 23;counter-reset:figure-counter-minor;}
+  h1[data-number="24"]{counter-set:figure-counter-major 24;counter-reset:figure-counter-minor;}
+  h1[data-number="25"]{counter-set:figure-counter-major 25;counter-reset:figure-counter-minor;}
+  h1[data-number="26"]{counter-set:figure-counter-major 26;counter-reset:figure-counter-minor;}
+  h1[data-number="27"]{counter-set:figure-counter-major 27;counter-reset:figure-counter-minor;}
+  h1[data-number="28"]{counter-set:figure-counter-major 28;counter-reset:figure-counter-minor;}
+  h1[data-number="29"]{counter-set:figure-counter-major 29;counter-reset:figure-counter-minor;}
+  h1[data-number="30"]{counter-set:figure-counter-major 30;counter-reset:figure-counter-minor;}
+  h1[data-number="31"]{counter-set:figure-counter-major 31;counter-reset:figure-counter-minor;}
+  h1[data-number="32"]{counter-set:figure-counter-major 32;counter-reset:figure-counter-minor;}
+  h1[data-number="33"]{counter-set:figure-counter-major 33;counter-reset:figure-counter-minor;}
+  h1[data-number="34"]{counter-set:figure-counter-major 34;counter-reset:figure-counter-minor;}
+  h1[data-number="35"]{counter-set:figure-counter-major 35;counter-reset:figure-counter-minor;}
+  h1[data-number="36"]{counter-set:figure-counter-major 36;counter-reset:figure-counter-minor;}
+  h1[data-number="37"]{counter-set:figure-counter-major 37;counter-reset:figure-counter-minor;}
+  h1[data-number="38"]{counter-set:figure-counter-major 38;counter-reset:figure-counter-minor;}
+  h1[data-number="39"]{counter-set:figure-counter-major 39;counter-reset:figure-counter-minor;}
+  h1[data-number="40"]{counter-set:figure-counter-major 40;counter-reset:figure-counter-minor;}
+  h1[data-number="41"]{counter-set:figure-counter-major 41;counter-reset:figure-counter-minor;}
+  h1[data-number="42"]{counter-set:figure-counter-major 42;counter-reset:figure-counter-minor;}
+  h1[data-number="43"]{counter-set:figure-counter-major 43;counter-reset:figure-counter-minor;}
+  h1[data-number="44"]{counter-set:figure-counter-major 44;counter-reset:figure-counter-minor;}
+  h1[data-number="45"]{counter-set:figure-counter-major 45;counter-reset:figure-counter-minor;}
+  h1[data-number="46"]{counter-set:figure-counter-major 46;counter-reset:figure-counter-minor;}
+  h1[data-number="47"]{counter-set:figure-counter-major 47;counter-reset:figure-counter-minor;}
+  h1[data-number="48"]{counter-set:figure-counter-major 48;counter-reset:figure-counter-minor;}
+  h1[data-number="49"]{counter-set:figure-counter-major 49;counter-reset:figure-counter-minor;}
+  h1[data-number="50"]{counter-set:figure-counter-major 50;counter-reset:figure-counter-minor;}
+  h1[data-number="51"]{counter-set:figure-counter-major 51;counter-reset:figure-counter-minor;}
+  h1[data-number="52"]{counter-set:figure-counter-major 52;counter-reset:figure-counter-minor;}
+  h1[data-number="53"]{counter-set:figure-counter-major 53;counter-reset:figure-counter-minor;}
+  h1[data-number="54"]{counter-set:figure-counter-major 54;counter-reset:figure-counter-minor;}
+  h1[data-number="55"]{counter-set:figure-counter-major 55;counter-reset:figure-counter-minor;}
+  h1[data-number="56"]{counter-set:figure-counter-major 56;counter-reset:figure-counter-minor;}
+  h1[data-number="57"]{counter-set:figure-counter-major 57;counter-reset:figure-counter-minor;}
+  h1[data-number="58"]{counter-set:figure-counter-major 58;counter-reset:figure-counter-minor;}
+  h1[data-number="59"]{counter-set:figure-counter-major 59;counter-reset:figure-counter-minor;}
+  h1[data-number="60"]{counter-set:figure-counter-major 60;counter-reset:figure-counter-minor;}
+  h1[data-number="61"]{counter-set:figure-counter-major 61;counter-reset:figure-counter-minor;}
+  h1[data-number="62"]{counter-set:figure-counter-major 62;counter-reset:figure-counter-minor;}
+  h1[data-number="63"]{counter-set:figure-counter-major 63;counter-reset:figure-counter-minor;}
+  h1[data-number="64"]{counter-set:figure-counter-major 64;counter-reset:figure-counter-minor;}
+  h1[data-number="65"]{counter-set:figure-counter-major 65;counter-reset:figure-counter-minor;}
+  h1[data-number="66"]{counter-set:figure-counter-major 66;counter-reset:figure-counter-minor;}
+  h1[data-number="67"]{counter-set:figure-counter-major 67;counter-reset:figure-counter-minor;}
+  h1[data-number="68"]{counter-set:figure-counter-major 68;counter-reset:figure-counter-minor;}
+  h1[data-number="69"]{counter-set:figure-counter-major 69;counter-reset:figure-counter-minor;}
+  h1[data-number="70"]{counter-set:figure-counter-major 70;counter-reset:figure-counter-minor;}
+  h1[data-number="71"]{counter-set:figure-counter-major 71;counter-reset:figure-counter-minor;}
+  h1[data-number="72"]{counter-set:figure-counter-major 72;counter-reset:figure-counter-minor;}
+  h1[data-number="73"]{counter-set:figure-counter-major 73;counter-reset:figure-counter-minor;}
+  h1[data-number="74"]{counter-set:figure-counter-major 74;counter-reset:figure-counter-minor;}
+  h1[data-number="75"]{counter-set:figure-counter-major 75;counter-reset:figure-counter-minor;}
+  h1[data-number="76"]{counter-set:figure-counter-major 76;counter-reset:figure-counter-minor;}
+  h1[data-number="77"]{counter-set:figure-counter-major 77;counter-reset:figure-counter-minor;}
+  h1[data-number="78"]{counter-set:figure-counter-major 78;counter-reset:figure-counter-minor;}
+  h1[data-number="79"]{counter-set:figure-counter-major 79;counter-reset:figure-counter-minor;}
+  h1[data-number="80"]{counter-set:figure-counter-major 80;counter-reset:figure-counter-minor;}
+  h1[data-number="81"]{counter-set:figure-counter-major 81;counter-reset:figure-counter-minor;}
+  h1[data-number="82"]{counter-set:figure-counter-major 82;counter-reset:figure-counter-minor;}
+  h1[data-number="83"]{counter-set:figure-counter-major 83;counter-reset:figure-counter-minor;}
+  h1[data-number="84"]{counter-set:figure-counter-major 84;counter-reset:figure-counter-minor;}
+  h1[data-number="85"]{counter-set:figure-counter-major 85;counter-reset:figure-counter-minor;}
+  h1[data-number="86"]{counter-set:figure-counter-major 86;counter-reset:figure-counter-minor;}
+  h1[data-number="87"]{counter-set:figure-counter-major 87;counter-reset:figure-counter-minor;}
+  h1[data-number="88"]{counter-set:figure-counter-major 88;counter-reset:figure-counter-minor;}
+  h1[data-number="89"]{counter-set:figure-counter-major 89;counter-reset:figure-counter-minor;}
+  h1[data-number="90"]{counter-set:figure-counter-major 90;counter-reset:figure-counter-minor;}
+  h1[data-number="91"]{counter-set:figure-counter-major 91;counter-reset:figure-counter-minor;}
+  h1[data-number="92"]{counter-set:figure-counter-major 92;counter-reset:figure-counter-minor;}
+  h1[data-number="93"]{counter-set:figure-counter-major 93;counter-reset:figure-counter-minor;}
+  h1[data-number="94"]{counter-set:figure-counter-major 94;counter-reset:figure-counter-minor;}
+  h1[data-number="95"]{counter-set:figure-counter-major 95;counter-reset:figure-counter-minor;}
+  h1[data-number="96"]{counter-set:figure-counter-major 96;counter-reset:figure-counter-minor;}
+  h1[data-number="97"]{counter-set:figure-counter-major 97;counter-reset:figure-counter-minor;}
+  h1[data-number="98"]{counter-set:figure-counter-major 98;counter-reset:figure-counter-minor;}
+  h1[data-number="99"]{counter-set:figure-counter-major 99;counter-reset:figure-counter-minor;}
+
+
+  </style>
+  <!-- BG custom styling for the wide body variant -->
+  <!-- Gets appended after bg-css.html -->
+
+  <style type="text/css">
+  body {
+      max-width: inherit;
+  }
+  </style>
+</head>
+<body>
+<div style="text-align:center"><span><a href="the-reference-log-reflog.html" rel="prev">Prev</a> | </span><a href="index.html">Contents</a><span> | <a href="cherry-pick-bringing-in-specific-commits.html" rel="next">Next</a></span></div><hr>
+<h1 data-number="21" id="patch-mode-applying-partial-changes"><span class="header-section-number">21</span> Patch Mode: Applying Partial Changes</h1>
+<p></p>
+<p>A lot of Git commands obey the <code>-p</code> switch that puts them in <strong><em>patch mode</em></strong>. This is a powerful mode that allows you to select <em>some</em> of the changes for a particular command, but not <em>all</em> of the changes.</p>
+<p>Commands that use <code>-p</code> include <code>add</code>, <code>reset</code>, <code>stash</code>, <code>restore</code>, <code>commit</code>, and more.</p>
+<p>Basically any time you have changes to a file and you’re thinking, “I want to do something with just <em>some</em> of these changes”, patch mode will help you out.</p>
+<p>Some terminology: Git calls a collection of close changes a <em>hunk</em>. An example might be if you modified function <code>foo()</code> by adding a few lines and modified function <code>bar()</code> by adding a few lines, you would likely have two hunks, one for each group of changes.</p>
+<p>Patch mode allows you to select which hunks will be operated on.</p>
+<h2 data-number="21.1" id="adding-files-in-patch-mode"><span class="header-section-number">21.1</span> Adding Files in Patch Mode</h2>
+<p></p>
+<p>Let’s say you had a commit that added <code>Line 1</code> to <code>Line 8</code> in a file:</p>
+<div class="sourceCode" id="cb260"><pre class="sourceCode default"><code class="sourceCode default"><span id="cb260-1"><a href="patch-mode-applying-partial-changes.html#cb260-1" aria-hidden="true" tabindex="-1"></a>Line 1</span>
+<span id="cb260-2"><a href="patch-mode-applying-partial-changes.html#cb260-2" aria-hidden="true" tabindex="-1"></a>Line 2</span>
+<span id="cb260-3"><a href="patch-mode-applying-partial-changes.html#cb260-3" aria-hidden="true" tabindex="-1"></a>Line 3</span>
+<span id="cb260-4"><a href="patch-mode-applying-partial-changes.html#cb260-4" aria-hidden="true" tabindex="-1"></a>Line 4</span>
+<span id="cb260-5"><a href="patch-mode-applying-partial-changes.html#cb260-5" aria-hidden="true" tabindex="-1"></a>Line 5</span>
+<span id="cb260-6"><a href="patch-mode-applying-partial-changes.html#cb260-6" aria-hidden="true" tabindex="-1"></a>Line 6</span>
+<span id="cb260-7"><a href="patch-mode-applying-partial-changes.html#cb260-7" aria-hidden="true" tabindex="-1"></a>Line 7</span>
+<span id="cb260-8"><a href="patch-mode-applying-partial-changes.html#cb260-8" aria-hidden="true" tabindex="-1"></a>Line 8</span></code></pre></div>
+<p>And we make a couple changes, adding a line to the top and bottom:</p>
+<div class="sourceCode" id="cb261"><pre class="sourceCode default"><code class="sourceCode default"><span id="cb261-1"><a href="patch-mode-applying-partial-changes.html#cb261-1" aria-hidden="true" tabindex="-1"></a>Line BEGIN</span>
+<span id="cb261-2"><a href="patch-mode-applying-partial-changes.html#cb261-2" aria-hidden="true" tabindex="-1"></a>Line 1</span>
+<span id="cb261-3"><a href="patch-mode-applying-partial-changes.html#cb261-3" aria-hidden="true" tabindex="-1"></a>Line 2</span>
+<span id="cb261-4"><a href="patch-mode-applying-partial-changes.html#cb261-4" aria-hidden="true" tabindex="-1"></a>Line 3</span>
+<span id="cb261-5"><a href="patch-mode-applying-partial-changes.html#cb261-5" aria-hidden="true" tabindex="-1"></a>Line 4</span>
+<span id="cb261-6"><a href="patch-mode-applying-partial-changes.html#cb261-6" aria-hidden="true" tabindex="-1"></a>Line 5</span>
+<span id="cb261-7"><a href="patch-mode-applying-partial-changes.html#cb261-7" aria-hidden="true" tabindex="-1"></a>Line 6</span>
+<span id="cb261-8"><a href="patch-mode-applying-partial-changes.html#cb261-8" aria-hidden="true" tabindex="-1"></a>Line 7</span>
+<span id="cb261-9"><a href="patch-mode-applying-partial-changes.html#cb261-9" aria-hidden="true" tabindex="-1"></a>Line 8</span>
+<span id="cb261-10"><a href="patch-mode-applying-partial-changes.html#cb261-10" aria-hidden="true" tabindex="-1"></a>Line END</span></code></pre></div>
+<p>And I’m about to add and commit, but I realize that I only want to add <code>Line BEGIN</code> at this time, and not <code>Line END</code>.</p>
+<p>If I did a regular <code>git add</code>, it would add both changes to the stage. But if I do <code>git add -p</code>, we can select one or the other. Let’s try it.</p>
+<p>First let’s have a look at our diff.</p>
+<div class="sourceCode" id="cb262"><pre class="sourceCode default"><code class="sourceCode default"><span id="cb262-1"><a href="patch-mode-applying-partial-changes.html#cb262-1" aria-hidden="true" tabindex="-1"></a>$ git diff</span>
+<span id="cb262-2"><a href="patch-mode-applying-partial-changes.html#cb262-2" aria-hidden="true" tabindex="-1"></a>  diff --git a/foo.txt b/foo.txt</span>
+<span id="cb262-3"><a href="patch-mode-applying-partial-changes.html#cb262-3" aria-hidden="true" tabindex="-1"></a>  index a982fdc..125f6ac 100644</span>
+<span id="cb262-4"><a href="patch-mode-applying-partial-changes.html#cb262-4" aria-hidden="true" tabindex="-1"></a>  --- a/foo.txt</span>
+<span id="cb262-5"><a href="patch-mode-applying-partial-changes.html#cb262-5" aria-hidden="true" tabindex="-1"></a>  +++ b/foo.txt</span>
+<span id="cb262-6"><a href="patch-mode-applying-partial-changes.html#cb262-6" aria-hidden="true" tabindex="-1"></a>  @@ -1,3 +1,4 @@</span>
+<span id="cb262-7"><a href="patch-mode-applying-partial-changes.html#cb262-7" aria-hidden="true" tabindex="-1"></a>  +Line BEGIN</span>
+<span id="cb262-8"><a href="patch-mode-applying-partial-changes.html#cb262-8" aria-hidden="true" tabindex="-1"></a>   Line 1</span>
+<span id="cb262-9"><a href="patch-mode-applying-partial-changes.html#cb262-9" aria-hidden="true" tabindex="-1"></a>   Line 2</span>
+<span id="cb262-10"><a href="patch-mode-applying-partial-changes.html#cb262-10" aria-hidden="true" tabindex="-1"></a>   Line 3</span>
+<span id="cb262-11"><a href="patch-mode-applying-partial-changes.html#cb262-11" aria-hidden="true" tabindex="-1"></a>  @@ -6,3 +7,4 @@ Line 5</span>
+<span id="cb262-12"><a href="patch-mode-applying-partial-changes.html#cb262-12" aria-hidden="true" tabindex="-1"></a>   Line 6</span>
+<span id="cb262-13"><a href="patch-mode-applying-partial-changes.html#cb262-13" aria-hidden="true" tabindex="-1"></a>   Line 7</span>
+<span id="cb262-14"><a href="patch-mode-applying-partial-changes.html#cb262-14" aria-hidden="true" tabindex="-1"></a>   Line 8</span>
+<span id="cb262-15"><a href="patch-mode-applying-partial-changes.html#cb262-15" aria-hidden="true" tabindex="-1"></a>  +Line END</span></code></pre></div>
+<p>Poring over that, you see we’ve added <code>Line BEGIN</code> to the top and <code>Line END</code> to the bottom. (Recall that lines with <code>+</code> in front of them are additions in diff.)</p>
+<p>Now let’s do a patch add.</p>
+<div class="sourceCode" id="cb263"><pre class="sourceCode default"><code class="sourceCode default"><span id="cb263-1"><a href="patch-mode-applying-partial-changes.html#cb263-1" aria-hidden="true" tabindex="-1"></a>$ git add -p</span>
+<span id="cb263-2"><a href="patch-mode-applying-partial-changes.html#cb263-2" aria-hidden="true" tabindex="-1"></a>  diff --git a/foo.txt b/foo.txt</span>
+<span id="cb263-3"><a href="patch-mode-applying-partial-changes.html#cb263-3" aria-hidden="true" tabindex="-1"></a>  index a982fdc..125f6ac 100644</span>
+<span id="cb263-4"><a href="patch-mode-applying-partial-changes.html#cb263-4" aria-hidden="true" tabindex="-1"></a>  --- a/foo.txt</span>
+<span id="cb263-5"><a href="patch-mode-applying-partial-changes.html#cb263-5" aria-hidden="true" tabindex="-1"></a>  +++ b/foo.txt</span>
+<span id="cb263-6"><a href="patch-mode-applying-partial-changes.html#cb263-6" aria-hidden="true" tabindex="-1"></a>  @@ -1,3 +1,4 @@</span>
+<span id="cb263-7"><a href="patch-mode-applying-partial-changes.html#cb263-7" aria-hidden="true" tabindex="-1"></a>  +Line BEGIN</span>
+<span id="cb263-8"><a href="patch-mode-applying-partial-changes.html#cb263-8" aria-hidden="true" tabindex="-1"></a>   Line 1</span>
+<span id="cb263-9"><a href="patch-mode-applying-partial-changes.html#cb263-9" aria-hidden="true" tabindex="-1"></a>   Line 2</span>
+<span id="cb263-10"><a href="patch-mode-applying-partial-changes.html#cb263-10" aria-hidden="true" tabindex="-1"></a>   Line 3</span>
+<span id="cb263-11"><a href="patch-mode-applying-partial-changes.html#cb263-11" aria-hidden="true" tabindex="-1"></a>  (1/2) Stage this hunk [y,n,q,a,d,j,J,g,/,e,p,?]? </span></code></pre></div>
+<p>Well, that’s a lot of options! The easy ones are <code>y</code> for “yes” and <code>n</code> for “no”. And also you can type <code>?</code> to get more detailed help.</p>
+<p>Also we see that this is hunk 1 of 2, which makes sense because we have one change at the top of the file and another at the bottom.</p>
+<p>In our case, we do want to keep this first hunk, so we’ll answer <code>y</code>.</p>
+<p>And then we get to hunk 2 of 2:</p>
+<div class="sourceCode" id="cb264"><pre class="sourceCode default"><code class="sourceCode default"><span id="cb264-1"><a href="patch-mode-applying-partial-changes.html#cb264-1" aria-hidden="true" tabindex="-1"></a>(1/2) Stage this hunk [y,n,q,a,d,j,J,g,/,e,p,?]? y</span>
+<span id="cb264-2"><a href="patch-mode-applying-partial-changes.html#cb264-2" aria-hidden="true" tabindex="-1"></a>@@ -6,3 +7,4 @@ Line 5</span>
+<span id="cb264-3"><a href="patch-mode-applying-partial-changes.html#cb264-3" aria-hidden="true" tabindex="-1"></a> Line 6</span>
+<span id="cb264-4"><a href="patch-mode-applying-partial-changes.html#cb264-4" aria-hidden="true" tabindex="-1"></a> Line 7</span>
+<span id="cb264-5"><a href="patch-mode-applying-partial-changes.html#cb264-5" aria-hidden="true" tabindex="-1"></a> Line 8</span>
+<span id="cb264-6"><a href="patch-mode-applying-partial-changes.html#cb264-6" aria-hidden="true" tabindex="-1"></a>+Line END</span>
+<span id="cb264-7"><a href="patch-mode-applying-partial-changes.html#cb264-7" aria-hidden="true" tabindex="-1"></a>(2/2) Stage this hunk [y,n,q,a,d,K,g,/,e,p,?]?</span></code></pre></div>
+<p>And for this one, I’m going to say <code>n</code> to not stage it. Then we’re back out to the shell prompt.</p>
+<p>Now I’m going to type <code>git status</code> to see where we are, but first I want you to think about what it’s going to tell us.</p>
+<p>We have one of the changes staged, and the other change not staged. What state are files in when they have unstaged changes? And when there are staged changes? We have both right now, right?</p>
+<div class="sourceCode" id="cb265"><pre class="sourceCode default"><code class="sourceCode default"><span id="cb265-1"><a href="patch-mode-applying-partial-changes.html#cb265-1" aria-hidden="true" tabindex="-1"></a>$ git status</span>
+<span id="cb265-2"><a href="patch-mode-applying-partial-changes.html#cb265-2" aria-hidden="true" tabindex="-1"></a>  On branch main</span>
+<span id="cb265-3"><a href="patch-mode-applying-partial-changes.html#cb265-3" aria-hidden="true" tabindex="-1"></a>  Changes to be committed:</span>
+<span id="cb265-4"><a href="patch-mode-applying-partial-changes.html#cb265-4" aria-hidden="true" tabindex="-1"></a>    (use &quot;git restore --staged &lt;file&gt;...&quot; to unstage)</span>
+<span id="cb265-5"><a href="patch-mode-applying-partial-changes.html#cb265-5" aria-hidden="true" tabindex="-1"></a>      modified:   foo.txt</span>
+<span id="cb265-6"><a href="patch-mode-applying-partial-changes.html#cb265-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb265-7"><a href="patch-mode-applying-partial-changes.html#cb265-7" aria-hidden="true" tabindex="-1"></a>  Changes not staged for commit:</span>
+<span id="cb265-8"><a href="patch-mode-applying-partial-changes.html#cb265-8" aria-hidden="true" tabindex="-1"></a>    (use &quot;git add &lt;file&gt;...&quot; to update what will be committed)</span>
+<span id="cb265-9"><a href="patch-mode-applying-partial-changes.html#cb265-9" aria-hidden="true" tabindex="-1"></a>    (use &quot;git restore &lt;file&gt;...&quot; to discard changes in working</span>
+<span id="cb265-10"><a href="patch-mode-applying-partial-changes.html#cb265-10" aria-hidden="true" tabindex="-1"></a>    directory)</span>
+<span id="cb265-11"><a href="patch-mode-applying-partial-changes.html#cb265-11" aria-hidden="true" tabindex="-1"></a>      modified:   foo.txt</span></code></pre></div>
+<p>Sure enough! Because we only did a partial add of the changes in the file, the added changes are on the stage, and the not-added changes are still out in the working directory. It <em>has</em> to be this way because we haven’t staged <em>all</em> our changes!</p>
+<p>At this point we can go ahead and commit the partially-added changes that are on the stage.</p>
+<p></p>
+<h2 data-number="21.2" id="resetting-files-in-patch-mode"><span class="header-section-number">21.2</span> Resetting Files in Patch Mode</h2>
+<p></p>
+<p>Kind of the opposite of <code>git add -p</code> is <code>git reset -p</code>. You can use <code>reset -p</code> to selectively change hunks <em>on the stage</em>.</p>
+<p>It’s that last part that makes it a bit weird, but you can think of <code>add -p</code> as selectively adding hunks to the stage from the working tree, and <code>reset -p</code> as selectively removing hunks from the stage relative to a particular commit.</p>
+<p>That is, I can reset to an earlier commit, but choose what hunks to reset.</p>
+<blockquote>
+<p><strong>This is not a hard, soft, or mixed reset.</strong> It’s its own thing. If you try to specify a certain type of reset in addition to <code>-p</code>, Git will complain. Arguably this should be a different command entirely, but that’s Git for ya!</p>
+</blockquote>
+<p>Let’s say I have two commits. In the first one, I added <code>Line 1</code> through <code>Line 8</code>, and in the second commit I added <code>Line BEGIN</code> and <code>Line END</code>, just like in the earlier example.</p>
+<p>But now I decide I want to reset the <code>Line END</code>, but it’s part of another commit. I can break it out with <code>git reset -p</code>. Let’s do it.</p>
+<p>Here’s my log:</p>
+<div class="sourceCode" id="cb266"><pre class="sourceCode default"><code class="sourceCode default"><span id="cb266-1"><a href="patch-mode-applying-partial-changes.html#cb266-1" aria-hidden="true" tabindex="-1"></a>commit d2d5899a253d5ce277d4d5981d03a43e68da6677 (HEAD -&gt; main)</span>
+<span id="cb266-2"><a href="patch-mode-applying-partial-changes.html#cb266-2" aria-hidden="true" tabindex="-1"></a>Author: User Name &lt;user@example.com&gt;</span>
+<span id="cb266-3"><a href="patch-mode-applying-partial-changes.html#cb266-3" aria-hidden="true" tabindex="-1"></a>Date:   Fri Oct 11 16:12:26 2024 -0700</span>
+<span id="cb266-4"><a href="patch-mode-applying-partial-changes.html#cb266-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb266-5"><a href="patch-mode-applying-partial-changes.html#cb266-5" aria-hidden="true" tabindex="-1"></a>    updated</span>
+<span id="cb266-6"><a href="patch-mode-applying-partial-changes.html#cb266-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb266-7"><a href="patch-mode-applying-partial-changes.html#cb266-7" aria-hidden="true" tabindex="-1"></a>commit aae754f46130b6d86680e74caa98642becc88d6e</span>
+<span id="cb266-8"><a href="patch-mode-applying-partial-changes.html#cb266-8" aria-hidden="true" tabindex="-1"></a>Author: User Name &lt;user@example.com&gt;</span>
+<span id="cb266-9"><a href="patch-mode-applying-partial-changes.html#cb266-9" aria-hidden="true" tabindex="-1"></a>Date:   Fri Oct 11 16:12:04 2024 -0700</span>
+<span id="cb266-10"><a href="patch-mode-applying-partial-changes.html#cb266-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb266-11"><a href="patch-mode-applying-partial-changes.html#cb266-11" aria-hidden="true" tabindex="-1"></a>    added</span></code></pre></div>
+<p>I want to do a partial reset to the earlier commit <code>aae75</code>. And I’m going to say “no” I don’t want to reset the first hunk, and “yes” I want to reset the second. Here’s what it looks like:</p>
+<div class="sourceCode" id="cb267"><pre class="sourceCode default"><code class="sourceCode default"><span id="cb267-1"><a href="patch-mode-applying-partial-changes.html#cb267-1" aria-hidden="true" tabindex="-1"></a>$ git reset -p aae75</span>
+<span id="cb267-2"><a href="patch-mode-applying-partial-changes.html#cb267-2" aria-hidden="true" tabindex="-1"></a>  diff --git b/foo.txt a/foo.txt</span>
+<span id="cb267-3"><a href="patch-mode-applying-partial-changes.html#cb267-3" aria-hidden="true" tabindex="-1"></a>  index 125f6ac..a982fdc 100644</span>
+<span id="cb267-4"><a href="patch-mode-applying-partial-changes.html#cb267-4" aria-hidden="true" tabindex="-1"></a>  --- b/foo.txt</span>
+<span id="cb267-5"><a href="patch-mode-applying-partial-changes.html#cb267-5" aria-hidden="true" tabindex="-1"></a>  +++ a/foo.txt</span>
+<span id="cb267-6"><a href="patch-mode-applying-partial-changes.html#cb267-6" aria-hidden="true" tabindex="-1"></a>  @@ -1,4 +1,3 @@</span>
+<span id="cb267-7"><a href="patch-mode-applying-partial-changes.html#cb267-7" aria-hidden="true" tabindex="-1"></a>  -Line BEGIN</span>
+<span id="cb267-8"><a href="patch-mode-applying-partial-changes.html#cb267-8" aria-hidden="true" tabindex="-1"></a>   Line 1</span>
+<span id="cb267-9"><a href="patch-mode-applying-partial-changes.html#cb267-9" aria-hidden="true" tabindex="-1"></a>   Line 2</span>
+<span id="cb267-10"><a href="patch-mode-applying-partial-changes.html#cb267-10" aria-hidden="true" tabindex="-1"></a>   Line 3</span>
+<span id="cb267-11"><a href="patch-mode-applying-partial-changes.html#cb267-11" aria-hidden="true" tabindex="-1"></a>  (1/2) Apply this hunk to index [y,n,q,a,d,j,J,g,/,e,p,?]? n</span>
+<span id="cb267-12"><a href="patch-mode-applying-partial-changes.html#cb267-12" aria-hidden="true" tabindex="-1"></a>  @@ -7,4 +6,3 @@ Line 5</span>
+<span id="cb267-13"><a href="patch-mode-applying-partial-changes.html#cb267-13" aria-hidden="true" tabindex="-1"></a>   Line 6</span>
+<span id="cb267-14"><a href="patch-mode-applying-partial-changes.html#cb267-14" aria-hidden="true" tabindex="-1"></a>   Line 7</span>
+<span id="cb267-15"><a href="patch-mode-applying-partial-changes.html#cb267-15" aria-hidden="true" tabindex="-1"></a>   Line 8</span>
+<span id="cb267-16"><a href="patch-mode-applying-partial-changes.html#cb267-16" aria-hidden="true" tabindex="-1"></a>  -Line END</span>
+<span id="cb267-17"><a href="patch-mode-applying-partial-changes.html#cb267-17" aria-hidden="true" tabindex="-1"></a>  (2/2) Apply this hunk to index [y,n,q,a,d,K,g,/,e,p,?]? y</span></code></pre></div>
+<p>The first question is asking, “Do you want to remove ‘Line BEGIN’?” And I said “no”. And the second question is asking “Do you want to remove ‘Line END’?” And I said “yes”.</p>
+<p>Where are we?</p>
+<div class="sourceCode" id="cb268"><pre class="sourceCode default"><code class="sourceCode default"><span id="cb268-1"><a href="patch-mode-applying-partial-changes.html#cb268-1" aria-hidden="true" tabindex="-1"></a>$ git status</span>
+<span id="cb268-2"><a href="patch-mode-applying-partial-changes.html#cb268-2" aria-hidden="true" tabindex="-1"></a>  On branch main</span>
+<span id="cb268-3"><a href="patch-mode-applying-partial-changes.html#cb268-3" aria-hidden="true" tabindex="-1"></a>  Changes to be committed:</span>
+<span id="cb268-4"><a href="patch-mode-applying-partial-changes.html#cb268-4" aria-hidden="true" tabindex="-1"></a>    (use &quot;git restore --staged &lt;file&gt;...&quot; to unstage)</span>
+<span id="cb268-5"><a href="patch-mode-applying-partial-changes.html#cb268-5" aria-hidden="true" tabindex="-1"></a>      modified:   foo.txt</span>
+<span id="cb268-6"><a href="patch-mode-applying-partial-changes.html#cb268-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb268-7"><a href="patch-mode-applying-partial-changes.html#cb268-7" aria-hidden="true" tabindex="-1"></a>  Changes not staged for commit:</span>
+<span id="cb268-8"><a href="patch-mode-applying-partial-changes.html#cb268-8" aria-hidden="true" tabindex="-1"></a>    (use &quot;git add &lt;file&gt;...&quot; to update what will be committed)</span>
+<span id="cb268-9"><a href="patch-mode-applying-partial-changes.html#cb268-9" aria-hidden="true" tabindex="-1"></a>    (use &quot;git restore &lt;file&gt;...&quot; to discard changes in working</span>
+<span id="cb268-10"><a href="patch-mode-applying-partial-changes.html#cb268-10" aria-hidden="true" tabindex="-1"></a>    directory)</span>
+<span id="cb268-11"><a href="patch-mode-applying-partial-changes.html#cb268-11" aria-hidden="true" tabindex="-1"></a>      modified:   foo.txt</span></code></pre></div>
+<p>Hmm. Let’s check the difference between the stage and <code>HEAD</code>.</p>
+<div class="sourceCode" id="cb269"><pre class="sourceCode default"><code class="sourceCode default"><span id="cb269-1"><a href="patch-mode-applying-partial-changes.html#cb269-1" aria-hidden="true" tabindex="-1"></a>$ git diff --staged</span>
+<span id="cb269-2"><a href="patch-mode-applying-partial-changes.html#cb269-2" aria-hidden="true" tabindex="-1"></a>  diff --git a/foo.txt b/foo.txt</span>
+<span id="cb269-3"><a href="patch-mode-applying-partial-changes.html#cb269-3" aria-hidden="true" tabindex="-1"></a>  index 125f6ac..e0e1d89 100644</span>
+<span id="cb269-4"><a href="patch-mode-applying-partial-changes.html#cb269-4" aria-hidden="true" tabindex="-1"></a>  --- a/foo.txt</span>
+<span id="cb269-5"><a href="patch-mode-applying-partial-changes.html#cb269-5" aria-hidden="true" tabindex="-1"></a>  +++ b/foo.txt</span>
+<span id="cb269-6"><a href="patch-mode-applying-partial-changes.html#cb269-6" aria-hidden="true" tabindex="-1"></a>  @@ -7,4 +7,3 @@ Line 5</span>
+<span id="cb269-7"><a href="patch-mode-applying-partial-changes.html#cb269-7" aria-hidden="true" tabindex="-1"></a>   Line 6</span>
+<span id="cb269-8"><a href="patch-mode-applying-partial-changes.html#cb269-8" aria-hidden="true" tabindex="-1"></a>   Line 7</span>
+<span id="cb269-9"><a href="patch-mode-applying-partial-changes.html#cb269-9" aria-hidden="true" tabindex="-1"></a>   Line 8</span>
+<span id="cb269-10"><a href="patch-mode-applying-partial-changes.html#cb269-10" aria-hidden="true" tabindex="-1"></a>  -Line END</span></code></pre></div>
+<p>That’s telling us that, compared to <code>HEAD</code>, the stage has the <code>Line END</code> removed. Which is great, because that’s what we asked for with <code>reset -p</code>. So we’re on track.</p>
+<p>But why is <code>foo.txt</code> modified? Let’s see:</p>
+<div class="sourceCode" id="cb270"><pre class="sourceCode default"><code class="sourceCode default"><span id="cb270-1"><a href="patch-mode-applying-partial-changes.html#cb270-1" aria-hidden="true" tabindex="-1"></a>$ git diff</span>
+<span id="cb270-2"><a href="patch-mode-applying-partial-changes.html#cb270-2" aria-hidden="true" tabindex="-1"></a>  diff --git a/foo.txt b/foo.txt</span>
+<span id="cb270-3"><a href="patch-mode-applying-partial-changes.html#cb270-3" aria-hidden="true" tabindex="-1"></a>  index e0e1d89..125f6ac 100644</span>
+<span id="cb270-4"><a href="patch-mode-applying-partial-changes.html#cb270-4" aria-hidden="true" tabindex="-1"></a>  --- a/foo.txt</span>
+<span id="cb270-5"><a href="patch-mode-applying-partial-changes.html#cb270-5" aria-hidden="true" tabindex="-1"></a>  +++ b/foo.txt</span>
+<span id="cb270-6"><a href="patch-mode-applying-partial-changes.html#cb270-6" aria-hidden="true" tabindex="-1"></a>  @@ -7,3 +7,4 @@ Line 5</span>
+<span id="cb270-7"><a href="patch-mode-applying-partial-changes.html#cb270-7" aria-hidden="true" tabindex="-1"></a>   Line 6</span>
+<span id="cb270-8"><a href="patch-mode-applying-partial-changes.html#cb270-8" aria-hidden="true" tabindex="-1"></a>   Line 7</span>
+<span id="cb270-9"><a href="patch-mode-applying-partial-changes.html#cb270-9" aria-hidden="true" tabindex="-1"></a>   Line 8</span>
+<span id="cb270-10"><a href="patch-mode-applying-partial-changes.html#cb270-10" aria-hidden="true" tabindex="-1"></a>  +Line END</span></code></pre></div>
+<p>This is telling us that, compared to the stage, the working tree has <code>Line END</code> added to the end.</p>
+<p>And sure enough, if we look at the <code>foo.txt</code> file in the working tree, <em>it still has <code>Line END</code> in it</em>.</p>
+<div class="sourceCode" id="cb271"><pre class="sourceCode default"><code class="sourceCode default"><span id="cb271-1"><a href="patch-mode-applying-partial-changes.html#cb271-1" aria-hidden="true" tabindex="-1"></a>$ cat foo.txt</span>
+<span id="cb271-2"><a href="patch-mode-applying-partial-changes.html#cb271-2" aria-hidden="true" tabindex="-1"></a>  Line BEGIN</span>
+<span id="cb271-3"><a href="patch-mode-applying-partial-changes.html#cb271-3" aria-hidden="true" tabindex="-1"></a>  Line 1</span>
+<span id="cb271-4"><a href="patch-mode-applying-partial-changes.html#cb271-4" aria-hidden="true" tabindex="-1"></a>  Line 2</span>
+<span id="cb271-5"><a href="patch-mode-applying-partial-changes.html#cb271-5" aria-hidden="true" tabindex="-1"></a>  Line 3</span>
+<span id="cb271-6"><a href="patch-mode-applying-partial-changes.html#cb271-6" aria-hidden="true" tabindex="-1"></a>  Line 4</span>
+<span id="cb271-7"><a href="patch-mode-applying-partial-changes.html#cb271-7" aria-hidden="true" tabindex="-1"></a>  Line 5</span>
+<span id="cb271-8"><a href="patch-mode-applying-partial-changes.html#cb271-8" aria-hidden="true" tabindex="-1"></a>  Line 6</span>
+<span id="cb271-9"><a href="patch-mode-applying-partial-changes.html#cb271-9" aria-hidden="true" tabindex="-1"></a>  Line 7</span>
+<span id="cb271-10"><a href="patch-mode-applying-partial-changes.html#cb271-10" aria-hidden="true" tabindex="-1"></a>  Line 8</span>
+<span id="cb271-11"><a href="patch-mode-applying-partial-changes.html#cb271-11" aria-hidden="true" tabindex="-1"></a>  Line END</span></code></pre></div>
+<p>What does it all mean? Well, it means <code>reset -p</code> messed with the stage, but not with the working tree. Our working tree is still the same as it was with the last commit. (<code>git diff HEAD</code> will show no changes.)</p>
+<p>Now, admittedly, it’s likely this isn’t what you want. Maybe you wanted to reset the hunk <strong>and</strong> get your working tree reset to that hunk, as well.</p>
+<p>But we can still get there! Remember that the reset hunk is on the stage ready to be committed! Let’s do that!</p>
+<div class="sourceCode" id="cb272"><pre class="sourceCode default"><code class="sourceCode default"><span id="cb272-1"><a href="patch-mode-applying-partial-changes.html#cb272-1" aria-hidden="true" tabindex="-1"></a>$ git commit -m &quot;remove END&quot;</span>
+<span id="cb272-2"><a href="patch-mode-applying-partial-changes.html#cb272-2" aria-hidden="true" tabindex="-1"></a>  [main 46badfe] remove END</span>
+<span id="cb272-3"><a href="patch-mode-applying-partial-changes.html#cb272-3" aria-hidden="true" tabindex="-1"></a>   1 file changed, 1 deletion(-)</span></code></pre></div>
+<p>There. Now the stage and <code>HEAD</code> are the same, both having had <code>Line END</code> removed. But <code>Line END</code> still exists in our working tree, like <code>status</code> informs us:</p>
+<div class="sourceCode" id="cb273"><pre class="sourceCode default"><code class="sourceCode default"><span id="cb273-1"><a href="patch-mode-applying-partial-changes.html#cb273-1" aria-hidden="true" tabindex="-1"></a>$ git status</span>
+<span id="cb273-2"><a href="patch-mode-applying-partial-changes.html#cb273-2" aria-hidden="true" tabindex="-1"></a>  On branch main</span>
+<span id="cb273-3"><a href="patch-mode-applying-partial-changes.html#cb273-3" aria-hidden="true" tabindex="-1"></a>  Changes not staged for commit:</span>
+<span id="cb273-4"><a href="patch-mode-applying-partial-changes.html#cb273-4" aria-hidden="true" tabindex="-1"></a>    (use &quot;git add &lt;file&gt;...&quot; to update what will be committed)</span>
+<span id="cb273-5"><a href="patch-mode-applying-partial-changes.html#cb273-5" aria-hidden="true" tabindex="-1"></a>    (use &quot;git restore &lt;file&gt;...&quot; to discard changes in working</span>
+<span id="cb273-6"><a href="patch-mode-applying-partial-changes.html#cb273-6" aria-hidden="true" tabindex="-1"></a>    directory)</span>
+<span id="cb273-7"><a href="patch-mode-applying-partial-changes.html#cb273-7" aria-hidden="true" tabindex="-1"></a>      modified:   foo.txt</span></code></pre></div>
+<p>So how do we get the reset change back into our working tree? The answer is right there in the hints.</p>
+<div class="sourceCode" id="cb274"><pre class="sourceCode default"><code class="sourceCode default"><span id="cb274-1"><a href="patch-mode-applying-partial-changes.html#cb274-1" aria-hidden="true" tabindex="-1"></a>$ git restore foo.txt</span></code></pre></div>
+<p>There. Now we’re all on the same page with the <code>Line END</code> removed entirely.</p>
+<blockquote>
+<p><strong>There’s another way to synchronize the stage and working tree during a patch reset.</strong> After you do the <code>reset -p</code>, you can copy the file <code>foo.txt</code> from the stage to the working tree with:</p>
+<div class="sourceCode" id="cb275"><pre class="sourceCode default"><code class="sourceCode default"><span id="cb275-1"><a href="patch-mode-applying-partial-changes.html#cb275-1" aria-hidden="true" tabindex="-1"></a>git checkout -- foo.txt</span></code></pre></div>
+<!-- ` -->
+<p>That will make the stage and working tree the same, so everything will all be on the same page when the commit is complete.</p>
+</blockquote>
+<p></p>
+<h2 data-number="21.3" id="other-patch-mode-commands"><span class="header-section-number">21.3</span> Other Patch Mode Commands</h2>
+<p>You can use <code>-p</code> with <code>stash</code>, <code>restore</code>, <code>commit</code>, and more. The UI behaves basically the same way as described above. See the manual pages for any particular command to learn more about it.</p>
+<p></p>
+<!-- BG_NEW_CHAPTER -->
+<hr><div style="text-align:center"><span><a href="the-reference-log-reflog.html" rel="prev">Prev</a> | </span><a href="index.html">Contents</a><span> | <a href="cherry-pick-bringing-in-specific-commits.html" rel="next">Next</a></span></div></body>
+</html>

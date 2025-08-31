@@ -1,0 +1,706 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <title>Beej's Guide to Git</title>
+  <style>
+    html {
+      color: #1a1a1a;
+      background-color: #fdfdfd;
+    }
+    body {
+      margin: 0 auto;
+      max-width: 36em;
+      padding-left: 50px;
+      padding-right: 50px;
+      padding-top: 50px;
+      padding-bottom: 50px;
+      hyphens: auto;
+      overflow-wrap: break-word;
+      text-rendering: optimizeLegibility;
+      font-kerning: normal;
+    }
+    @media (max-width: 600px) {
+      body {
+        font-size: 0.9em;
+        padding: 12px;
+      }
+      h1 {
+        font-size: 1.8em;
+      }
+    }
+    @media print {
+      html {
+        background-color: white;
+      }
+      body {
+        background-color: transparent;
+        color: black;
+        font-size: 12pt;
+      }
+      p, h2, h3 {
+        orphans: 3;
+        widows: 3;
+      }
+      h2, h3, h4 {
+        page-break-after: avoid;
+      }
+    }
+    p {
+      margin: 1em 0;
+    }
+    a {
+      color: #1a1a1a;
+    }
+    a:visited {
+      color: #1a1a1a;
+    }
+    img {
+      max-width: 100%;
+    }
+    svg {
+      height: auto;
+      max-width: 100%;
+    }
+    h1, h2, h3, h4, h5, h6 {
+      margin-top: 1.4em;
+    }
+    h5, h6 {
+      font-size: 1em;
+      font-style: italic;
+    }
+    h6 {
+      font-weight: normal;
+    }
+    ol, ul {
+      padding-left: 1.7em;
+      margin-top: 1em;
+    }
+    li > ol, li > ul {
+      margin-top: 0;
+    }
+    blockquote {
+      margin: 1em 0 1em 1.7em;
+      padding-left: 1em;
+      border-left: 2px solid #e6e6e6;
+      color: #606060;
+    }
+    code {
+      font-family: Menlo, Monaco, Consolas, 'Lucida Console', monospace;
+      font-size: 85%;
+      margin: 0;
+      hyphens: manual;
+    }
+    pre {
+      margin: 1em 0;
+      overflow: auto;
+    }
+    pre code {
+      padding: 0;
+      overflow: visible;
+      overflow-wrap: normal;
+    }
+    .sourceCode {
+     background-color: transparent;
+     overflow: visible;
+    }
+    hr {
+      background-color: #1a1a1a;
+      border: none;
+      height: 1px;
+      margin: 1em 0;
+    }
+    table {
+      margin: 1em 0;
+      border-collapse: collapse;
+      width: 100%;
+      overflow-x: auto;
+      display: block;
+      font-variant-numeric: lining-nums tabular-nums;
+    }
+    table caption {
+      margin-bottom: 0.75em;
+    }
+    tbody {
+      margin-top: 0.5em;
+      border-top: 1px solid #1a1a1a;
+      border-bottom: 1px solid #1a1a1a;
+    }
+    th {
+      border-top: 1px solid #1a1a1a;
+      padding: 0.25em 0.5em 0.25em 0.5em;
+    }
+    td {
+      padding: 0.125em 0.5em 0.25em 0.5em;
+    }
+    header {
+      margin-bottom: 4em;
+      text-align: center;
+    }
+    #TOC li {
+      list-style: none;
+    }
+    #TOC ul {
+      padding-left: 1.3em;
+    }
+    #TOC > ul {
+      padding-left: 0;
+    }
+    #TOC a:not(:hover) {
+      text-decoration: none;
+    }
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+    /* CSS for syntax highlighting */
+    html { -webkit-text-size-adjust: 100%; }
+    pre > code.sourceCode { white-space: pre; position: relative; }
+    pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+    pre > code.sourceCode > span:empty { height: 1.2em; }
+    .sourceCode { overflow: visible; }
+    code.sourceCode > span { color: inherit; text-decoration: inherit; }
+    div.sourceCode { margin: 1em 0; }
+    pre.sourceCode { margin: 0; }
+    @media screen {
+    div.sourceCode { overflow: auto; }
+    }
+    @media print {
+    pre > code.sourceCode { white-space: pre-wrap; }
+    pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+    }
+    pre.numberSource code
+      { counter-reset: source-line 0; }
+    pre.numberSource code > span
+      { position: relative; left: -4em; counter-increment: source-line; }
+    pre.numberSource code > span > a:first-child::before
+      { content: counter(source-line);
+        position: relative; left: -1em; text-align: right; vertical-align: baseline;
+        border: none; display: inline-block;
+        -webkit-touch-callout: none; -webkit-user-select: none;
+        -khtml-user-select: none; -moz-user-select: none;
+        -ms-user-select: none; user-select: none;
+        padding: 0 4px; width: 4em;
+        color: #aaaaaa;
+      }
+    pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+    div.sourceCode
+      {   }
+    @media screen {
+    pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+    }
+    code span.al { color: #ff0000; font-weight: bold; } /* Alert */
+    code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+    code span.at { color: #7d9029; } /* Attribute */
+    code span.bn { color: #40a070; } /* BaseN */
+    code span.bu { color: #008000; } /* BuiltIn */
+    code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+    code span.ch { color: #4070a0; } /* Char */
+    code span.cn { color: #880000; } /* Constant */
+    code span.co { color: #60a0b0; font-style: italic; } /* Comment */
+    code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+    code span.do { color: #ba2121; font-style: italic; } /* Documentation */
+    code span.dt { color: #902000; } /* DataType */
+    code span.dv { color: #40a070; } /* DecVal */
+    code span.er { color: #ff0000; font-weight: bold; } /* Error */
+    code span.ex { } /* Extension */
+    code span.fl { color: #40a070; } /* Float */
+    code span.fu { color: #06287e; } /* Function */
+    code span.im { color: #008000; font-weight: bold; } /* Import */
+    code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+    code span.kw { color: #007020; font-weight: bold; } /* Keyword */
+    code span.op { color: #666666; } /* Operator */
+    code span.ot { color: #007020; } /* Other */
+    code span.pp { color: #bc7a00; } /* Preprocessor */
+    code span.sc { color: #4070a0; } /* SpecialChar */
+    code span.ss { color: #bb6688; } /* SpecialString */
+    code span.st { color: #4070a0; } /* String */
+    code span.va { color: #19177c; } /* Variable */
+    code span.vs { color: #4070a0; } /* VerbatimString */
+    code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+  </style>
+  <!-- BG custom styling -->
+  <style type="text/css">
+  /* Fix for line numbers not visible */
+  pre.numberSource code > span {
+      left: -1em;
+  }
+  pre.numberSource {
+      margin-left: initial;
+  }
+
+  /* Put some space after the section numbers */
+  span.toc-section-number::after {
+      content: "\a0\a0\a0";  /* non-breaking whitespace */
+  }
+
+  /* Hide underlines on code number links */
+  pre > code.sourceCode > span > a:first-child::before {
+      text-decoration: none;
+  }
+
+  /* Color the source blocks */
+  div.sourceCode {
+      background-color: #f0f0f0;
+  }
+
+  /* Fix iOS big text rendering issue */
+  pre > code.sourceCode > span {
+      display: initial;
+  }
+
+
+  /* Color the inline code */
+  code:not(.sourceCode) {
+      background: #f0f0f0;
+      padding-left: 0.2em;
+      padding-right: 0.2em;
+      border-radius: 0.2em;
+  }
+
+  pre.sourceCode {
+      border: 1px solid #ccc;
+      padding: 0.5em;
+      border-radius: 0.2em;
+  }
+
+  /* Keep code tags from wrapping in tables */
+  tbody code {
+      white-space: nowrap;
+  }
+
+  /* Prevent hyphenation and hyphen breaks in code*/
+  code {
+      word-break: keep-all;
+  }
+
+  td {
+      vertical-align: top;
+  }
+
+  body {
+      font-size: 12pt;
+      max-width: 43em;
+      font-family: sans-serif;
+  }
+
+  html {
+      background: #f9f9f9;
+  }
+
+  figure > embed {
+      max-width: 100%;
+  }
+
+  figure {
+      text-align: center;
+      margin-top: 2em;
+      margin-bottom: 2em;
+  }
+
+  figcaption {
+      font-size: 0.9em;
+      font-style: italic;
+      margin-top: 0.6em;
+  }
+
+  body {
+      counter-reset: figure-counter-major;
+      counter-reset: figure-counter-minor;
+  }
+
+  figure {
+      counter-increment: figure-counter-minor;
+  }
+
+  figcaption::before {
+      content: "Figure " counter(figure-counter-major) "." counter(figure-counter-minor) ": ";
+  }
+
+  blockquote {
+      border-left: 2px solid #bbb;
+      color: #444;
+  }
+
+  /* Contents */
+
+  nav[role="doc-toc"] > ul > li {
+    font-weight: bold;
+    margin-top: 1.2em;
+  }
+
+  nav[role="doc-toc"] > ul > li:first {
+    font-weight: bold;
+    margin-top: initial;
+  }
+
+  nav[role="doc-toc"] > ul > li > ul {
+    font-weight: normal;
+    margin-top: 0.3em;
+  }
+
+  /*
+  In multipage, we need to reset the figure counter to the chapter
+  number. Luckily, this is in the <h1 data-number> attribute. Unluckily,
+  there is no way to get this in a general way.
+
+  This doesn't work:
+
+    h1[data-number] {
+      counter-set: figure-counter-major attr(data-number);
+    }
+
+  Nor this:
+
+    h1[data-number] {
+      --figure-counter-major-value: attr(data-number);
+      counter-set: figure-counter-major var(--figure-counter-major-value);
+    }
+
+  So, dumbly, we have a bunch of rules for all these sections, up to the
+  maximum possible section.
+
+  Here's a program to generate them:
+
+    for (let i = 1; i < 100; i++)
+        console.log(`h1[data-number="${i}"]{counter-set:figure-counter-major ${i};counter-reset:figure-counter-minor;}`);
+
+  Note to self: never write a book with more than 99 frickin' chapters.
+  */
+
+  h1[data-number="1"]{counter-set:figure-counter-major 1;counter-reset:figure-counter-minor;}
+  h1[data-number="2"]{counter-set:figure-counter-major 2;counter-reset:figure-counter-minor;}
+  h1[data-number="3"]{counter-set:figure-counter-major 3;counter-reset:figure-counter-minor;}
+  h1[data-number="4"]{counter-set:figure-counter-major 4;counter-reset:figure-counter-minor;}
+  h1[data-number="5"]{counter-set:figure-counter-major 5;counter-reset:figure-counter-minor;}
+  h1[data-number="6"]{counter-set:figure-counter-major 6;counter-reset:figure-counter-minor;}
+  h1[data-number="7"]{counter-set:figure-counter-major 7;counter-reset:figure-counter-minor;}
+  h1[data-number="8"]{counter-set:figure-counter-major 8;counter-reset:figure-counter-minor;}
+  h1[data-number="9"]{counter-set:figure-counter-major 9;counter-reset:figure-counter-minor;}
+  h1[data-number="10"]{counter-set:figure-counter-major 10;counter-reset:figure-counter-minor;}
+  h1[data-number="11"]{counter-set:figure-counter-major 11;counter-reset:figure-counter-minor;}
+  h1[data-number="12"]{counter-set:figure-counter-major 12;counter-reset:figure-counter-minor;}
+  h1[data-number="13"]{counter-set:figure-counter-major 13;counter-reset:figure-counter-minor;}
+  h1[data-number="14"]{counter-set:figure-counter-major 14;counter-reset:figure-counter-minor;}
+  h1[data-number="15"]{counter-set:figure-counter-major 15;counter-reset:figure-counter-minor;}
+  h1[data-number="16"]{counter-set:figure-counter-major 16;counter-reset:figure-counter-minor;}
+  h1[data-number="17"]{counter-set:figure-counter-major 17;counter-reset:figure-counter-minor;}
+  h1[data-number="18"]{counter-set:figure-counter-major 18;counter-reset:figure-counter-minor;}
+  h1[data-number="19"]{counter-set:figure-counter-major 19;counter-reset:figure-counter-minor;}
+  h1[data-number="20"]{counter-set:figure-counter-major 20;counter-reset:figure-counter-minor;}
+  h1[data-number="21"]{counter-set:figure-counter-major 21;counter-reset:figure-counter-minor;}
+  h1[data-number="22"]{counter-set:figure-counter-major 22;counter-reset:figure-counter-minor;}
+  h1[data-number="23"]{counter-set:figure-counter-major 23;counter-reset:figure-counter-minor;}
+  h1[data-number="24"]{counter-set:figure-counter-major 24;counter-reset:figure-counter-minor;}
+  h1[data-number="25"]{counter-set:figure-counter-major 25;counter-reset:figure-counter-minor;}
+  h1[data-number="26"]{counter-set:figure-counter-major 26;counter-reset:figure-counter-minor;}
+  h1[data-number="27"]{counter-set:figure-counter-major 27;counter-reset:figure-counter-minor;}
+  h1[data-number="28"]{counter-set:figure-counter-major 28;counter-reset:figure-counter-minor;}
+  h1[data-number="29"]{counter-set:figure-counter-major 29;counter-reset:figure-counter-minor;}
+  h1[data-number="30"]{counter-set:figure-counter-major 30;counter-reset:figure-counter-minor;}
+  h1[data-number="31"]{counter-set:figure-counter-major 31;counter-reset:figure-counter-minor;}
+  h1[data-number="32"]{counter-set:figure-counter-major 32;counter-reset:figure-counter-minor;}
+  h1[data-number="33"]{counter-set:figure-counter-major 33;counter-reset:figure-counter-minor;}
+  h1[data-number="34"]{counter-set:figure-counter-major 34;counter-reset:figure-counter-minor;}
+  h1[data-number="35"]{counter-set:figure-counter-major 35;counter-reset:figure-counter-minor;}
+  h1[data-number="36"]{counter-set:figure-counter-major 36;counter-reset:figure-counter-minor;}
+  h1[data-number="37"]{counter-set:figure-counter-major 37;counter-reset:figure-counter-minor;}
+  h1[data-number="38"]{counter-set:figure-counter-major 38;counter-reset:figure-counter-minor;}
+  h1[data-number="39"]{counter-set:figure-counter-major 39;counter-reset:figure-counter-minor;}
+  h1[data-number="40"]{counter-set:figure-counter-major 40;counter-reset:figure-counter-minor;}
+  h1[data-number="41"]{counter-set:figure-counter-major 41;counter-reset:figure-counter-minor;}
+  h1[data-number="42"]{counter-set:figure-counter-major 42;counter-reset:figure-counter-minor;}
+  h1[data-number="43"]{counter-set:figure-counter-major 43;counter-reset:figure-counter-minor;}
+  h1[data-number="44"]{counter-set:figure-counter-major 44;counter-reset:figure-counter-minor;}
+  h1[data-number="45"]{counter-set:figure-counter-major 45;counter-reset:figure-counter-minor;}
+  h1[data-number="46"]{counter-set:figure-counter-major 46;counter-reset:figure-counter-minor;}
+  h1[data-number="47"]{counter-set:figure-counter-major 47;counter-reset:figure-counter-minor;}
+  h1[data-number="48"]{counter-set:figure-counter-major 48;counter-reset:figure-counter-minor;}
+  h1[data-number="49"]{counter-set:figure-counter-major 49;counter-reset:figure-counter-minor;}
+  h1[data-number="50"]{counter-set:figure-counter-major 50;counter-reset:figure-counter-minor;}
+  h1[data-number="51"]{counter-set:figure-counter-major 51;counter-reset:figure-counter-minor;}
+  h1[data-number="52"]{counter-set:figure-counter-major 52;counter-reset:figure-counter-minor;}
+  h1[data-number="53"]{counter-set:figure-counter-major 53;counter-reset:figure-counter-minor;}
+  h1[data-number="54"]{counter-set:figure-counter-major 54;counter-reset:figure-counter-minor;}
+  h1[data-number="55"]{counter-set:figure-counter-major 55;counter-reset:figure-counter-minor;}
+  h1[data-number="56"]{counter-set:figure-counter-major 56;counter-reset:figure-counter-minor;}
+  h1[data-number="57"]{counter-set:figure-counter-major 57;counter-reset:figure-counter-minor;}
+  h1[data-number="58"]{counter-set:figure-counter-major 58;counter-reset:figure-counter-minor;}
+  h1[data-number="59"]{counter-set:figure-counter-major 59;counter-reset:figure-counter-minor;}
+  h1[data-number="60"]{counter-set:figure-counter-major 60;counter-reset:figure-counter-minor;}
+  h1[data-number="61"]{counter-set:figure-counter-major 61;counter-reset:figure-counter-minor;}
+  h1[data-number="62"]{counter-set:figure-counter-major 62;counter-reset:figure-counter-minor;}
+  h1[data-number="63"]{counter-set:figure-counter-major 63;counter-reset:figure-counter-minor;}
+  h1[data-number="64"]{counter-set:figure-counter-major 64;counter-reset:figure-counter-minor;}
+  h1[data-number="65"]{counter-set:figure-counter-major 65;counter-reset:figure-counter-minor;}
+  h1[data-number="66"]{counter-set:figure-counter-major 66;counter-reset:figure-counter-minor;}
+  h1[data-number="67"]{counter-set:figure-counter-major 67;counter-reset:figure-counter-minor;}
+  h1[data-number="68"]{counter-set:figure-counter-major 68;counter-reset:figure-counter-minor;}
+  h1[data-number="69"]{counter-set:figure-counter-major 69;counter-reset:figure-counter-minor;}
+  h1[data-number="70"]{counter-set:figure-counter-major 70;counter-reset:figure-counter-minor;}
+  h1[data-number="71"]{counter-set:figure-counter-major 71;counter-reset:figure-counter-minor;}
+  h1[data-number="72"]{counter-set:figure-counter-major 72;counter-reset:figure-counter-minor;}
+  h1[data-number="73"]{counter-set:figure-counter-major 73;counter-reset:figure-counter-minor;}
+  h1[data-number="74"]{counter-set:figure-counter-major 74;counter-reset:figure-counter-minor;}
+  h1[data-number="75"]{counter-set:figure-counter-major 75;counter-reset:figure-counter-minor;}
+  h1[data-number="76"]{counter-set:figure-counter-major 76;counter-reset:figure-counter-minor;}
+  h1[data-number="77"]{counter-set:figure-counter-major 77;counter-reset:figure-counter-minor;}
+  h1[data-number="78"]{counter-set:figure-counter-major 78;counter-reset:figure-counter-minor;}
+  h1[data-number="79"]{counter-set:figure-counter-major 79;counter-reset:figure-counter-minor;}
+  h1[data-number="80"]{counter-set:figure-counter-major 80;counter-reset:figure-counter-minor;}
+  h1[data-number="81"]{counter-set:figure-counter-major 81;counter-reset:figure-counter-minor;}
+  h1[data-number="82"]{counter-set:figure-counter-major 82;counter-reset:figure-counter-minor;}
+  h1[data-number="83"]{counter-set:figure-counter-major 83;counter-reset:figure-counter-minor;}
+  h1[data-number="84"]{counter-set:figure-counter-major 84;counter-reset:figure-counter-minor;}
+  h1[data-number="85"]{counter-set:figure-counter-major 85;counter-reset:figure-counter-minor;}
+  h1[data-number="86"]{counter-set:figure-counter-major 86;counter-reset:figure-counter-minor;}
+  h1[data-number="87"]{counter-set:figure-counter-major 87;counter-reset:figure-counter-minor;}
+  h1[data-number="88"]{counter-set:figure-counter-major 88;counter-reset:figure-counter-minor;}
+  h1[data-number="89"]{counter-set:figure-counter-major 89;counter-reset:figure-counter-minor;}
+  h1[data-number="90"]{counter-set:figure-counter-major 90;counter-reset:figure-counter-minor;}
+  h1[data-number="91"]{counter-set:figure-counter-major 91;counter-reset:figure-counter-minor;}
+  h1[data-number="92"]{counter-set:figure-counter-major 92;counter-reset:figure-counter-minor;}
+  h1[data-number="93"]{counter-set:figure-counter-major 93;counter-reset:figure-counter-minor;}
+  h1[data-number="94"]{counter-set:figure-counter-major 94;counter-reset:figure-counter-minor;}
+  h1[data-number="95"]{counter-set:figure-counter-major 95;counter-reset:figure-counter-minor;}
+  h1[data-number="96"]{counter-set:figure-counter-major 96;counter-reset:figure-counter-minor;}
+  h1[data-number="97"]{counter-set:figure-counter-major 97;counter-reset:figure-counter-minor;}
+  h1[data-number="98"]{counter-set:figure-counter-major 98;counter-reset:figure-counter-minor;}
+  h1[data-number="99"]{counter-set:figure-counter-major 99;counter-reset:figure-counter-minor;}
+
+
+  </style>
+  <!-- BG custom styling for the wide body variant -->
+  <!-- Gets appended after bg-css.html -->
+
+  <style type="text/css">
+  body {
+      max-width: inherit;
+  }
+  </style>
+</head>
+<body>
+<div style="text-align:center"><span><a href="github-how-to-use-it.html" rel="prev">Prev</a> | </span><a href="index.html">Contents</a><span> | <a href="branches-and-fast-forward-merges.html" rel="next">Next</a></span></div><hr>
+<h1 data-number="4" id="the-git-log-and-head"><span class="header-section-number">4</span> The Git Log and <code>HEAD</code></h1>
+<p></p>
+<p>When we make commits to a Git repo, it tracks each of those commits in a log that you can visit. Let’s take a look at that now.</p>
+<h2 data-number="4.1" id="an-example-log"><span class="header-section-number">4.1</span> An Example Log</h2>
+<p>You can get the commit log by typing <code>git log</code>.</p>
+<p>Let’s say I’m in a repo with a single commit where I’ve just added a file with the commit message “Added”.</p>
+<div class="sourceCode" id="cb37"><pre class="sourceCode default"><code class="sourceCode default"><span id="cb37-1"><a href="the-git-log-and-head.html#cb37-1" aria-hidden="true" tabindex="-1"></a>$ git log</span></code></pre></div>
+<p>produces:</p>
+<div class="sourceCode" id="cb38"><pre class="sourceCode default"><code class="sourceCode default"><span id="cb38-1"><a href="the-git-log-and-head.html#cb38-1" aria-hidden="true" tabindex="-1"></a>commit 5a02fede3007edf55d18e2f9ee3e57979535e8f2 (HEAD -&gt; main)</span>
+<span id="cb38-2"><a href="the-git-log-and-head.html#cb38-2" aria-hidden="true" tabindex="-1"></a>Author: User Name &lt;user@example.com&gt;</span>
+<span id="cb38-3"><a href="the-git-log-and-head.html#cb38-3" aria-hidden="true" tabindex="-1"></a>Date:   Thu Feb 1 09:24:52 2024 -0800</span>
+<span id="cb38-4"><a href="the-git-log-and-head.html#cb38-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb38-5"><a href="the-git-log-and-head.html#cb38-5" aria-hidden="true" tabindex="-1"></a>    Added</span></code></pre></div>
+<p>If I make another commit, we get a longer log:</p>
+<div class="sourceCode" id="cb39"><pre class="sourceCode default"><code class="sourceCode default"><span id="cb39-1"><a href="the-git-log-and-head.html#cb39-1" aria-hidden="true" tabindex="-1"></a>commit 5e8cb52cb813a371a11f75050ac2d7b9e15e4751 (HEAD -&gt; main)</span>
+<span id="cb39-2"><a href="the-git-log-and-head.html#cb39-2" aria-hidden="true" tabindex="-1"></a>Author: User Name &lt;user@example.com&gt;</span>
+<span id="cb39-3"><a href="the-git-log-and-head.html#cb39-3" aria-hidden="true" tabindex="-1"></a>Date:   Thu Feb 1 12:36:13 2024 -0800</span>
+<span id="cb39-4"><a href="the-git-log-and-head.html#cb39-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb39-5"><a href="the-git-log-and-head.html#cb39-5" aria-hidden="true" tabindex="-1"></a>    More output</span>
+<span id="cb39-6"><a href="the-git-log-and-head.html#cb39-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb39-7"><a href="the-git-log-and-head.html#cb39-7" aria-hidden="true" tabindex="-1"></a>commit 5a02fede3007edf55d18e2f9ee3e57979535e8f2</span>
+<span id="cb39-8"><a href="the-git-log-and-head.html#cb39-8" aria-hidden="true" tabindex="-1"></a>Author: User Name &lt;user@example.com&gt;</span>
+<span id="cb39-9"><a href="the-git-log-and-head.html#cb39-9" aria-hidden="true" tabindex="-1"></a>Date:   Thu Feb 1 09:24:52 2024 -0800</span>
+<span id="cb39-10"><a href="the-git-log-and-head.html#cb39-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb39-11"><a href="the-git-log-and-head.html#cb39-11" aria-hidden="true" tabindex="-1"></a>    Added</span></code></pre></div>
+<p>Notice that the most recent commit entry is at the top of the output.</p>
+<h2 data-number="4.2" id="whats-in-the-log"><span class="header-section-number">4.2</span> What’s in the log?</h2>
+<p>There are a few things to notice in the log:</p>
+<ul>
+<li>The commit comment</li>
+<li>The date</li>
+<li>The user who made the commit</li>
+</ul>
+<p>Also, we have those huge <a href="https://en.wikipedia.org/wiki/Hexadecimal">hex</a><a href="quick-reference.html#fn16" class="footnote-ref" id="fnref16" role="doc-noteref"><sup>16</sup></a> numbers after the word <code>commit</code>.</p>
+<p>This is the <em>commit ID</em> or <em>commit hash</em>. This is universally unique number that you can use to identify a particular commit.</p>
+<p>Normally you don’t need to know this, but it can be useful for going back in time or keeping track of commits in multi-developer projects.</p>
+<p>We also see a bit at the top that says <code>(HEAD -&gt; main)</code>. What’s that about?</p>
+<p></p>
+<h2 data-number="4.3" id="the-head-reference"><span class="header-section-number">4.3</span> The <code>HEAD</code> Reference</h2>
+<p></p>
+<p>We’ve seen that each commit has a unique and unwieldy identifier like this:</p>
+<p><code>5a02fede3007edf55d18e2f9ee3e57979535e8f2</code></p>
+<p>Luckily, there are a few ways to refer to commits with more-human symbolic names.</p>
+<p><code>HEAD</code> is one of these references. It indicates which branch or commit you’re looking at right now in your project subdirectory<a href="quick-reference.html#fn17" class="footnote-ref" id="fnref17" role="doc-noteref"><sup>17</sup></a>. Remember how we said you could go look at previous commits? The way you do that is by moving <code>HEAD</code> to them.</p>
+<blockquote>
+<p><strong>We haven’t talked about branches yet, but the <code>HEAD</code> normally refers to a branch.</strong> By default, it’s the <code>main</code> branch. But since we’re getting ahead of ourselves, I’m going to just keep saying that <code>HEAD</code> refers to a commit, even though it usually does it indirectly via a branch.</p>
+<p>So this is a bit of a lie, but I hope you forgive me.</p>
+</blockquote>
+<p>Some terminology: the Git subdirectory you’re looking at right now and all the files within it is referred to as your <em>working tree</em>. The working tree is the files as they appear at the commit pointed to by <code>HEAD</code>, plus any uncommitted changes you might have made.</p>
+<p>So if you switch <code>HEAD</code> to another commit, the files in your working tree will be updated to reflect that.</p>
+<blockquote>
+<p><strong>Importantly, the data in the files in the working tree might differ from the data in the files at the current commit pointed to by <code>HEAD</code>.</strong> This happens when you’ve modified a file in the working tree but haven’t yet committed it.</p>
+</blockquote>
+<p>Okay then, how do we know which commit <code>HEAD</code> is referring to? Well, it’s right there at the top of the log:</p>
+<div class="sourceCode" id="cb40"><pre class="sourceCode default"><code class="sourceCode default"><span id="cb40-1"><a href="the-git-log-and-head.html#cb40-1" aria-hidden="true" tabindex="-1"></a>commit 5e8cb52cb813a371a11f75050ac2d7b9e15e4751 (HEAD -&gt; main)</span>
+<span id="cb40-2"><a href="the-git-log-and-head.html#cb40-2" aria-hidden="true" tabindex="-1"></a>Author: User Name &lt;user@example.com&gt;</span>
+<span id="cb40-3"><a href="the-git-log-and-head.html#cb40-3" aria-hidden="true" tabindex="-1"></a>Date:   Thu Feb 1 12:36:13 2024 -0800</span>
+<span id="cb40-4"><a href="the-git-log-and-head.html#cb40-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb40-5"><a href="the-git-log-and-head.html#cb40-5" aria-hidden="true" tabindex="-1"></a>    More output</span></code></pre></div>
+<p>We see <code>HEAD</code> right there on the first line, indicating that <code>HEAD</code> is referring to commit with ID:</p>
+<p><code>5e8cb52cb813a371a11f75050ac2d7b9e15e4751</code></p>
+<p>Again, that’s a bit of a lie. The <code>HEAD -&gt; main</code> means that <code>HEAD</code> is actually referring to the <code>main</code> branch, and that <code>main</code> is referring to the commit. <code>HEAD</code> is therefore indirectly referring to the commit. More on that later.</p>
+<h2 data-number="4.4" id="going-back-in-time-and-detached-head"><span class="header-section-number">4.4</span> Going Back In Time and Detached <code>HEAD</code></h2>
+<p></p>
+<p>Here’s my full Git log:</p>
+<div class="sourceCode" id="cb41"><pre class="sourceCode default"><code class="sourceCode default"><span id="cb41-1"><a href="the-git-log-and-head.html#cb41-1" aria-hidden="true" tabindex="-1"></a>commit 5e8cb52cb813a371a11f75050ac2d7b9e15e4751 (HEAD -&gt; main)</span>
+<span id="cb41-2"><a href="the-git-log-and-head.html#cb41-2" aria-hidden="true" tabindex="-1"></a>Author: User Name &lt;user@example.com&gt;</span>
+<span id="cb41-3"><a href="the-git-log-and-head.html#cb41-3" aria-hidden="true" tabindex="-1"></a>Date:   Thu Feb 1 12:36:13 2024 -0800</span>
+<span id="cb41-4"><a href="the-git-log-and-head.html#cb41-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb41-5"><a href="the-git-log-and-head.html#cb41-5" aria-hidden="true" tabindex="-1"></a>    More output</span>
+<span id="cb41-6"><a href="the-git-log-and-head.html#cb41-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb41-7"><a href="the-git-log-and-head.html#cb41-7" aria-hidden="true" tabindex="-1"></a>commit 5a02fede3007edf55d18e2f9ee3e57979535e8f2</span>
+<span id="cb41-8"><a href="the-git-log-and-head.html#cb41-8" aria-hidden="true" tabindex="-1"></a>Author: User Name &lt;user@example.com&gt;</span>
+<span id="cb41-9"><a href="the-git-log-and-head.html#cb41-9" aria-hidden="true" tabindex="-1"></a>Date:   Thu Feb 1 09:24:52 2024 -0800</span>
+<span id="cb41-10"><a href="the-git-log-and-head.html#cb41-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb41-11"><a href="the-git-log-and-head.html#cb41-11" aria-hidden="true" tabindex="-1"></a>    Added</span></code></pre></div>
+<p>If I look at the files, I’ll see the changes indicated by the “More output” commit. But let’s say I want to go back in time to the previous commit and see what the files looked like then. How would I do that?</p>
+<blockquote>
+<p><strong>Maybe there were some changes that existed back in an earlier commit</strong> that had since been removed, and you wanted to look at them, for example.</p>
+</blockquote>
+<p>I can use the <code>git switch</code> command to make that happen.</p>
+<blockquote>
+<p><strong>Before you switch branches, you should be all committed with <code>git status</code> telling you everything is clean.</strong> If you’re not, make a commit or <a href="stash.html#stash">stash</a> your stuff before your switch.</p>
+</blockquote>
+<p>Let’s check out the first commit, the one with ID <code>5a02fede3007edf55d18e2f9ee3e57979535e8f2</code>.</p>
+<p>Now, I could say:</p>
+<div class="sourceCode" id="cb42"><pre class="sourceCode default"><code class="sourceCode default"><span id="cb42-1"><a href="the-git-log-and-head.html#cb42-1" aria-hidden="true" tabindex="-1"></a>$ git switch --detach 5a02fede3007edf55d18e2f9ee3e57979535e8f2</span></code></pre></div>
+<p>and that would work, but the rule is that you must specific at least 4 unique digits of the ID, so I could have also done this:</p>
+<div class="sourceCode" id="cb43"><pre class="sourceCode default"><code class="sourceCode default"><span id="cb43-1"><a href="the-git-log-and-head.html#cb43-1" aria-hidden="true" tabindex="-1"></a>$ git switch --detach 5a02</span></code></pre></div>
+<p>for the same result.</p>
+<p>And that result is:</p>
+<div class="sourceCode" id="cb44"><pre class="sourceCode default"><code class="sourceCode default"><span id="cb44-1"><a href="the-git-log-and-head.html#cb44-1" aria-hidden="true" tabindex="-1"></a>HEAD is now at 5a02fed</span></code></pre></div>
+<p>Let’s take a look around with <code>git log</code>:</p>
+<div class="sourceCode" id="cb45"><pre class="sourceCode default"><code class="sourceCode default"><span id="cb45-1"><a href="the-git-log-and-head.html#cb45-1" aria-hidden="true" tabindex="-1"></a>commit 5a02fede3007edf55d18e2f9ee3e57979535e8f2 (HEAD)</span>
+<span id="cb45-2"><a href="the-git-log-and-head.html#cb45-2" aria-hidden="true" tabindex="-1"></a>Author: User &lt;user@example.com&gt;</span>
+<span id="cb45-3"><a href="the-git-log-and-head.html#cb45-3" aria-hidden="true" tabindex="-1"></a>Date:   Thu Feb 1 09:24:52 2024 -0800</span>
+<span id="cb45-4"><a href="the-git-log-and-head.html#cb45-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb45-5"><a href="the-git-log-and-head.html#cb45-5" aria-hidden="true" tabindex="-1"></a>    Added</span></code></pre></div>
+<p>That’s all! Just one commit?! Where’s the second commit I made? Is it gone forever?!</p>
+<p>No. Everything is fine. <em>[Soothing image of a kitten sleeping in the sun.]</em></p>
+<p>When you have <code>HEAD</code> at a certain commit, you’re looking at the world as it looked at that snapshot in time. Future commits haven’t “happened” yet from this perspective. They are still out there, but you’ll have to change back to them by name. (It’s like a flippin’ <em>time machine</em>!)</p>
+<p>Also, do you see anything different about that first line that reads <code>(HEAD)</code>? That’s right: no <code>main</code> to be seen.</p>
+<p>That’s because the <code>main</code> branch is still looking at the latest commit, the one with the “More output” comment. So we don’t see it from this perspective.</p>
+<p>Furthermore, this means that <code>HEAD</code> is no longer <em>attached</em> to <code>main</code>. We call this state <em>detached head</em>. And <code>git switch</code> doesn’t let you do that unless you mean it, which is why we have that <code>--detach</code> in there. (And reattaching is easy: just switch to the branch you want to attach to.)</p>
+<blockquote>
+<p><strong>Remember earlier when I said it was a bit of a lie to say that <code>HEAD</code> points to a commit?</strong> Well, detached head state is the case where it actually <strong>does</strong>. Detached head state is just what happens when <code>HEAD</code> is pointing to a commit instead of a branch. To reattach it, you have to change it to point to a branch again.</p>
+</blockquote>
+<p>Let’s reattach <code>HEAD</code> to the <code>main</code> branch. There are two options:</p>
+<ol type="1">
+<li><code>git switch -</code>: this switches to wherever we were before this, which, in this case, was <code>main</code>.</li>
+<li><code>git switch main</code>: this explicitly switches to <code>main</code>.</li>
+</ol>
+<p>Let’s try:</p>
+<div class="sourceCode" id="cb46"><pre class="sourceCode default"><code class="sourceCode default"><span id="cb46-1"><a href="the-git-log-and-head.html#cb46-1" aria-hidden="true" tabindex="-1"></a>$ git switch main</span>
+<span id="cb46-2"><a href="the-git-log-and-head.html#cb46-2" aria-hidden="true" tabindex="-1"></a>  Previous HEAD position was 5a02fed Added</span>
+<span id="cb46-3"><a href="the-git-log-and-head.html#cb46-3" aria-hidden="true" tabindex="-1"></a>  Switched to branch &#39;main&#39;</span></code></pre></div>
+<p>Notice there was no <code>--detach</code> in that <code>git switch</code>! We’re reattaching the head, not detaching it, so we don’t have to tell Git we know what we’re doing.</p>
+<blockquote>
+<p><strong>Don’t worry if you forget the <code>--detach</code>.</strong> Git will tell you if you need it.</p>
+<div class="sourceCode" id="cb47"><pre class="sourceCode default"><code class="sourceCode default"><span id="cb47-1"><a href="the-git-log-and-head.html#cb47-1" aria-hidden="true" tabindex="-1"></a>$ git switch 5a02</span>
+<span id="cb47-2"><a href="the-git-log-and-head.html#cb47-2" aria-hidden="true" tabindex="-1"></a>  fatal: a branch is expected, got commit &#39;5a02&#39;</span>
+<span id="cb47-3"><a href="the-git-log-and-head.html#cb47-3" aria-hidden="true" tabindex="-1"></a>  hint: If you want to detach HEAD at the commit, try again</span>
+<span id="cb47-4"><a href="the-git-log-and-head.html#cb47-4" aria-hidden="true" tabindex="-1"></a>        with the --detach option.</span></code></pre></div>
+</blockquote>
+<!-- ` -->
+<p>And now if we <code>git log</code>, we see all our changes again:</p>
+<div class="sourceCode" id="cb48"><pre class="sourceCode default"><code class="sourceCode default"><span id="cb48-1"><a href="the-git-log-and-head.html#cb48-1" aria-hidden="true" tabindex="-1"></a>commit 5e8cb52cb813a371a11f75050ac2d7b9e15e4751 (HEAD -&gt; main)</span>
+<span id="cb48-2"><a href="the-git-log-and-head.html#cb48-2" aria-hidden="true" tabindex="-1"></a>Author: User Name &lt;user@example.com&gt;</span>
+<span id="cb48-3"><a href="the-git-log-and-head.html#cb48-3" aria-hidden="true" tabindex="-1"></a>Date:   Thu Feb 1 12:36:13 2024 -0800</span>
+<span id="cb48-4"><a href="the-git-log-and-head.html#cb48-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb48-5"><a href="the-git-log-and-head.html#cb48-5" aria-hidden="true" tabindex="-1"></a>    More output</span>
+<span id="cb48-6"><a href="the-git-log-and-head.html#cb48-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb48-7"><a href="the-git-log-and-head.html#cb48-7" aria-hidden="true" tabindex="-1"></a>commit 5a02fede3007edf55d18e2f9ee3e57979535e8f2</span>
+<span id="cb48-8"><a href="the-git-log-and-head.html#cb48-8" aria-hidden="true" tabindex="-1"></a>Author: User Name &lt;user@example.com&gt;</span>
+<span id="cb48-9"><a href="the-git-log-and-head.html#cb48-9" aria-hidden="true" tabindex="-1"></a>Date:   Thu Feb 1 09:24:52 2024 -0800</span>
+<span id="cb48-10"><a href="the-git-log-and-head.html#cb48-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb48-11"><a href="the-git-log-and-head.html#cb48-11" aria-hidden="true" tabindex="-1"></a>    Added</span></code></pre></div>
+<p>and our working tree will be updated to show the files as they are in the <code>main</code> commit.</p>
+<p>And you see the <code>HEAD -&gt; main</code>? The arrow means <code>HEAD</code> is reattached to <code>main</code>. (If <code>HEAD</code> were detached at the same commit as <code>main</code>, you’d see <code>HEAD, main</code>.)</p>
+<p></p>
+<h2 data-number="4.5" id="the-old-command-git-checkout"><span class="header-section-number">4.5</span> The Old Command: <code>git checkout</code></h2>
+<p></p>
+<p>In ye olden days before <code>git switch</code> existed, there was a command to do all that stuff called <code>git checkout</code>. <code>git checkout</code> did a lot of things, and it still does. Because it does so much, the maintainers of Git have been trying to break some of that functionality into <code>git switch</code> and other commands.</p>
+<blockquote>
+<p><strong>There are still times when you need to use <code>checkout</code></strong>, but if your version of Git supports <code>switch</code>, this isn’t one of them. Use <code>switch</code> if you can and skip this section.</p>
+</blockquote>
+<p>But let’s redo the previous section by using just <code>git checkout</code> instead of <code>git switch</code>. Let’s try:</p>
+<div class="sourceCode" id="cb49"><pre class="sourceCode default"><code class="sourceCode default"><span id="cb49-1"><a href="the-git-log-and-head.html#cb49-1" aria-hidden="true" tabindex="-1"></a>$ git checkout 5a02</span></code></pre></div>
+<p>and it says:</p>
+<div class="sourceCode" id="cb50"><pre class="sourceCode default"><code class="sourceCode default"><span id="cb50-1"><a href="the-git-log-and-head.html#cb50-1" aria-hidden="true" tabindex="-1"></a>Note: switching to &#39;5a02fede3007edf55d18e2f9ee3e57979535e8f2&#39;.</span>
+<span id="cb50-2"><a href="the-git-log-and-head.html#cb50-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb50-3"><a href="the-git-log-and-head.html#cb50-3" aria-hidden="true" tabindex="-1"></a>You are in &#39;detached HEAD&#39; state. You can look around, make</span>
+<span id="cb50-4"><a href="the-git-log-and-head.html#cb50-4" aria-hidden="true" tabindex="-1"></a>experimental changes and commit them, and you can discard any</span>
+<span id="cb50-5"><a href="the-git-log-and-head.html#cb50-5" aria-hidden="true" tabindex="-1"></a>commits you make in this state without impacting any branches by</span>
+<span id="cb50-6"><a href="the-git-log-and-head.html#cb50-6" aria-hidden="true" tabindex="-1"></a>switching back to a branch.</span>
+<span id="cb50-7"><a href="the-git-log-and-head.html#cb50-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb50-8"><a href="the-git-log-and-head.html#cb50-8" aria-hidden="true" tabindex="-1"></a>If you want to create a new branch to retain commits you create, you</span>
+<span id="cb50-9"><a href="the-git-log-and-head.html#cb50-9" aria-hidden="true" tabindex="-1"></a>may do so (now or later) by using -c with the switch command.</span>
+<span id="cb50-10"><a href="the-git-log-and-head.html#cb50-10" aria-hidden="true" tabindex="-1"></a>Example:</span>
+<span id="cb50-11"><a href="the-git-log-and-head.html#cb50-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb50-12"><a href="the-git-log-and-head.html#cb50-12" aria-hidden="true" tabindex="-1"></a>  git switch -c &lt;new-branch-name&gt;</span>
+<span id="cb50-13"><a href="the-git-log-and-head.html#cb50-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb50-14"><a href="the-git-log-and-head.html#cb50-14" aria-hidden="true" tabindex="-1"></a>Or undo this operation with:</span>
+<span id="cb50-15"><a href="the-git-log-and-head.html#cb50-15" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb50-16"><a href="the-git-log-and-head.html#cb50-16" aria-hidden="true" tabindex="-1"></a>  git switch -</span>
+<span id="cb50-17"><a href="the-git-log-and-head.html#cb50-17" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb50-18"><a href="the-git-log-and-head.html#cb50-18" aria-hidden="true" tabindex="-1"></a>Turn off this advice by setting config variable advice.detachedHead</span>
+<span id="cb50-19"><a href="the-git-log-and-head.html#cb50-19" aria-hidden="true" tabindex="-1"></a>to false</span>
+<span id="cb50-20"><a href="the-git-log-and-head.html#cb50-20" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb50-21"><a href="the-git-log-and-head.html#cb50-21" aria-hidden="true" tabindex="-1"></a>HEAD is now at 5a02fed Added</span></code></pre></div>
+<p>Well, that’s a lot of scary stuff, but it’s just Git telling us that we’re now in detached head state. Which of course we are since we just detached the head from branch <code>main</code> by switching to a specific commit hash.</p>
+<p>And we can get back to the <code>main</code> branch with:</p>
+<div class="sourceCode" id="cb51"><pre class="sourceCode default"><code class="sourceCode default"><span id="cb51-1"><a href="the-git-log-and-head.html#cb51-1" aria-hidden="true" tabindex="-1"></a>$ git checkout main</span></code></pre></div>
+<p>You can also switch back with the aforementioned <code>git switch</code> variants, but we’re pretending those don’t exist for this section.</p>
+<p></p>
+<h2 data-number="4.6" id="commits-relative-to-head"><span class="header-section-number">4.6</span> Commits Relative to <code>HEAD</code></h2>
+<p></p>
+<p>There are a couple shortcuts to get to commits that are earlier than <code>HEAD</code>, like, “I want to switch to the 3rd commit before this one.”</p>
+<p>Here’s a pretty useless example that we’ll start with:</p>
+<p></p>
+<div class="sourceCode" id="cb52"><pre class="sourceCode default"><code class="sourceCode default"><span id="cb52-1"><a href="the-git-log-and-head.html#cb52-1" aria-hidden="true" tabindex="-1"></a>$ git switch --detach HEAD</span></code></pre></div>
+<p>This moves <code>HEAD</code> to where <code>HEAD</code> was. That is, it moves it nowhere. (Though it does have the effect of detaching it from the branch.)</p>
+<p>But what if I wanted to move to the commit right <em>before</em> where <code>HEAD</code> is now? You can do it with <strong><em>caret notation</em></strong> like this:</p>
+<div class="sourceCode" id="cb53"><pre class="sourceCode default"><code class="sourceCode default"><span id="cb53-1"><a href="the-git-log-and-head.html#cb53-1" aria-hidden="true" tabindex="-1"></a>$ git switch --detach HEAD^</span></code></pre></div>
+<p>And that gets you to the previous commit.</p>
+<blockquote>
+<p><strong>It’s apparently a little-known Fun Fact™ that you can commonly enter <code>@</code> instead of <code>HEAD</code> with these commands.</strong> For example, the previous command could be written:</p>
+<div class="sourceCode" id="cb54"><pre class="sourceCode default"><code class="sourceCode default"><span id="cb54-1"><a href="the-git-log-and-head.html#cb54-1" aria-hidden="true" tabindex="-1"></a>$ git switch --detach HEAD^</span>
+<span id="cb54-2"><a href="the-git-log-and-head.html#cb54-2" aria-hidden="true" tabindex="-1"></a>$ git switch --detach @^     # Same thing</span></code></pre></div>
+<!-- ` -->
+<p>Be aware that some shells might require you to put the <code>@</code> in quotes to get it to work right. But that can potentially save three keystrokes.</p>
+</blockquote>
+<p>What if you wanted to get to the <em>third-previous</em> commit? You can add more carets!</p>
+<div class="sourceCode" id="cb55"><pre class="sourceCode default"><code class="sourceCode default"><span id="cb55-1"><a href="the-git-log-and-head.html#cb55-1" aria-hidden="true" tabindex="-1"></a>$ git switch --detach HEAD^^^</span></code></pre></div>
+<p>Or the 10th previous commit!</p>
+<div class="sourceCode" id="cb56"><pre class="sourceCode default"><code class="sourceCode default"><span id="cb56-1"><a href="the-git-log-and-head.html#cb56-1" aria-hidden="true" tabindex="-1"></a>$ git switch --detach HEAD^^^^^^^^^^</span></code></pre></div>
+<p>Or the 100th previous commit!</p>
+<div class="sourceCode" id="cb57"><pre class="sourceCode default"><code class="sourceCode default"><span id="cb57-1"><a href="the-git-log-and-head.html#cb57-1" aria-hidden="true" tabindex="-1"></a>$ git switch --detach HEAD^^^^^^^^^^^^^^^^^^^^forget this</span></code></pre></div>
+<p>Typing all these carets is wearing me out. Luckily there’s <em>another</em> shorthand we have at our disposal with <strong><em>tilde notation</em></strong>. The two following lines are equivalent:</p>
+<div class="sourceCode" id="cb58"><pre class="sourceCode default"><code class="sourceCode default"><span id="cb58-1"><a href="the-git-log-and-head.html#cb58-1" aria-hidden="true" tabindex="-1"></a>$ git switch --detach HEAD^^^</span>
+<span id="cb58-2"><a href="the-git-log-and-head.html#cb58-2" aria-hidden="true" tabindex="-1"></a>$ git switch --detach HEAD~3</span></code></pre></div>
+<p>After the tilde, you can just give the number of commits back you want to go. So back to my example:</p>
+<div class="sourceCode" id="cb59"><pre class="sourceCode default"><code class="sourceCode default"><span id="cb59-1"><a href="the-git-log-and-head.html#cb59-1" aria-hidden="true" tabindex="-1"></a>$ git switch --detach HEAD~100   # Much easier</span></code></pre></div>
+<p>All this said, personally I usually just look at the log and go to a specific commit instead of counting back.</p>
+<blockquote>
+<p><em>“But that’s just, like, my opinion, man.”</em><br />
+                                        —The Dude</p>
+</blockquote>
+<!-- BG_NEW_CHAPTER -->
+<hr><div style="text-align:center"><span><a href="github-how-to-use-it.html" rel="prev">Prev</a> | </span><a href="index.html">Contents</a><span> | <a href="branches-and-fast-forward-merges.html" rel="next">Next</a></span></div></body>
+</html>

@@ -41,6 +41,14 @@ int getaddrinfo(const char *node,   // e.g. "www.example.com" or IP
 //ai_flags = AI_PASSIVE for connections within own machine, set *node arg to NULL
 //^^^*node arg is always the address of 
 //
+void	*memset(void *ptr, int value, size_t num);
+//plss clear hints before using it
+//
+//
+int setsockopt(int socket, int level, int option_name, const void *option_value, socklen_t option_len);
+//^^^int yes = 1;
+//^^^(sockfd, SOL_SOCKET, SO_REUSEADDR, &yes, sizeof(yes)) //call right before bind()
+//
 //
 //valgrind:
 void	freeaddrinfo(struct addrinfo *ai);
@@ -58,13 +66,19 @@ struct	addrinfo
 
 	struct addrinfo	*ai_next;      // linked list, next node
 };
-//official sockaddr to use
+//sockaddr consists of LIES AND FUCKING DECEIT:
 struct	sockaddr
 {
 	sa_family_t sa_family;
 	char		sa_data[14];
 };
-//outdated:
+//
+//sockaddr * will usually point to an existing sockaddr_in or in6,
+//reassign it to those to get the right structure
+//sa_data ALWAYS has relevant data overflowing past 14 chars^^^^^^^
+//
+//
+//pls use:
 // (IPv4 only--see struct sockaddr_in6 for IPv6)
 
 struct	sockaddr_in
@@ -82,7 +96,7 @@ struct	in_addr
 	uint32_t	s_addr; // that's a 32-bit int (4 bytes)
 };
 //
-//
+//pls also use:
 // (IPv6 only--see struct sockaddr_in and struct in_addr for IPv4)
 
 struct	sockaddr_in6
@@ -99,7 +113,13 @@ struct	in6_addr
 	unsigned char	s6_addr[16];   // IPv6 address
 };
 
-//to make in_addr or in6_addr later:
+
+
+//									  |
+//									  |
+//to make in_addr or in6_addr later   v
+//the following is a fucking bandaid solution
+//it just replaces sockaddr where youd otherwise be tossing sockaddr:
 struct	sockaddr_storage
 {
 	sa_family_t  ss_family;     // address family

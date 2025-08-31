@@ -1,0 +1,588 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <title>Beej's Guide to Git</title>
+  <style>
+    html {
+      color: #1a1a1a;
+      background-color: #fdfdfd;
+    }
+    body {
+      margin: 0 auto;
+      max-width: 36em;
+      padding-left: 50px;
+      padding-right: 50px;
+      padding-top: 50px;
+      padding-bottom: 50px;
+      hyphens: auto;
+      overflow-wrap: break-word;
+      text-rendering: optimizeLegibility;
+      font-kerning: normal;
+    }
+    @media (max-width: 600px) {
+      body {
+        font-size: 0.9em;
+        padding: 12px;
+      }
+      h1 {
+        font-size: 1.8em;
+      }
+    }
+    @media print {
+      html {
+        background-color: white;
+      }
+      body {
+        background-color: transparent;
+        color: black;
+        font-size: 12pt;
+      }
+      p, h2, h3 {
+        orphans: 3;
+        widows: 3;
+      }
+      h2, h3, h4 {
+        page-break-after: avoid;
+      }
+    }
+    p {
+      margin: 1em 0;
+    }
+    a {
+      color: #1a1a1a;
+    }
+    a:visited {
+      color: #1a1a1a;
+    }
+    img {
+      max-width: 100%;
+    }
+    svg {
+      height: auto;
+      max-width: 100%;
+    }
+    h1, h2, h3, h4, h5, h6 {
+      margin-top: 1.4em;
+    }
+    h5, h6 {
+      font-size: 1em;
+      font-style: italic;
+    }
+    h6 {
+      font-weight: normal;
+    }
+    ol, ul {
+      padding-left: 1.7em;
+      margin-top: 1em;
+    }
+    li > ol, li > ul {
+      margin-top: 0;
+    }
+    blockquote {
+      margin: 1em 0 1em 1.7em;
+      padding-left: 1em;
+      border-left: 2px solid #e6e6e6;
+      color: #606060;
+    }
+    code {
+      font-family: Menlo, Monaco, Consolas, 'Lucida Console', monospace;
+      font-size: 85%;
+      margin: 0;
+      hyphens: manual;
+    }
+    pre {
+      margin: 1em 0;
+      overflow: auto;
+    }
+    pre code {
+      padding: 0;
+      overflow: visible;
+      overflow-wrap: normal;
+    }
+    .sourceCode {
+     background-color: transparent;
+     overflow: visible;
+    }
+    hr {
+      background-color: #1a1a1a;
+      border: none;
+      height: 1px;
+      margin: 1em 0;
+    }
+    table {
+      margin: 1em 0;
+      border-collapse: collapse;
+      width: 100%;
+      overflow-x: auto;
+      display: block;
+      font-variant-numeric: lining-nums tabular-nums;
+    }
+    table caption {
+      margin-bottom: 0.75em;
+    }
+    tbody {
+      margin-top: 0.5em;
+      border-top: 1px solid #1a1a1a;
+      border-bottom: 1px solid #1a1a1a;
+    }
+    th {
+      border-top: 1px solid #1a1a1a;
+      padding: 0.25em 0.5em 0.25em 0.5em;
+    }
+    td {
+      padding: 0.125em 0.5em 0.25em 0.5em;
+    }
+    header {
+      margin-bottom: 4em;
+      text-align: center;
+    }
+    #TOC li {
+      list-style: none;
+    }
+    #TOC ul {
+      padding-left: 1.3em;
+    }
+    #TOC > ul {
+      padding-left: 0;
+    }
+    #TOC a:not(:hover) {
+      text-decoration: none;
+    }
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+    /* CSS for syntax highlighting */
+    html { -webkit-text-size-adjust: 100%; }
+    pre > code.sourceCode { white-space: pre; position: relative; }
+    pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+    pre > code.sourceCode > span:empty { height: 1.2em; }
+    .sourceCode { overflow: visible; }
+    code.sourceCode > span { color: inherit; text-decoration: inherit; }
+    div.sourceCode { margin: 1em 0; }
+    pre.sourceCode { margin: 0; }
+    @media screen {
+    div.sourceCode { overflow: auto; }
+    }
+    @media print {
+    pre > code.sourceCode { white-space: pre-wrap; }
+    pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+    }
+    pre.numberSource code
+      { counter-reset: source-line 0; }
+    pre.numberSource code > span
+      { position: relative; left: -4em; counter-increment: source-line; }
+    pre.numberSource code > span > a:first-child::before
+      { content: counter(source-line);
+        position: relative; left: -1em; text-align: right; vertical-align: baseline;
+        border: none; display: inline-block;
+        -webkit-touch-callout: none; -webkit-user-select: none;
+        -khtml-user-select: none; -moz-user-select: none;
+        -ms-user-select: none; user-select: none;
+        padding: 0 4px; width: 4em;
+        color: #aaaaaa;
+      }
+    pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+    div.sourceCode
+      {   }
+    @media screen {
+    pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+    }
+    code span.al { color: #ff0000; font-weight: bold; } /* Alert */
+    code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+    code span.at { color: #7d9029; } /* Attribute */
+    code span.bn { color: #40a070; } /* BaseN */
+    code span.bu { color: #008000; } /* BuiltIn */
+    code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+    code span.ch { color: #4070a0; } /* Char */
+    code span.cn { color: #880000; } /* Constant */
+    code span.co { color: #60a0b0; font-style: italic; } /* Comment */
+    code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+    code span.do { color: #ba2121; font-style: italic; } /* Documentation */
+    code span.dt { color: #902000; } /* DataType */
+    code span.dv { color: #40a070; } /* DecVal */
+    code span.er { color: #ff0000; font-weight: bold; } /* Error */
+    code span.ex { } /* Extension */
+    code span.fl { color: #40a070; } /* Float */
+    code span.fu { color: #06287e; } /* Function */
+    code span.im { color: #008000; font-weight: bold; } /* Import */
+    code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+    code span.kw { color: #007020; font-weight: bold; } /* Keyword */
+    code span.op { color: #666666; } /* Operator */
+    code span.ot { color: #007020; } /* Other */
+    code span.pp { color: #bc7a00; } /* Preprocessor */
+    code span.sc { color: #4070a0; } /* SpecialChar */
+    code span.ss { color: #bb6688; } /* SpecialString */
+    code span.st { color: #4070a0; } /* String */
+    code span.va { color: #19177c; } /* Variable */
+    code span.vs { color: #4070a0; } /* VerbatimString */
+    code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+  </style>
+  <!-- BG custom styling -->
+  <style type="text/css">
+  /* Fix for line numbers not visible */
+  pre.numberSource code > span {
+      left: -1em;
+  }
+  pre.numberSource {
+      margin-left: initial;
+  }
+
+  /* Put some space after the section numbers */
+  span.toc-section-number::after {
+      content: "\a0\a0\a0";  /* non-breaking whitespace */
+  }
+
+  /* Hide underlines on code number links */
+  pre > code.sourceCode > span > a:first-child::before {
+      text-decoration: none;
+  }
+
+  /* Color the source blocks */
+  div.sourceCode {
+      background-color: #f0f0f0;
+  }
+
+  /* Fix iOS big text rendering issue */
+  pre > code.sourceCode > span {
+      display: initial;
+  }
+
+
+  /* Color the inline code */
+  code:not(.sourceCode) {
+      background: #f0f0f0;
+      padding-left: 0.2em;
+      padding-right: 0.2em;
+      border-radius: 0.2em;
+  }
+
+  pre.sourceCode {
+      border: 1px solid #ccc;
+      padding: 0.5em;
+      border-radius: 0.2em;
+  }
+
+  /* Keep code tags from wrapping in tables */
+  tbody code {
+      white-space: nowrap;
+  }
+
+  /* Prevent hyphenation and hyphen breaks in code*/
+  code {
+      word-break: keep-all;
+  }
+
+  td {
+      vertical-align: top;
+  }
+
+  body {
+      font-size: 12pt;
+      max-width: 43em;
+      font-family: sans-serif;
+  }
+
+  html {
+      background: #f9f9f9;
+  }
+
+  figure > embed {
+      max-width: 100%;
+  }
+
+  figure {
+      text-align: center;
+      margin-top: 2em;
+      margin-bottom: 2em;
+  }
+
+  figcaption {
+      font-size: 0.9em;
+      font-style: italic;
+      margin-top: 0.6em;
+  }
+
+  body {
+      counter-reset: figure-counter-major;
+      counter-reset: figure-counter-minor;
+  }
+
+  figure {
+      counter-increment: figure-counter-minor;
+  }
+
+  figcaption::before {
+      content: "Figure " counter(figure-counter-major) "." counter(figure-counter-minor) ": ";
+  }
+
+  blockquote {
+      border-left: 2px solid #bbb;
+      color: #444;
+  }
+
+  /* Contents */
+
+  nav[role="doc-toc"] > ul > li {
+    font-weight: bold;
+    margin-top: 1.2em;
+  }
+
+  nav[role="doc-toc"] > ul > li:first {
+    font-weight: bold;
+    margin-top: initial;
+  }
+
+  nav[role="doc-toc"] > ul > li > ul {
+    font-weight: normal;
+    margin-top: 0.3em;
+  }
+
+  /*
+  In multipage, we need to reset the figure counter to the chapter
+  number. Luckily, this is in the <h1 data-number> attribute. Unluckily,
+  there is no way to get this in a general way.
+
+  This doesn't work:
+
+    h1[data-number] {
+      counter-set: figure-counter-major attr(data-number);
+    }
+
+  Nor this:
+
+    h1[data-number] {
+      --figure-counter-major-value: attr(data-number);
+      counter-set: figure-counter-major var(--figure-counter-major-value);
+    }
+
+  So, dumbly, we have a bunch of rules for all these sections, up to the
+  maximum possible section.
+
+  Here's a program to generate them:
+
+    for (let i = 1; i < 100; i++)
+        console.log(`h1[data-number="${i}"]{counter-set:figure-counter-major ${i};counter-reset:figure-counter-minor;}`);
+
+  Note to self: never write a book with more than 99 frickin' chapters.
+  */
+
+  h1[data-number="1"]{counter-set:figure-counter-major 1;counter-reset:figure-counter-minor;}
+  h1[data-number="2"]{counter-set:figure-counter-major 2;counter-reset:figure-counter-minor;}
+  h1[data-number="3"]{counter-set:figure-counter-major 3;counter-reset:figure-counter-minor;}
+  h1[data-number="4"]{counter-set:figure-counter-major 4;counter-reset:figure-counter-minor;}
+  h1[data-number="5"]{counter-set:figure-counter-major 5;counter-reset:figure-counter-minor;}
+  h1[data-number="6"]{counter-set:figure-counter-major 6;counter-reset:figure-counter-minor;}
+  h1[data-number="7"]{counter-set:figure-counter-major 7;counter-reset:figure-counter-minor;}
+  h1[data-number="8"]{counter-set:figure-counter-major 8;counter-reset:figure-counter-minor;}
+  h1[data-number="9"]{counter-set:figure-counter-major 9;counter-reset:figure-counter-minor;}
+  h1[data-number="10"]{counter-set:figure-counter-major 10;counter-reset:figure-counter-minor;}
+  h1[data-number="11"]{counter-set:figure-counter-major 11;counter-reset:figure-counter-minor;}
+  h1[data-number="12"]{counter-set:figure-counter-major 12;counter-reset:figure-counter-minor;}
+  h1[data-number="13"]{counter-set:figure-counter-major 13;counter-reset:figure-counter-minor;}
+  h1[data-number="14"]{counter-set:figure-counter-major 14;counter-reset:figure-counter-minor;}
+  h1[data-number="15"]{counter-set:figure-counter-major 15;counter-reset:figure-counter-minor;}
+  h1[data-number="16"]{counter-set:figure-counter-major 16;counter-reset:figure-counter-minor;}
+  h1[data-number="17"]{counter-set:figure-counter-major 17;counter-reset:figure-counter-minor;}
+  h1[data-number="18"]{counter-set:figure-counter-major 18;counter-reset:figure-counter-minor;}
+  h1[data-number="19"]{counter-set:figure-counter-major 19;counter-reset:figure-counter-minor;}
+  h1[data-number="20"]{counter-set:figure-counter-major 20;counter-reset:figure-counter-minor;}
+  h1[data-number="21"]{counter-set:figure-counter-major 21;counter-reset:figure-counter-minor;}
+  h1[data-number="22"]{counter-set:figure-counter-major 22;counter-reset:figure-counter-minor;}
+  h1[data-number="23"]{counter-set:figure-counter-major 23;counter-reset:figure-counter-minor;}
+  h1[data-number="24"]{counter-set:figure-counter-major 24;counter-reset:figure-counter-minor;}
+  h1[data-number="25"]{counter-set:figure-counter-major 25;counter-reset:figure-counter-minor;}
+  h1[data-number="26"]{counter-set:figure-counter-major 26;counter-reset:figure-counter-minor;}
+  h1[data-number="27"]{counter-set:figure-counter-major 27;counter-reset:figure-counter-minor;}
+  h1[data-number="28"]{counter-set:figure-counter-major 28;counter-reset:figure-counter-minor;}
+  h1[data-number="29"]{counter-set:figure-counter-major 29;counter-reset:figure-counter-minor;}
+  h1[data-number="30"]{counter-set:figure-counter-major 30;counter-reset:figure-counter-minor;}
+  h1[data-number="31"]{counter-set:figure-counter-major 31;counter-reset:figure-counter-minor;}
+  h1[data-number="32"]{counter-set:figure-counter-major 32;counter-reset:figure-counter-minor;}
+  h1[data-number="33"]{counter-set:figure-counter-major 33;counter-reset:figure-counter-minor;}
+  h1[data-number="34"]{counter-set:figure-counter-major 34;counter-reset:figure-counter-minor;}
+  h1[data-number="35"]{counter-set:figure-counter-major 35;counter-reset:figure-counter-minor;}
+  h1[data-number="36"]{counter-set:figure-counter-major 36;counter-reset:figure-counter-minor;}
+  h1[data-number="37"]{counter-set:figure-counter-major 37;counter-reset:figure-counter-minor;}
+  h1[data-number="38"]{counter-set:figure-counter-major 38;counter-reset:figure-counter-minor;}
+  h1[data-number="39"]{counter-set:figure-counter-major 39;counter-reset:figure-counter-minor;}
+  h1[data-number="40"]{counter-set:figure-counter-major 40;counter-reset:figure-counter-minor;}
+  h1[data-number="41"]{counter-set:figure-counter-major 41;counter-reset:figure-counter-minor;}
+  h1[data-number="42"]{counter-set:figure-counter-major 42;counter-reset:figure-counter-minor;}
+  h1[data-number="43"]{counter-set:figure-counter-major 43;counter-reset:figure-counter-minor;}
+  h1[data-number="44"]{counter-set:figure-counter-major 44;counter-reset:figure-counter-minor;}
+  h1[data-number="45"]{counter-set:figure-counter-major 45;counter-reset:figure-counter-minor;}
+  h1[data-number="46"]{counter-set:figure-counter-major 46;counter-reset:figure-counter-minor;}
+  h1[data-number="47"]{counter-set:figure-counter-major 47;counter-reset:figure-counter-minor;}
+  h1[data-number="48"]{counter-set:figure-counter-major 48;counter-reset:figure-counter-minor;}
+  h1[data-number="49"]{counter-set:figure-counter-major 49;counter-reset:figure-counter-minor;}
+  h1[data-number="50"]{counter-set:figure-counter-major 50;counter-reset:figure-counter-minor;}
+  h1[data-number="51"]{counter-set:figure-counter-major 51;counter-reset:figure-counter-minor;}
+  h1[data-number="52"]{counter-set:figure-counter-major 52;counter-reset:figure-counter-minor;}
+  h1[data-number="53"]{counter-set:figure-counter-major 53;counter-reset:figure-counter-minor;}
+  h1[data-number="54"]{counter-set:figure-counter-major 54;counter-reset:figure-counter-minor;}
+  h1[data-number="55"]{counter-set:figure-counter-major 55;counter-reset:figure-counter-minor;}
+  h1[data-number="56"]{counter-set:figure-counter-major 56;counter-reset:figure-counter-minor;}
+  h1[data-number="57"]{counter-set:figure-counter-major 57;counter-reset:figure-counter-minor;}
+  h1[data-number="58"]{counter-set:figure-counter-major 58;counter-reset:figure-counter-minor;}
+  h1[data-number="59"]{counter-set:figure-counter-major 59;counter-reset:figure-counter-minor;}
+  h1[data-number="60"]{counter-set:figure-counter-major 60;counter-reset:figure-counter-minor;}
+  h1[data-number="61"]{counter-set:figure-counter-major 61;counter-reset:figure-counter-minor;}
+  h1[data-number="62"]{counter-set:figure-counter-major 62;counter-reset:figure-counter-minor;}
+  h1[data-number="63"]{counter-set:figure-counter-major 63;counter-reset:figure-counter-minor;}
+  h1[data-number="64"]{counter-set:figure-counter-major 64;counter-reset:figure-counter-minor;}
+  h1[data-number="65"]{counter-set:figure-counter-major 65;counter-reset:figure-counter-minor;}
+  h1[data-number="66"]{counter-set:figure-counter-major 66;counter-reset:figure-counter-minor;}
+  h1[data-number="67"]{counter-set:figure-counter-major 67;counter-reset:figure-counter-minor;}
+  h1[data-number="68"]{counter-set:figure-counter-major 68;counter-reset:figure-counter-minor;}
+  h1[data-number="69"]{counter-set:figure-counter-major 69;counter-reset:figure-counter-minor;}
+  h1[data-number="70"]{counter-set:figure-counter-major 70;counter-reset:figure-counter-minor;}
+  h1[data-number="71"]{counter-set:figure-counter-major 71;counter-reset:figure-counter-minor;}
+  h1[data-number="72"]{counter-set:figure-counter-major 72;counter-reset:figure-counter-minor;}
+  h1[data-number="73"]{counter-set:figure-counter-major 73;counter-reset:figure-counter-minor;}
+  h1[data-number="74"]{counter-set:figure-counter-major 74;counter-reset:figure-counter-minor;}
+  h1[data-number="75"]{counter-set:figure-counter-major 75;counter-reset:figure-counter-minor;}
+  h1[data-number="76"]{counter-set:figure-counter-major 76;counter-reset:figure-counter-minor;}
+  h1[data-number="77"]{counter-set:figure-counter-major 77;counter-reset:figure-counter-minor;}
+  h1[data-number="78"]{counter-set:figure-counter-major 78;counter-reset:figure-counter-minor;}
+  h1[data-number="79"]{counter-set:figure-counter-major 79;counter-reset:figure-counter-minor;}
+  h1[data-number="80"]{counter-set:figure-counter-major 80;counter-reset:figure-counter-minor;}
+  h1[data-number="81"]{counter-set:figure-counter-major 81;counter-reset:figure-counter-minor;}
+  h1[data-number="82"]{counter-set:figure-counter-major 82;counter-reset:figure-counter-minor;}
+  h1[data-number="83"]{counter-set:figure-counter-major 83;counter-reset:figure-counter-minor;}
+  h1[data-number="84"]{counter-set:figure-counter-major 84;counter-reset:figure-counter-minor;}
+  h1[data-number="85"]{counter-set:figure-counter-major 85;counter-reset:figure-counter-minor;}
+  h1[data-number="86"]{counter-set:figure-counter-major 86;counter-reset:figure-counter-minor;}
+  h1[data-number="87"]{counter-set:figure-counter-major 87;counter-reset:figure-counter-minor;}
+  h1[data-number="88"]{counter-set:figure-counter-major 88;counter-reset:figure-counter-minor;}
+  h1[data-number="89"]{counter-set:figure-counter-major 89;counter-reset:figure-counter-minor;}
+  h1[data-number="90"]{counter-set:figure-counter-major 90;counter-reset:figure-counter-minor;}
+  h1[data-number="91"]{counter-set:figure-counter-major 91;counter-reset:figure-counter-minor;}
+  h1[data-number="92"]{counter-set:figure-counter-major 92;counter-reset:figure-counter-minor;}
+  h1[data-number="93"]{counter-set:figure-counter-major 93;counter-reset:figure-counter-minor;}
+  h1[data-number="94"]{counter-set:figure-counter-major 94;counter-reset:figure-counter-minor;}
+  h1[data-number="95"]{counter-set:figure-counter-major 95;counter-reset:figure-counter-minor;}
+  h1[data-number="96"]{counter-set:figure-counter-major 96;counter-reset:figure-counter-minor;}
+  h1[data-number="97"]{counter-set:figure-counter-major 97;counter-reset:figure-counter-minor;}
+  h1[data-number="98"]{counter-set:figure-counter-major 98;counter-reset:figure-counter-minor;}
+  h1[data-number="99"]{counter-set:figure-counter-major 99;counter-reset:figure-counter-minor;}
+
+
+  </style>
+  <!-- BG custom styling for the wide body variant -->
+  <!-- Gets appended after bg-css.html -->
+
+  <style type="text/css">
+  body {
+      max-width: inherit;
+  }
+  </style>
+</head>
+<body>
+<div style="text-align:center"><span><a href="configuration.html" rel="prev">Prev</a> | </span><a href="index.html">Contents</a><span> | <a href="changing-identity.html" rel="next">Next</a></span></div><hr>
+<h1 data-number="25" id="git-aliases"><span class="header-section-number">25</span> Git Aliases</h1>
+<p></p>
+<p>Some of these Git commands might be painstaking to type. So far, we haven’t had to do anything <em>too</em> complicated, but we might eventually.</p>
+<p>For example, let’s say you want to see the names of the files that were modified with <code>git log</code>. It’s no problem; you can tell it to do that.</p>
+<div class="sourceCode" id="cb300"><pre class="sourceCode default"><code class="sourceCode default"><span id="cb300-1"><a href="git-aliases.html#cb300-1" aria-hidden="true" tabindex="-1"></a>$ git log --name-only</span></code></pre></div>
+<p>And that’ll work.</p>
+<p>But let’s say for the sake of example that you find yourself doing that a <em>lot</em>. It would get irksome.</p>
+<p>Wouldn’t it be easier if you could just make up a new command, like <code>git logn</code> that would do the same thing?</p>
+<p>That’s what aliases are for.</p>
+<p>This chapter assumes you’ve read the <a href="configuration.html#configuration">Configuration chapter</a>. In particular, if these commands don’t work, you should look at <a href="configuration.html#config-old">configuration of Older Git Versions</a>.</p>
+<h2 data-number="25.1" id="creating-an-alias"><span class="header-section-number">25.1</span> Creating an Alias</h2>
+<p></p>
+<p>You do this through the configuration interface. Basically what you want to set is the variable <code>alias.myname</code> where <code>myname</code> is the name of the new command.</p>
+<p>Let’s say you want to make <code>git logn</code> an alias for <code>git log --name-only</code>. You can do it like this:</p>
+<div class="sourceCode" id="cb301"><pre class="sourceCode default"><code class="sourceCode default"><span id="cb301-1"><a href="git-aliases.html#cb301-1" aria-hidden="true" tabindex="-1"></a>$ git config set --global alias.logn &#39;log --name-only&#39;</span></code></pre></div>
+<p>And at this point, you can run:</p>
+<div class="sourceCode" id="cb302"><pre class="sourceCode default"><code class="sourceCode default"><span id="cb302-1"><a href="git-aliases.html#cb302-1" aria-hidden="true" tabindex="-1"></a>$ git logn</span></code></pre></div>
+<p>and it will be an alias for <code>git log --name-only</code>, effectively running that command.</p>
+<p>I speculate that Git has a number of built-in commands (like <code>log</code> and <code>push</code>) and if you try to have it run something that is not a built-in, it tries to find it as an <code>alias</code> variable. And if it does, it substitutes that instead. 99% sure that’s what’s happening under the hood.</p>
+<p>Since aliases are just regular configuration variables, getting, setting, and deleting them happens as described in the <a href="configuration.html#configuration">config chapter</a>.</p>
+<p></p>
+<h2 data-number="25.2" id="displaying-aliases"><span class="header-section-number">25.2</span> Displaying Aliases</h2>
+<p></p>
+<p>Since aliases are just config variables, you can just get them in order to see what they are.</p>
+<div class="sourceCode" id="cb303"><pre class="sourceCode default"><code class="sourceCode default"><span id="cb303-1"><a href="git-aliases.html#cb303-1" aria-hidden="true" tabindex="-1"></a>$ git config get alias.logx</span></code></pre></div>
+<p>If you want to see all of them, you can run this command:</p>
+<div class="sourceCode" id="cb304"><pre class="sourceCode default"><code class="sourceCode default"><span id="cb304-1"><a href="git-aliases.html#cb304-1" aria-hidden="true" tabindex="-1"></a>$ git config get --all --show-names --regexp &#39;^alias\.&#39;</span></code></pre></div>
+<p>which is super annoying. I suggest you alias it. Wheee!</p>
+<blockquote>
+<p><strong>Older versions of Git use this command instead:</strong></p>
+<pre class="display"><code>$ git config --get-regexp ^alias\.</code></pre>
+<!-- ` -->
+</blockquote>
+<p></p>
+<h2 data-number="25.3" id="some-neat-sample-aliases"><span class="header-section-number">25.3</span> Some Neat Sample Aliases</h2>
+<p></p>
+<p>Some of the following are split into multiple lines so they fit in the book. You can put them on a single line, or type them as-is with the <code>\</code> escape that tells the shell to continue the command on the next line.</p>
+<p><strong>Add all changed files</strong> with <code>git adda</code>. Do this carefully since you might add more than you wanted!</p>
+<div class="sourceCode" id="cb306"><pre class="sourceCode default"><code class="sourceCode default"><span id="cb306-1"><a href="git-aliases.html#cb306-1" aria-hidden="true" tabindex="-1"></a>$ git config set alias.adda &quot;add --all&quot;</span></code></pre></div>
+<p><strong>More compact log showing the commit graph</strong> with <code>git logc</code>.</p>
+<div class="sourceCode" id="cb307"><pre class="sourceCode default"><code class="sourceCode default"><span id="cb307-1"><a href="git-aliases.html#cb307-1" aria-hidden="true" tabindex="-1"></a>$ git config set alias.logc &quot;log --oneline --graph --decorate&quot;</span></code></pre></div>
+<p><strong>Diff the stage with the repo</strong> with <code>git diffs</code>.</p>
+<div class="sourceCode" id="cb308"><pre class="sourceCode default"><code class="sourceCode default"><span id="cb308-1"><a href="git-aliases.html#cb308-1" aria-hidden="true" tabindex="-1"></a>$ git config set alias.diffs &quot;diff --staged&quot;</span></code></pre></div>
+<p><strong>Make <code>git aliases</code> show all aliases</strong> with <code>git aliases</code>.</p>
+<div class="sourceCode" id="cb309"><pre class="sourceCode default"><code class="sourceCode default"><span id="cb309-1"><a href="git-aliases.html#cb309-1" aria-hidden="true" tabindex="-1"></a>$ git config set alias.aliases \</span>
+<span id="cb309-2"><a href="git-aliases.html#cb309-2" aria-hidden="true" tabindex="-1"></a>    &quot;config get --all --show-names --regexp &#39;^alias\.&#39;&quot;</span></code></pre></div>
+<p><strong>Make a very colorful and customized log</strong> with <code>git lol</code>.</p>
+<p>(Make sure to get the spacing exactly as-is on this copy-paste or the shell and/or Git will be unhappy.)</p>
+<div class="sourceCode" id="cb310"><pre class="sourceCode default"><code class="sourceCode default"><span id="cb310-1"><a href="git-aliases.html#cb310-1" aria-hidden="true" tabindex="-1"></a>$ git config set alias.lol &quot;log --graph&quot;\</span>
+<span id="cb310-2"><a href="git-aliases.html#cb310-2" aria-hidden="true" tabindex="-1"></a>&quot; --pretty=format:&#39;%Cred%h%Creset -%C(yellow)%d%Creset %s&quot;\</span>
+<span id="cb310-3"><a href="git-aliases.html#cb310-3" aria-hidden="true" tabindex="-1"></a>&quot; %Cgreen(%cr) %C(bold blue)&lt;%an&gt;%Creset&#39; --abbrev-commit&quot;</span></code></pre></div>
+<p>For that last one, we’re making heavy use of <code>--pretty</code> formatting which gives tons of control over the output. <a href="https://git-scm.com/docs/git-log#_pretty_formats">See the “Pretty Formats” section of the <code>git log</code> manual page for more info</a><a href="quick-reference.html#fn43" class="footnote-ref" id="fnref43" role="doc-noteref"><sup>43</sup></a>.</p>
+<p></p>
+<h2 data-number="25.4" id="seeing-gits-alias-expansion"><span class="header-section-number">25.4</span> Seeing Git’s Alias Expansion</h2>
+<p></p>
+<p>Let’s say you’ve added an alias, but it’s not working. When you run it, it just gives some error and it’s not super clear what’s going on.</p>
+<div class="sourceCode" id="cb311"><pre class="sourceCode default"><code class="sourceCode default"><span id="cb311-1"><a href="git-aliases.html#cb311-1" aria-hidden="true" tabindex="-1"></a>$ git logx</span>
+<span id="cb311-2"><a href="git-aliases.html#cb311-2" aria-hidden="true" tabindex="-1"></a>fatal: unrecognized argument: --foobar</span></code></pre></div>
+<p>You can ask Git to give you more information by adding <code>GIT_TRACE=1</code> to the beginning of the command line.</p>
+<blockquote>
+<p><strong>This sets the environment variable <code>GIT_TRACE</code> to <code>1</code>,</strong> but it only does it for this one command. It’s not persistent. Git knows to look for <code>GIT_TRACE</code> and that it should alter its behavior if it finds it.</p>
+</blockquote>
+<p>Here’s some example output:</p>
+<div class="sourceCode" id="cb312"><pre class="sourceCode default"><code class="sourceCode default"><span id="cb312-1"><a href="git-aliases.html#cb312-1" aria-hidden="true" tabindex="-1"></a>$ GIT_TRACE=1 git logx</span>
+<span id="cb312-2"><a href="git-aliases.html#cb312-2" aria-hidden="true" tabindex="-1"></a>  14:09:28.502707 git.c:758               trace: exec: git-logx</span>
+<span id="cb312-3"><a href="git-aliases.html#cb312-3" aria-hidden="true" tabindex="-1"></a>  14:09:28.502750 run-command.c:666       trace: run_command: git-l</span>
+<span id="cb312-4"><a href="git-aliases.html#cb312-4" aria-hidden="true" tabindex="-1"></a>  14:09:28.502905 git.c:416               trace: alias expansion: l</span>
+<span id="cb312-5"><a href="git-aliases.html#cb312-5" aria-hidden="true" tabindex="-1"></a>  14:09:28.502913 git.c:816               trace: exec: git log --fo</span>
+<span id="cb312-6"><a href="git-aliases.html#cb312-6" aria-hidden="true" tabindex="-1"></a>  14:09:28.502916 run-command.c:666       trace: run_command: git l</span>
+<span id="cb312-7"><a href="git-aliases.html#cb312-7" aria-hidden="true" tabindex="-1"></a>  14:09:28.502926 run-command.c:758       trace: start_command: /us</span>
+<span id="cb312-8"><a href="git-aliases.html#cb312-8" aria-hidden="true" tabindex="-1"></a>  14:09:28.504192 git.c:472               trace: built-in: git log </span>
+<span id="cb312-9"><a href="git-aliases.html#cb312-9" aria-hidden="true" tabindex="-1"></a>  fatal: unrecognized argument: --foobar</span></code></pre></div>
+<p>Unfortunately I had to truncate the lines on the right so they fit in the print version of the book, and that’s what we really want to look at. We’ll get there in a moment.</p>
+<p>For now, let’s look on the left. What we see there is a timestamp and some information about which part of the Git code is sending the trace out. And the it ends with our error.</p>
+<p>Let’s scroll to the right and just look at the lines following the <code>trace:</code>.</p>
+<div class="sourceCode" id="cb313"><pre class="sourceCode default"><code class="sourceCode default"><span id="cb313-1"><a href="git-aliases.html#cb313-1" aria-hidden="true" tabindex="-1"></a>trace: exec: git-logx</span>
+<span id="cb313-2"><a href="git-aliases.html#cb313-2" aria-hidden="true" tabindex="-1"></a>trace: run_command: git-logx</span>
+<span id="cb313-3"><a href="git-aliases.html#cb313-3" aria-hidden="true" tabindex="-1"></a>trace: alias expansion: logx =&gt; log --foobar</span>
+<span id="cb313-4"><a href="git-aliases.html#cb313-4" aria-hidden="true" tabindex="-1"></a>trace: exec: git log --foobar</span>
+<span id="cb313-5"><a href="git-aliases.html#cb313-5" aria-hidden="true" tabindex="-1"></a>trace: run_command: git log --foobar</span>
+<span id="cb313-6"><a href="git-aliases.html#cb313-6" aria-hidden="true" tabindex="-1"></a>trace: start_command: /usr/lib/git-core/git log --foobar</span>
+<span id="cb313-7"><a href="git-aliases.html#cb313-7" aria-hidden="true" tabindex="-1"></a>trace: built-in: git log --foobar</span></code></pre></div>
+<p>It might take some sifting through, but let’s look just at the lines with <code>run_command</code> and <code>alias expansion</code> in them:</p>
+<div class="sourceCode" id="cb314"><pre class="sourceCode default"><code class="sourceCode default"><span id="cb314-1"><a href="git-aliases.html#cb314-1" aria-hidden="true" tabindex="-1"></a>trace: run_command: git-logx</span>
+<span id="cb314-2"><a href="git-aliases.html#cb314-2" aria-hidden="true" tabindex="-1"></a>trace: alias expansion: logx =&gt; log --foobar</span>
+<span id="cb314-3"><a href="git-aliases.html#cb314-3" aria-hidden="true" tabindex="-1"></a>trace: run_command: git log --foobar</span></code></pre></div>
+<p>And there we can see exactly what’s being expanded into what. And that might be useful for debugging it.</p>
+<p>It’s probably a bit of overkill for this simple example, but there are some aliases of extraordinary complexity for which this technique might help.</p>
+<p></p>
+<p></p>
+<!-- BG_NEW_CHAPTER -->
+<hr><div style="text-align:center"><span><a href="configuration.html" rel="prev">Prev</a> | </span><a href="index.html">Contents</a><span> | <a href="changing-identity.html" rel="next">Next</a></span></div></body>
+</html>

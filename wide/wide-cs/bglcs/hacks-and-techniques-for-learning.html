@@ -1,0 +1,626 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <title>Beej's Guide to Learning Computer Science</title>
+  <style>
+    html {
+      color: #1a1a1a;
+      background-color: #fdfdfd;
+    }
+    body {
+      margin: 0 auto;
+      max-width: 36em;
+      padding-left: 50px;
+      padding-right: 50px;
+      padding-top: 50px;
+      padding-bottom: 50px;
+      hyphens: auto;
+      overflow-wrap: break-word;
+      text-rendering: optimizeLegibility;
+      font-kerning: normal;
+    }
+    @media (max-width: 600px) {
+      body {
+        font-size: 0.9em;
+        padding: 12px;
+      }
+      h1 {
+        font-size: 1.8em;
+      }
+    }
+    @media print {
+      html {
+        background-color: white;
+      }
+      body {
+        background-color: transparent;
+        color: black;
+        font-size: 12pt;
+      }
+      p, h2, h3 {
+        orphans: 3;
+        widows: 3;
+      }
+      h2, h3, h4 {
+        page-break-after: avoid;
+      }
+    }
+    p {
+      margin: 1em 0;
+    }
+    a {
+      color: #1a1a1a;
+    }
+    a:visited {
+      color: #1a1a1a;
+    }
+    img {
+      max-width: 100%;
+    }
+    svg {
+      height: auto;
+      max-width: 100%;
+    }
+    h1, h2, h3, h4, h5, h6 {
+      margin-top: 1.4em;
+    }
+    h5, h6 {
+      font-size: 1em;
+      font-style: italic;
+    }
+    h6 {
+      font-weight: normal;
+    }
+    ol, ul {
+      padding-left: 1.7em;
+      margin-top: 1em;
+    }
+    li > ol, li > ul {
+      margin-top: 0;
+    }
+    blockquote {
+      margin: 1em 0 1em 1.7em;
+      padding-left: 1em;
+      border-left: 2px solid #e6e6e6;
+      color: #606060;
+    }
+    code {
+      font-family: Menlo, Monaco, Consolas, 'Lucida Console', monospace;
+      font-size: 85%;
+      margin: 0;
+      hyphens: manual;
+    }
+    pre {
+      margin: 1em 0;
+      overflow: auto;
+    }
+    pre code {
+      padding: 0;
+      overflow: visible;
+      overflow-wrap: normal;
+    }
+    .sourceCode {
+     background-color: transparent;
+     overflow: visible;
+    }
+    hr {
+      border: none;
+      border-top: 1px solid #1a1a1a;
+      height: 1px;
+      margin: 1em 0;
+    }
+    table {
+      margin: 1em 0;
+      border-collapse: collapse;
+      width: 100%;
+      overflow-x: auto;
+      display: block;
+      font-variant-numeric: lining-nums tabular-nums;
+    }
+    table caption {
+      margin-bottom: 0.75em;
+    }
+    tbody {
+      margin-top: 0.5em;
+      border-top: 1px solid #1a1a1a;
+      border-bottom: 1px solid #1a1a1a;
+    }
+    th {
+      border-top: 1px solid #1a1a1a;
+      padding: 0.25em 0.5em 0.25em 0.5em;
+    }
+    td {
+      padding: 0.125em 0.5em 0.25em 0.5em;
+    }
+    header {
+      margin-bottom: 4em;
+      text-align: center;
+    }
+    #TOC li {
+      list-style: none;
+    }
+    #TOC ul {
+      padding-left: 1.3em;
+    }
+    #TOC > ul {
+      padding-left: 0;
+    }
+    #TOC a:not(:hover) {
+      text-decoration: none;
+    }
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+    /* CSS for syntax highlighting */
+    html { -webkit-text-size-adjust: 100%; }
+    pre > code.sourceCode { white-space: pre; position: relative; }
+    pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+    pre > code.sourceCode > span:empty { height: 1.2em; }
+    .sourceCode { overflow: visible; }
+    code.sourceCode > span { color: inherit; text-decoration: inherit; }
+    div.sourceCode { margin: 1em 0; }
+    pre.sourceCode { margin: 0; }
+    @media screen {
+    div.sourceCode { overflow: auto; }
+    }
+    @media print {
+    pre > code.sourceCode { white-space: pre-wrap; }
+    pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+    }
+    pre.numberSource code
+      { counter-reset: source-line 0; }
+    pre.numberSource code > span
+      { position: relative; left: -4em; counter-increment: source-line; }
+    pre.numberSource code > span > a:first-child::before
+      { content: counter(source-line);
+        position: relative; left: -1em; text-align: right; vertical-align: baseline;
+        border: none; display: inline-block;
+        -webkit-touch-callout: none; -webkit-user-select: none;
+        -khtml-user-select: none; -moz-user-select: none;
+        -ms-user-select: none; user-select: none;
+        padding: 0 4px; width: 4em;
+        color: #aaaaaa;
+      }
+    pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+    div.sourceCode
+      {   }
+    @media screen {
+    pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+    }
+    code span.al { color: #ff0000; font-weight: bold; } /* Alert */
+    code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+    code span.at { color: #7d9029; } /* Attribute */
+    code span.bn { color: #40a070; } /* BaseN */
+    code span.bu { color: #008000; } /* BuiltIn */
+    code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+    code span.ch { color: #4070a0; } /* Char */
+    code span.cn { color: #880000; } /* Constant */
+    code span.co { color: #60a0b0; font-style: italic; } /* Comment */
+    code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+    code span.do { color: #ba2121; font-style: italic; } /* Documentation */
+    code span.dt { color: #902000; } /* DataType */
+    code span.dv { color: #40a070; } /* DecVal */
+    code span.er { color: #ff0000; font-weight: bold; } /* Error */
+    code span.ex { } /* Extension */
+    code span.fl { color: #40a070; } /* Float */
+    code span.fu { color: #06287e; } /* Function */
+    code span.im { color: #008000; font-weight: bold; } /* Import */
+    code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+    code span.kw { color: #007020; font-weight: bold; } /* Keyword */
+    code span.op { color: #666666; } /* Operator */
+    code span.ot { color: #007020; } /* Other */
+    code span.pp { color: #bc7a00; } /* Preprocessor */
+    code span.sc { color: #4070a0; } /* SpecialChar */
+    code span.ss { color: #bb6688; } /* SpecialString */
+    code span.st { color: #4070a0; } /* String */
+    code span.va { color: #19177c; } /* Variable */
+    code span.vs { color: #4070a0; } /* VerbatimString */
+    code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+  </style>
+  <!-- BG custom styling -->
+  <style type="text/css">
+  /* Fix for line numbers not visible */
+  pre.numberSource code > span {
+      left: -1em;
+  }
+  pre.numberSource {
+      margin-left: initial;
+  }
+
+  /* Put some space after the section numbers */
+  span.toc-section-number::after {
+      content: "\a0\a0\a0";  /* non-breaking whitespace */
+  }
+
+  /* Hide underlines on code number links */
+  pre > code.sourceCode > span > a:first-child::before {
+      text-decoration: none;
+  }
+
+  /* Color the source blocks */
+  div.sourceCode {
+      background-color: #f0f0f0;
+  }
+
+  /* Fix iOS big text rendering issue */
+  pre > code.sourceCode > span {
+      display: initial;
+  }
+
+
+  /* Color the inline code */
+  code:not(.sourceCode) {
+      background: #f0f0f0;
+      padding-left: 0.2em;
+      padding-right: 0.2em;
+      border-radius: 0.2em;
+  }
+
+  pre.sourceCode {
+      border: 1px solid #ccc;
+      padding: 0.5em;
+      border-radius: 0.2em;
+  }
+
+  /* Keep code tags from wrapping in tables */
+  tbody code {
+      white-space: nowrap;
+  }
+
+  /* Prevent hyphenation and hyphen breaks in code*/
+  code {
+      word-break: keep-all;
+  }
+
+  td {
+      vertical-align: top;
+  }
+
+  body {
+      font-size: 12pt;
+      max-width: 43em;
+      font-family: sans-serif;
+  }
+
+  html {
+      background: #f9f9f9;
+  }
+
+  figure > embed {
+      max-width: 100%;
+  }
+
+  figure {
+      text-align: center;
+      margin-top: 2em;
+      margin-bottom: 2em;
+  }
+
+  figcaption {
+      font-size: 0.9em;
+      font-style: italic;
+      margin-top: 0.6em;
+  }
+
+  body {
+      counter-reset: figure-counter-major;
+      counter-reset: figure-counter-minor;
+  }
+
+  figure {
+      counter-increment: figure-counter-minor;
+  }
+
+  figcaption::before {
+      content: "Figure " counter(figure-counter-major) "." counter(figure-counter-minor) ": ";
+  }
+
+  blockquote {
+      border-left: 2px solid #bbb;
+      color: #444;
+  }
+
+  /* Contents */
+
+  nav[role="doc-toc"] > ul > li {
+    font-weight: bold;
+    margin-top: 1.2em;
+  }
+
+  nav[role="doc-toc"] > ul > li:first {
+    font-weight: bold;
+    margin-top: initial;
+  }
+
+  nav[role="doc-toc"] > ul > li > ul {
+    font-weight: normal;
+    margin-top: 0.3em;
+  }
+
+  /*
+  In multipage, we need to reset the figure counter to the chapter
+  number. Luckily, this is in the <h1 data-number> attribute. Unluckily,
+  there is no way to get this in a general way.
+
+  This doesn't work:
+
+    h1[data-number] {
+      counter-set: figure-counter-major attr(data-number);
+    }
+
+  Nor this:
+
+    h1[data-number] {
+      --figure-counter-major-value: attr(data-number);
+      counter-set: figure-counter-major var(--figure-counter-major-value);
+    }
+
+  So, dumbly, we have a bunch of rules for all these sections, up to the
+  maximum possible section.
+
+  Here's a program to generate them:
+
+    for (let i = 1; i < 100; i++)
+        console.log(`h1[data-number="${i}"]{counter-set:figure-counter-major ${i};counter-reset:figure-counter-minor;}`);
+
+  Note to self: never write a book with more than 99 frickin' chapters.
+  */
+
+  h1[data-number="1"]{counter-set:figure-counter-major 1;counter-reset:figure-counter-minor;}
+  h1[data-number="2"]{counter-set:figure-counter-major 2;counter-reset:figure-counter-minor;}
+  h1[data-number="3"]{counter-set:figure-counter-major 3;counter-reset:figure-counter-minor;}
+  h1[data-number="4"]{counter-set:figure-counter-major 4;counter-reset:figure-counter-minor;}
+  h1[data-number="5"]{counter-set:figure-counter-major 5;counter-reset:figure-counter-minor;}
+  h1[data-number="6"]{counter-set:figure-counter-major 6;counter-reset:figure-counter-minor;}
+  h1[data-number="7"]{counter-set:figure-counter-major 7;counter-reset:figure-counter-minor;}
+  h1[data-number="8"]{counter-set:figure-counter-major 8;counter-reset:figure-counter-minor;}
+  h1[data-number="9"]{counter-set:figure-counter-major 9;counter-reset:figure-counter-minor;}
+  h1[data-number="10"]{counter-set:figure-counter-major 10;counter-reset:figure-counter-minor;}
+  h1[data-number="11"]{counter-set:figure-counter-major 11;counter-reset:figure-counter-minor;}
+  h1[data-number="12"]{counter-set:figure-counter-major 12;counter-reset:figure-counter-minor;}
+  h1[data-number="13"]{counter-set:figure-counter-major 13;counter-reset:figure-counter-minor;}
+  h1[data-number="14"]{counter-set:figure-counter-major 14;counter-reset:figure-counter-minor;}
+  h1[data-number="15"]{counter-set:figure-counter-major 15;counter-reset:figure-counter-minor;}
+  h1[data-number="16"]{counter-set:figure-counter-major 16;counter-reset:figure-counter-minor;}
+  h1[data-number="17"]{counter-set:figure-counter-major 17;counter-reset:figure-counter-minor;}
+  h1[data-number="18"]{counter-set:figure-counter-major 18;counter-reset:figure-counter-minor;}
+  h1[data-number="19"]{counter-set:figure-counter-major 19;counter-reset:figure-counter-minor;}
+  h1[data-number="20"]{counter-set:figure-counter-major 20;counter-reset:figure-counter-minor;}
+  h1[data-number="21"]{counter-set:figure-counter-major 21;counter-reset:figure-counter-minor;}
+  h1[data-number="22"]{counter-set:figure-counter-major 22;counter-reset:figure-counter-minor;}
+  h1[data-number="23"]{counter-set:figure-counter-major 23;counter-reset:figure-counter-minor;}
+  h1[data-number="24"]{counter-set:figure-counter-major 24;counter-reset:figure-counter-minor;}
+  h1[data-number="25"]{counter-set:figure-counter-major 25;counter-reset:figure-counter-minor;}
+  h1[data-number="26"]{counter-set:figure-counter-major 26;counter-reset:figure-counter-minor;}
+  h1[data-number="27"]{counter-set:figure-counter-major 27;counter-reset:figure-counter-minor;}
+  h1[data-number="28"]{counter-set:figure-counter-major 28;counter-reset:figure-counter-minor;}
+  h1[data-number="29"]{counter-set:figure-counter-major 29;counter-reset:figure-counter-minor;}
+  h1[data-number="30"]{counter-set:figure-counter-major 30;counter-reset:figure-counter-minor;}
+  h1[data-number="31"]{counter-set:figure-counter-major 31;counter-reset:figure-counter-minor;}
+  h1[data-number="32"]{counter-set:figure-counter-major 32;counter-reset:figure-counter-minor;}
+  h1[data-number="33"]{counter-set:figure-counter-major 33;counter-reset:figure-counter-minor;}
+  h1[data-number="34"]{counter-set:figure-counter-major 34;counter-reset:figure-counter-minor;}
+  h1[data-number="35"]{counter-set:figure-counter-major 35;counter-reset:figure-counter-minor;}
+  h1[data-number="36"]{counter-set:figure-counter-major 36;counter-reset:figure-counter-minor;}
+  h1[data-number="37"]{counter-set:figure-counter-major 37;counter-reset:figure-counter-minor;}
+  h1[data-number="38"]{counter-set:figure-counter-major 38;counter-reset:figure-counter-minor;}
+  h1[data-number="39"]{counter-set:figure-counter-major 39;counter-reset:figure-counter-minor;}
+  h1[data-number="40"]{counter-set:figure-counter-major 40;counter-reset:figure-counter-minor;}
+  h1[data-number="41"]{counter-set:figure-counter-major 41;counter-reset:figure-counter-minor;}
+  h1[data-number="42"]{counter-set:figure-counter-major 42;counter-reset:figure-counter-minor;}
+  h1[data-number="43"]{counter-set:figure-counter-major 43;counter-reset:figure-counter-minor;}
+  h1[data-number="44"]{counter-set:figure-counter-major 44;counter-reset:figure-counter-minor;}
+  h1[data-number="45"]{counter-set:figure-counter-major 45;counter-reset:figure-counter-minor;}
+  h1[data-number="46"]{counter-set:figure-counter-major 46;counter-reset:figure-counter-minor;}
+  h1[data-number="47"]{counter-set:figure-counter-major 47;counter-reset:figure-counter-minor;}
+  h1[data-number="48"]{counter-set:figure-counter-major 48;counter-reset:figure-counter-minor;}
+  h1[data-number="49"]{counter-set:figure-counter-major 49;counter-reset:figure-counter-minor;}
+  h1[data-number="50"]{counter-set:figure-counter-major 50;counter-reset:figure-counter-minor;}
+  h1[data-number="51"]{counter-set:figure-counter-major 51;counter-reset:figure-counter-minor;}
+  h1[data-number="52"]{counter-set:figure-counter-major 52;counter-reset:figure-counter-minor;}
+  h1[data-number="53"]{counter-set:figure-counter-major 53;counter-reset:figure-counter-minor;}
+  h1[data-number="54"]{counter-set:figure-counter-major 54;counter-reset:figure-counter-minor;}
+  h1[data-number="55"]{counter-set:figure-counter-major 55;counter-reset:figure-counter-minor;}
+  h1[data-number="56"]{counter-set:figure-counter-major 56;counter-reset:figure-counter-minor;}
+  h1[data-number="57"]{counter-set:figure-counter-major 57;counter-reset:figure-counter-minor;}
+  h1[data-number="58"]{counter-set:figure-counter-major 58;counter-reset:figure-counter-minor;}
+  h1[data-number="59"]{counter-set:figure-counter-major 59;counter-reset:figure-counter-minor;}
+  h1[data-number="60"]{counter-set:figure-counter-major 60;counter-reset:figure-counter-minor;}
+  h1[data-number="61"]{counter-set:figure-counter-major 61;counter-reset:figure-counter-minor;}
+  h1[data-number="62"]{counter-set:figure-counter-major 62;counter-reset:figure-counter-minor;}
+  h1[data-number="63"]{counter-set:figure-counter-major 63;counter-reset:figure-counter-minor;}
+  h1[data-number="64"]{counter-set:figure-counter-major 64;counter-reset:figure-counter-minor;}
+  h1[data-number="65"]{counter-set:figure-counter-major 65;counter-reset:figure-counter-minor;}
+  h1[data-number="66"]{counter-set:figure-counter-major 66;counter-reset:figure-counter-minor;}
+  h1[data-number="67"]{counter-set:figure-counter-major 67;counter-reset:figure-counter-minor;}
+  h1[data-number="68"]{counter-set:figure-counter-major 68;counter-reset:figure-counter-minor;}
+  h1[data-number="69"]{counter-set:figure-counter-major 69;counter-reset:figure-counter-minor;}
+  h1[data-number="70"]{counter-set:figure-counter-major 70;counter-reset:figure-counter-minor;}
+  h1[data-number="71"]{counter-set:figure-counter-major 71;counter-reset:figure-counter-minor;}
+  h1[data-number="72"]{counter-set:figure-counter-major 72;counter-reset:figure-counter-minor;}
+  h1[data-number="73"]{counter-set:figure-counter-major 73;counter-reset:figure-counter-minor;}
+  h1[data-number="74"]{counter-set:figure-counter-major 74;counter-reset:figure-counter-minor;}
+  h1[data-number="75"]{counter-set:figure-counter-major 75;counter-reset:figure-counter-minor;}
+  h1[data-number="76"]{counter-set:figure-counter-major 76;counter-reset:figure-counter-minor;}
+  h1[data-number="77"]{counter-set:figure-counter-major 77;counter-reset:figure-counter-minor;}
+  h1[data-number="78"]{counter-set:figure-counter-major 78;counter-reset:figure-counter-minor;}
+  h1[data-number="79"]{counter-set:figure-counter-major 79;counter-reset:figure-counter-minor;}
+  h1[data-number="80"]{counter-set:figure-counter-major 80;counter-reset:figure-counter-minor;}
+  h1[data-number="81"]{counter-set:figure-counter-major 81;counter-reset:figure-counter-minor;}
+  h1[data-number="82"]{counter-set:figure-counter-major 82;counter-reset:figure-counter-minor;}
+  h1[data-number="83"]{counter-set:figure-counter-major 83;counter-reset:figure-counter-minor;}
+  h1[data-number="84"]{counter-set:figure-counter-major 84;counter-reset:figure-counter-minor;}
+  h1[data-number="85"]{counter-set:figure-counter-major 85;counter-reset:figure-counter-minor;}
+  h1[data-number="86"]{counter-set:figure-counter-major 86;counter-reset:figure-counter-minor;}
+  h1[data-number="87"]{counter-set:figure-counter-major 87;counter-reset:figure-counter-minor;}
+  h1[data-number="88"]{counter-set:figure-counter-major 88;counter-reset:figure-counter-minor;}
+  h1[data-number="89"]{counter-set:figure-counter-major 89;counter-reset:figure-counter-minor;}
+  h1[data-number="90"]{counter-set:figure-counter-major 90;counter-reset:figure-counter-minor;}
+  h1[data-number="91"]{counter-set:figure-counter-major 91;counter-reset:figure-counter-minor;}
+  h1[data-number="92"]{counter-set:figure-counter-major 92;counter-reset:figure-counter-minor;}
+  h1[data-number="93"]{counter-set:figure-counter-major 93;counter-reset:figure-counter-minor;}
+  h1[data-number="94"]{counter-set:figure-counter-major 94;counter-reset:figure-counter-minor;}
+  h1[data-number="95"]{counter-set:figure-counter-major 95;counter-reset:figure-counter-minor;}
+  h1[data-number="96"]{counter-set:figure-counter-major 96;counter-reset:figure-counter-minor;}
+  h1[data-number="97"]{counter-set:figure-counter-major 97;counter-reset:figure-counter-minor;}
+  h1[data-number="98"]{counter-set:figure-counter-major 98;counter-reset:figure-counter-minor;}
+  h1[data-number="99"]{counter-set:figure-counter-major 99;counter-reset:figure-counter-minor;}
+
+
+  </style>
+  <!-- BG custom styling for the wide body variant -->
+  <!-- Gets appended after bg-css.html -->
+
+  <style type="text/css">
+  body {
+      max-width: inherit;
+  }
+  </style>
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
+</head>
+<body>
+<div style="text-align:center"><span><a href="right-tool-for-the-job.html" rel="prev">Prev</a> | </span><a href="index.html">Contents</a><span> | <a href="debugging.html" rel="next">Next</a></span></div><hr>
+<h1 data-number="7" id="hacks-and-techniques-for-learning"><span class="header-section-number">7</span> Hacks and Techniques for Learning</h1>
+<p></p>
+<p>There are a number of tips and tricks for maximizing your speed of durable learning. Devs know these help, and yet we stubbornly ignore them all the time.</p>
+<p>But just in case you want to get faster at learning, here are a few things that work for some people. No guarantees; everyone’s different, and you might have your own path that works better.</p>
+<blockquote>
+<p><strong>Music</strong> is one of those things. Some people swear by silence or white, pink, or brown noise. Some people listen to classical music, or electronica, or metal. Do what works for you.</p>
+</blockquote>
+<h2 data-number="7.1" id="flow"><span class="header-section-number">7.1</span> Flow</h2>
+<p></p>
+<p><a href="https://en.wikipedia.org/wiki/Flow_(psychology)"><em>Flow</em></a><a href="use-of-ai.html#fn30" class="footnote-ref" id="fnref30" role="doc-noteref"><sup>30</sup></a> is a mental state you get in where you’re focused and ideas are connecting freely. There are no interruptions.</p>
+<p>Programmers like to get in flow for maximum productivity.</p>
+<p>Here are the characteristics of that state stolen directly from Wikipedia:</p>
+<ol type="1">
+<li>Intense and focused concentration on the present moment</li>
+<li>Merging of action and awareness</li>
+<li>A loss of reflective self-consciousness</li>
+<li>A sense of personal control or agency over the situation or activity</li>
+<li>A distortion of temporal experience, as one’s subjective experience of time is altered</li>
+<li>Experience of the activity as intrinsically rewarding</li>
+</ol>
+<p>You’ve probably already experienced this in some aspect of your life. Keep in mind that it can be very beneficial for programmers.</p>
+<p></p>
+<h2 data-number="7.2" id="reading-ahead"><span class="header-section-number">7.2</span> Reading Ahead</h2>
+<p></p>
+<p>I know when I was a student, if something was due on Sunday, I’d commonly read about it for the first time on Sunday. Anyone else do that? Yeah.</p>
+<p>But here’s another idea: read the assignment as soon as you get it. Maybe you don’t know enough yet for it to make sense, but that’s okay. Just read it, maybe not even that closely.</p>
+<p>And another idea: read the assignment when you’ve done some of the other reading and lecture, but days before you plan to start working on it. Again, just read it, not worrying about solving it. Maybe read it right away <strong>and</strong> partway through the week!</p>
+<p>What this does is prime your brain with the information. You won’t retain it or understand it all, but your brain will start chewing on it in the background and will make the project easier to tackle when you finally get around to it at 9 PM Sunday night.</p>
+<p>And when you do start the four-stage problem solving process, the material will seem less foreign and more approachable.</p>
+<p>A powerful variant of this is to complete the <em>Understanding</em> phase early. Don’t need to <em>Plan</em> or <em>Code</em> it up yet.</p>
+<p></p>
+<h2 data-number="7.3" id="no-copy-paste-coding"><span class="header-section-number">7.3</span> No Copy-Paste Coding</h2>
+<p></p>
+<p>You need to solve a problem, and look right there on the Intertubes! There’s a solution! Time to break out the ol’ <code>CTRL-c</code>/<code>CTRL-v</code> skills!</p>
+<p>It used to be that people frequently found this solution on the programming site <a href="https://stackoverflow.com/">Stack Overflow</a><a href="use-of-ai.html#fn31" class="footnote-ref" id="fnref31" role="doc-noteref"><sup>31</sup></a>. And still do. But nowadays they tend to punt to some AI.</p>
+<p><em>Beginning developers should not do this.</em> Remember the main goal: develop excellent problem-solving skills. Copy-paste coding does <strong>nothing</strong> to further this goal.</p>
+<p>One exception to this rule is if you already struggled with the problem for some time, as mentioned in the <em>30 Minute Rule</em> section, below. But even then, you <strong>must</strong> understand the code you’re copying 100% completely before using it.</p>
+<p></p>
+<h2 data-number="7.4" id="the-30-minute-rule"><span class="header-section-number">7.4</span> The 30 Minute Rule</h2>
+<p></p>
+<p>If you’ve been stuck for 30 minutes and you’ve <strong>really</strong> tried to attack the problem from a variety of directions and have still come up dry, it’s time to reach out for help.</p>
+<p>Yes, you can go longer than 30 minutes without help (we all do), but 30 minutes is a good balance between working hard and bring productive with the limited time you have for schoolwork.</p>
+<p>Here’s a story. One of my favorite books for learning about programming is called <a href="https://en.wikipedia.org/wiki/Structure_and_Interpretation_of_Computer_Programs"><em>The Structure and Interpretation of Computer Programs</em></a><a href="use-of-ai.html#fn32" class="footnote-ref" id="fnref32" role="doc-noteref"><sup>32</sup></a>, or SICP for short. (I particularly like the Scheme version—really helps you learn recursion.)</p>
+<p>The programming problems in that book can be really challenging. But I gave myself a six hour time limit per problem. (I didn’t do all six in a row, usually.) After the time was up, I looked at the answer.</p>
+<p>And here’s what that does and why it’s important: while you work hard on a problem, you’re busy building a mental framework around it, trying to support it. And if you get the answer, great! But even if you don’t, <em>you’ve still built that framework</em>.</p>
+<p>So when you give up after your time limit, very often the solution you read fits neatly into the framework you’ve already built. It’s just a tiny step from your framework to the solution, and it’s <em>way</em> easier to take that little step to the solution than to try to <a href="https://en.wikipedia.org/wiki/https://en.wikipedia.org/wiki/Grok#In_computer_programmer_culture">grok</a><a href="use-of-ai.html#fn33" class="footnote-ref" id="fnref33" role="doc-noteref"><sup>33</sup></a> the entire thing.</p>
+<p>Contrast that to when you just look up the answer immediately without building the framework. The solution has nowhere to “sit” in your brain, and doesn’t connect to anything else. And it’s a much bigger step to achieve understanding.</p>
+<p><em>The struggle is vital!</em> Don’t skip the struggle! But at the same time, don’t keep it up forever. When you timeout, ask for help from a peer, a tutor, an instructor, or (if allowed) an AI.</p>
+<p>Also, maybe follow this up with going for a walk.</p>
+<p></p>
+<h2 data-number="7.5" id="go-for-a-walk"><span class="header-section-number">7.5</span> Go for a Walk</h2>
+<p></p>
+<p>Yes, I’m serious. You’re stuck, and nothing seems to be working, and no additional plans of attack are coming to mind. What do you do?</p>
+<p>Go for a walk.</p>
+<p>As you try different approaches to a problem, it’s like you’re leaving ruts behind in the road, and your brain tends to focus on the existing ruts rather than trying something new. You’re locked in on the approaches you’ve tried but aren’t working. “If only I could just tweak this one thing that almost works…” but you’re not seeing how.</p>
+<p>Stand up and stroll. Maybe you’re at work and this just means you’re making laps in the hallway. Or maybe you can go outside on a balcony, out front, or on the roof.</p>
+<p>This frees your mind to get out of those ruts and explore new approaches.</p>
+<p>There have been times where I’ve decided to go for a walk and have gotten two steps out the door when a new approach to the problem has occurred to me.</p>
+<p>This method of getting unstuck is tried-and-true.</p>
+<p></p>
+<h2 data-number="7.6" id="rubber-duck"><span class="header-section-number">7.6</span> Rubber Duck</h2>
+<p></p>
+<p>Talk to someone about the issue. This is such an effective technique that it even works if you’re talking to an inanimate rubber duck, giving rise to the name <em>rubber ducking</em>.</p>
+<p>The basic idea is that you’re going to lead the other person through the problem-solving steps, effectively teaching it to them. Get them to understand the problem, and have them help with a plan.</p>
+<p>Here’s the really amazing thing about this: <em>it works even if the other person (or duck) is non-technical</em>.</p>
+<p>One of the reasons is that to understand a problem and come up with a plan, you really don’t need to know anything about programming. They can still help.</p>
+<p>And here’s the <em>really</em> amazing thing: they don’t even have to say anything. The mere act of teaching someone about the problem is very often enough for you to find the answer on your own. Maybe it was a piece of understanding that you missed, or there’s a non-obvious hole in your plan. Talking it through can help you find these things.</p>
+<p>One time, in a combination of going for a walk and rubber ducking, a coworker of mine walked up to my cube, raised his hand as if to ask a question, paused a beat, then said, “Never mind, I figured it out.” That was all it took.</p>
+<p></p>
+<h2 data-number="7.7" id="write-down-questions"><span class="header-section-number">7.7</span> Write Down Questions</h2>
+<p></p>
+<p>When poring over a problem description or learning a tool or language, there are basically two kinds of questions that crop up.</p>
+<ol type="1">
+<li><p><strong>Blocking questions</strong> are questions that you need an answer to right now because they’re blocking your progress. You can’t do anything else until you get the answer.</p></li>
+<li><p><strong>Non-blocking questions</strong> are things that come up of the course of development that are interesting, but you can keep going without knowing the answer right now.</p></li>
+</ol>
+<p>I like to write down non-blocking questions and get answers to them later. Things like, “Does this language support destructuring assignments?” or “Can the library also provide random numbers in an integer range?” or “What other networking protocols are built into the standard library?”</p>
+<p>They were things that I was curious about, but didn’t need to know the answer to immediately.</p>
+<p>Coming back and getting the questions answered later can help build a more complete picture of the systems you’re working with and make you a more effective developer.</p>
+<p></p>
+<h2 data-number="7.8" id="build-a-tapestry-of-knowledge"><span class="header-section-number">7.8</span> Build a Tapestry of Knowledge</h2>
+<p></p>
+<p>This is where it all comes together.</p>
+<p>When you first start coding, you’re in the middle of the vast unexplored world of knowledge. You’ve learned how to print <code>Hello, world!</code> on the screen, but that’s it.</p>
+<p>So you start mapping it out. You see that there are functions and variables and I/O operations and you see how those are connected. And you learn about networking and see how that’s connected to the I/O system in the OS, and you connect them on the map.</p>
+<p>As your map grows, you draw connections between many of the things you’ve learned, and you gradually see that the world of development is more interconnected than not. A lot of problems are very similar to a lot of other problems.</p>
+<p>And when you know a lot of problems like that, that’s a lot of power you can bring to bear on new challenges you face. “Oh, this problem <em>x</em> reminds me of problem <em>y</em>. Maybe I can solve it in a similar way.”</p>
+<blockquote>
+<p><strong>You have a group of 10 people numbered 0 to 9</strong> and they are all lining up at a bank window. Your simulation needs them in random order with no repeats in <span class="math inline">\(O(n)\)</span> time. How do you code this up?</p>
+<p>Maybe earlier you’d written a program to shuffle a deck of cards using the famous <a href="https://en.wikipedia.org/wiki/Fisher–Yates_shuffle">Fisher-Yates algorithm</a><a href="use-of-ai.html#fn34" class="footnote-ref" id="fnref34" role="doc-noteref"><sup>34</sup></a>… wait! All you have to do is make a list of people numbered <code>0</code> to <code>9</code> in order, then shuffle the list like a deck of cards!</p>
+<p>It’s the same problem!</p>
+</blockquote>
+<p>Beginning developers solve programming problems through sheer logic and reasoning.</p>
+<p> Experienced devs also use logic and reasoning, but they primarily rely heavily on pattern matching. What coding pattern do I know that best solves the type of problem that I’m currently facing?</p>
+<p>In short, they rely on their interconnected tapestry of knowledge they’ve built up over their years of programming.</p>
+<p>As you learn to code, look for ways that the thing you’re learning about now connects to the rest of the programming world you’ve already explored. Make those connections so you can exploit them later.</p>
+<p></p>
+<h2 data-number="7.9" id="get-and-give-code-reviews"><span class="header-section-number">7.9</span> Get and Give Code Reviews</h2>
+<p></p>
+<p>It can be really hard to put your code out there and ask someone to give you advice on how to make it better. It’s easy to take that advice personally.</p>
+<p>But fight that urge, and treat every code review you get like a gift. Someone was willing to spend their time helping you become a better coder, usually at no cost to you.</p>
+<blockquote>
+<p><strong>Be nice during code reviews</strong> no matter if you’re the reviewee or the reviewer. Be supportive with your feedback, be modest, and don’t take negative feedback personally.</p>
+</blockquote>
+<p>And if you can’t find a human to help, feed it to an AI chatbot and ask it to review your code.</p>
+<p>Even if you’re not well-versed in the subject matter, that shouldn’t stop you from giving a code review if you can. Just reading other people’s code exposes you to different coding styles and algorithmic patterns that you might not have been aware of.</p>
+<p>But remember to always <a href="right-tool-for-the-job.html#be-opinionated">be opinionated</a> about the feedback you get, and use critical judgment when deciding whether or not to incorporate it.</p>
+<p></p>
+<h2 data-number="7.10" id="join-a-club"><span class="header-section-number">7.10</span> Join a Club</h2>
+<p></p>
+<p>Coding has historically and generally been a solo endeavor—at least the part where you’re sitting at the keyboard typing things. And even during the <em>Understand</em> and <em>Plan</em> phases it can be tempting to work alone.</p>
+<p>Joining a like-minded group of people where you can bounce around ideas (or even just vent) can really help your brain get unstuck from ruts and help you approach problems in ways you hadn’t considered or even been aware of.</p>
+<p>It’s also good for networking, and lots of clubs have interesting presentations you can attend. Or even better, present at!</p>
+<p>Clubs can make the fight feel a lot less lonely. We’re all in this together.</p>
+<h2 data-number="7.11" id="chapter-reflection-5"><span class="header-section-number">7.11</span> Chapter Reflection</h2>
+<ul>
+<li><p>What do you (personally) do to get into <em>flow</em>?</p></li>
+<li><p>What are the advantages to reading an assignment way before you intend to work on it?</p></li>
+<li><p>What are the disadvantages of working on a problem for too short a time before asking for help?</p></li>
+<li><p>What are the disadvantages of working on a problem too long before asking for help?</p></li>
+<li><p>When is it acceptable to use copy-paste coding? What happens if you use it unacceptably?</p></li>
+<li><p>Why is going for a walk a good idea when stuck?</p></li>
+<li><p>How can an inanimate rubber duck be a good programming partner?</p></li>
+<li><p>What does the author mean by <em>tapestry of knowledge</em> and how does it relate to your skill as a developer?</p></li>
+<li><p>What do you gain by getting a code review? What do you gain by giving one?</p></li>
+</ul>
+<p> </p>
+<!-- BG_NEW_CHAPTER -->
+<hr><div style="text-align:center"><span><a href="right-tool-for-the-job.html" rel="prev">Prev</a> | </span><a href="index.html">Contents</a><span> | <a href="debugging.html" rel="next">Next</a></span></div></body>
+</html>

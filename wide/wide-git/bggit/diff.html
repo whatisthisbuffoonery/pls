@@ -1,0 +1,674 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <title>Beej's Guide to Git</title>
+  <style>
+    html {
+      color: #1a1a1a;
+      background-color: #fdfdfd;
+    }
+    body {
+      margin: 0 auto;
+      max-width: 36em;
+      padding-left: 50px;
+      padding-right: 50px;
+      padding-top: 50px;
+      padding-bottom: 50px;
+      hyphens: auto;
+      overflow-wrap: break-word;
+      text-rendering: optimizeLegibility;
+      font-kerning: normal;
+    }
+    @media (max-width: 600px) {
+      body {
+        font-size: 0.9em;
+        padding: 12px;
+      }
+      h1 {
+        font-size: 1.8em;
+      }
+    }
+    @media print {
+      html {
+        background-color: white;
+      }
+      body {
+        background-color: transparent;
+        color: black;
+        font-size: 12pt;
+      }
+      p, h2, h3 {
+        orphans: 3;
+        widows: 3;
+      }
+      h2, h3, h4 {
+        page-break-after: avoid;
+      }
+    }
+    p {
+      margin: 1em 0;
+    }
+    a {
+      color: #1a1a1a;
+    }
+    a:visited {
+      color: #1a1a1a;
+    }
+    img {
+      max-width: 100%;
+    }
+    svg {
+      height: auto;
+      max-width: 100%;
+    }
+    h1, h2, h3, h4, h5, h6 {
+      margin-top: 1.4em;
+    }
+    h5, h6 {
+      font-size: 1em;
+      font-style: italic;
+    }
+    h6 {
+      font-weight: normal;
+    }
+    ol, ul {
+      padding-left: 1.7em;
+      margin-top: 1em;
+    }
+    li > ol, li > ul {
+      margin-top: 0;
+    }
+    blockquote {
+      margin: 1em 0 1em 1.7em;
+      padding-left: 1em;
+      border-left: 2px solid #e6e6e6;
+      color: #606060;
+    }
+    code {
+      font-family: Menlo, Monaco, Consolas, 'Lucida Console', monospace;
+      font-size: 85%;
+      margin: 0;
+      hyphens: manual;
+    }
+    pre {
+      margin: 1em 0;
+      overflow: auto;
+    }
+    pre code {
+      padding: 0;
+      overflow: visible;
+      overflow-wrap: normal;
+    }
+    .sourceCode {
+     background-color: transparent;
+     overflow: visible;
+    }
+    hr {
+      background-color: #1a1a1a;
+      border: none;
+      height: 1px;
+      margin: 1em 0;
+    }
+    table {
+      margin: 1em 0;
+      border-collapse: collapse;
+      width: 100%;
+      overflow-x: auto;
+      display: block;
+      font-variant-numeric: lining-nums tabular-nums;
+    }
+    table caption {
+      margin-bottom: 0.75em;
+    }
+    tbody {
+      margin-top: 0.5em;
+      border-top: 1px solid #1a1a1a;
+      border-bottom: 1px solid #1a1a1a;
+    }
+    th {
+      border-top: 1px solid #1a1a1a;
+      padding: 0.25em 0.5em 0.25em 0.5em;
+    }
+    td {
+      padding: 0.125em 0.5em 0.25em 0.5em;
+    }
+    header {
+      margin-bottom: 4em;
+      text-align: center;
+    }
+    #TOC li {
+      list-style: none;
+    }
+    #TOC ul {
+      padding-left: 1.3em;
+    }
+    #TOC > ul {
+      padding-left: 0;
+    }
+    #TOC a:not(:hover) {
+      text-decoration: none;
+    }
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+    /* CSS for syntax highlighting */
+    html { -webkit-text-size-adjust: 100%; }
+    pre > code.sourceCode { white-space: pre; position: relative; }
+    pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+    pre > code.sourceCode > span:empty { height: 1.2em; }
+    .sourceCode { overflow: visible; }
+    code.sourceCode > span { color: inherit; text-decoration: inherit; }
+    div.sourceCode { margin: 1em 0; }
+    pre.sourceCode { margin: 0; }
+    @media screen {
+    div.sourceCode { overflow: auto; }
+    }
+    @media print {
+    pre > code.sourceCode { white-space: pre-wrap; }
+    pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+    }
+    pre.numberSource code
+      { counter-reset: source-line 0; }
+    pre.numberSource code > span
+      { position: relative; left: -4em; counter-increment: source-line; }
+    pre.numberSource code > span > a:first-child::before
+      { content: counter(source-line);
+        position: relative; left: -1em; text-align: right; vertical-align: baseline;
+        border: none; display: inline-block;
+        -webkit-touch-callout: none; -webkit-user-select: none;
+        -khtml-user-select: none; -moz-user-select: none;
+        -ms-user-select: none; user-select: none;
+        padding: 0 4px; width: 4em;
+        color: #aaaaaa;
+      }
+    pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+    div.sourceCode
+      {   }
+    @media screen {
+    pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+    }
+    code span.al { color: #ff0000; font-weight: bold; } /* Alert */
+    code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+    code span.at { color: #7d9029; } /* Attribute */
+    code span.bn { color: #40a070; } /* BaseN */
+    code span.bu { color: #008000; } /* BuiltIn */
+    code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+    code span.ch { color: #4070a0; } /* Char */
+    code span.cn { color: #880000; } /* Constant */
+    code span.co { color: #60a0b0; font-style: italic; } /* Comment */
+    code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+    code span.do { color: #ba2121; font-style: italic; } /* Documentation */
+    code span.dt { color: #902000; } /* DataType */
+    code span.dv { color: #40a070; } /* DecVal */
+    code span.er { color: #ff0000; font-weight: bold; } /* Error */
+    code span.ex { } /* Extension */
+    code span.fl { color: #40a070; } /* Float */
+    code span.fu { color: #06287e; } /* Function */
+    code span.im { color: #008000; font-weight: bold; } /* Import */
+    code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+    code span.kw { color: #007020; font-weight: bold; } /* Keyword */
+    code span.op { color: #666666; } /* Operator */
+    code span.ot { color: #007020; } /* Other */
+    code span.pp { color: #bc7a00; } /* Preprocessor */
+    code span.sc { color: #4070a0; } /* SpecialChar */
+    code span.ss { color: #bb6688; } /* SpecialString */
+    code span.st { color: #4070a0; } /* String */
+    code span.va { color: #19177c; } /* Variable */
+    code span.vs { color: #4070a0; } /* VerbatimString */
+    code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+  </style>
+  <!-- BG custom styling -->
+  <style type="text/css">
+  /* Fix for line numbers not visible */
+  pre.numberSource code > span {
+      left: -1em;
+  }
+  pre.numberSource {
+      margin-left: initial;
+  }
+
+  /* Put some space after the section numbers */
+  span.toc-section-number::after {
+      content: "\a0\a0\a0";  /* non-breaking whitespace */
+  }
+
+  /* Hide underlines on code number links */
+  pre > code.sourceCode > span > a:first-child::before {
+      text-decoration: none;
+  }
+
+  /* Color the source blocks */
+  div.sourceCode {
+      background-color: #f0f0f0;
+  }
+
+  /* Fix iOS big text rendering issue */
+  pre > code.sourceCode > span {
+      display: initial;
+  }
+
+
+  /* Color the inline code */
+  code:not(.sourceCode) {
+      background: #f0f0f0;
+      padding-left: 0.2em;
+      padding-right: 0.2em;
+      border-radius: 0.2em;
+  }
+
+  pre.sourceCode {
+      border: 1px solid #ccc;
+      padding: 0.5em;
+      border-radius: 0.2em;
+  }
+
+  /* Keep code tags from wrapping in tables */
+  tbody code {
+      white-space: nowrap;
+  }
+
+  /* Prevent hyphenation and hyphen breaks in code*/
+  code {
+      word-break: keep-all;
+  }
+
+  td {
+      vertical-align: top;
+  }
+
+  body {
+      font-size: 12pt;
+      max-width: 43em;
+      font-family: sans-serif;
+  }
+
+  html {
+      background: #f9f9f9;
+  }
+
+  figure > embed {
+      max-width: 100%;
+  }
+
+  figure {
+      text-align: center;
+      margin-top: 2em;
+      margin-bottom: 2em;
+  }
+
+  figcaption {
+      font-size: 0.9em;
+      font-style: italic;
+      margin-top: 0.6em;
+  }
+
+  body {
+      counter-reset: figure-counter-major;
+      counter-reset: figure-counter-minor;
+  }
+
+  figure {
+      counter-increment: figure-counter-minor;
+  }
+
+  figcaption::before {
+      content: "Figure " counter(figure-counter-major) "." counter(figure-counter-minor) ": ";
+  }
+
+  blockquote {
+      border-left: 2px solid #bbb;
+      color: #444;
+  }
+
+  /* Contents */
+
+  nav[role="doc-toc"] > ul > li {
+    font-weight: bold;
+    margin-top: 1.2em;
+  }
+
+  nav[role="doc-toc"] > ul > li:first {
+    font-weight: bold;
+    margin-top: initial;
+  }
+
+  nav[role="doc-toc"] > ul > li > ul {
+    font-weight: normal;
+    margin-top: 0.3em;
+  }
+
+  /*
+  In multipage, we need to reset the figure counter to the chapter
+  number. Luckily, this is in the <h1 data-number> attribute. Unluckily,
+  there is no way to get this in a general way.
+
+  This doesn't work:
+
+    h1[data-number] {
+      counter-set: figure-counter-major attr(data-number);
+    }
+
+  Nor this:
+
+    h1[data-number] {
+      --figure-counter-major-value: attr(data-number);
+      counter-set: figure-counter-major var(--figure-counter-major-value);
+    }
+
+  So, dumbly, we have a bunch of rules for all these sections, up to the
+  maximum possible section.
+
+  Here's a program to generate them:
+
+    for (let i = 1; i < 100; i++)
+        console.log(`h1[data-number="${i}"]{counter-set:figure-counter-major ${i};counter-reset:figure-counter-minor;}`);
+
+  Note to self: never write a book with more than 99 frickin' chapters.
+  */
+
+  h1[data-number="1"]{counter-set:figure-counter-major 1;counter-reset:figure-counter-minor;}
+  h1[data-number="2"]{counter-set:figure-counter-major 2;counter-reset:figure-counter-minor;}
+  h1[data-number="3"]{counter-set:figure-counter-major 3;counter-reset:figure-counter-minor;}
+  h1[data-number="4"]{counter-set:figure-counter-major 4;counter-reset:figure-counter-minor;}
+  h1[data-number="5"]{counter-set:figure-counter-major 5;counter-reset:figure-counter-minor;}
+  h1[data-number="6"]{counter-set:figure-counter-major 6;counter-reset:figure-counter-minor;}
+  h1[data-number="7"]{counter-set:figure-counter-major 7;counter-reset:figure-counter-minor;}
+  h1[data-number="8"]{counter-set:figure-counter-major 8;counter-reset:figure-counter-minor;}
+  h1[data-number="9"]{counter-set:figure-counter-major 9;counter-reset:figure-counter-minor;}
+  h1[data-number="10"]{counter-set:figure-counter-major 10;counter-reset:figure-counter-minor;}
+  h1[data-number="11"]{counter-set:figure-counter-major 11;counter-reset:figure-counter-minor;}
+  h1[data-number="12"]{counter-set:figure-counter-major 12;counter-reset:figure-counter-minor;}
+  h1[data-number="13"]{counter-set:figure-counter-major 13;counter-reset:figure-counter-minor;}
+  h1[data-number="14"]{counter-set:figure-counter-major 14;counter-reset:figure-counter-minor;}
+  h1[data-number="15"]{counter-set:figure-counter-major 15;counter-reset:figure-counter-minor;}
+  h1[data-number="16"]{counter-set:figure-counter-major 16;counter-reset:figure-counter-minor;}
+  h1[data-number="17"]{counter-set:figure-counter-major 17;counter-reset:figure-counter-minor;}
+  h1[data-number="18"]{counter-set:figure-counter-major 18;counter-reset:figure-counter-minor;}
+  h1[data-number="19"]{counter-set:figure-counter-major 19;counter-reset:figure-counter-minor;}
+  h1[data-number="20"]{counter-set:figure-counter-major 20;counter-reset:figure-counter-minor;}
+  h1[data-number="21"]{counter-set:figure-counter-major 21;counter-reset:figure-counter-minor;}
+  h1[data-number="22"]{counter-set:figure-counter-major 22;counter-reset:figure-counter-minor;}
+  h1[data-number="23"]{counter-set:figure-counter-major 23;counter-reset:figure-counter-minor;}
+  h1[data-number="24"]{counter-set:figure-counter-major 24;counter-reset:figure-counter-minor;}
+  h1[data-number="25"]{counter-set:figure-counter-major 25;counter-reset:figure-counter-minor;}
+  h1[data-number="26"]{counter-set:figure-counter-major 26;counter-reset:figure-counter-minor;}
+  h1[data-number="27"]{counter-set:figure-counter-major 27;counter-reset:figure-counter-minor;}
+  h1[data-number="28"]{counter-set:figure-counter-major 28;counter-reset:figure-counter-minor;}
+  h1[data-number="29"]{counter-set:figure-counter-major 29;counter-reset:figure-counter-minor;}
+  h1[data-number="30"]{counter-set:figure-counter-major 30;counter-reset:figure-counter-minor;}
+  h1[data-number="31"]{counter-set:figure-counter-major 31;counter-reset:figure-counter-minor;}
+  h1[data-number="32"]{counter-set:figure-counter-major 32;counter-reset:figure-counter-minor;}
+  h1[data-number="33"]{counter-set:figure-counter-major 33;counter-reset:figure-counter-minor;}
+  h1[data-number="34"]{counter-set:figure-counter-major 34;counter-reset:figure-counter-minor;}
+  h1[data-number="35"]{counter-set:figure-counter-major 35;counter-reset:figure-counter-minor;}
+  h1[data-number="36"]{counter-set:figure-counter-major 36;counter-reset:figure-counter-minor;}
+  h1[data-number="37"]{counter-set:figure-counter-major 37;counter-reset:figure-counter-minor;}
+  h1[data-number="38"]{counter-set:figure-counter-major 38;counter-reset:figure-counter-minor;}
+  h1[data-number="39"]{counter-set:figure-counter-major 39;counter-reset:figure-counter-minor;}
+  h1[data-number="40"]{counter-set:figure-counter-major 40;counter-reset:figure-counter-minor;}
+  h1[data-number="41"]{counter-set:figure-counter-major 41;counter-reset:figure-counter-minor;}
+  h1[data-number="42"]{counter-set:figure-counter-major 42;counter-reset:figure-counter-minor;}
+  h1[data-number="43"]{counter-set:figure-counter-major 43;counter-reset:figure-counter-minor;}
+  h1[data-number="44"]{counter-set:figure-counter-major 44;counter-reset:figure-counter-minor;}
+  h1[data-number="45"]{counter-set:figure-counter-major 45;counter-reset:figure-counter-minor;}
+  h1[data-number="46"]{counter-set:figure-counter-major 46;counter-reset:figure-counter-minor;}
+  h1[data-number="47"]{counter-set:figure-counter-major 47;counter-reset:figure-counter-minor;}
+  h1[data-number="48"]{counter-set:figure-counter-major 48;counter-reset:figure-counter-minor;}
+  h1[data-number="49"]{counter-set:figure-counter-major 49;counter-reset:figure-counter-minor;}
+  h1[data-number="50"]{counter-set:figure-counter-major 50;counter-reset:figure-counter-minor;}
+  h1[data-number="51"]{counter-set:figure-counter-major 51;counter-reset:figure-counter-minor;}
+  h1[data-number="52"]{counter-set:figure-counter-major 52;counter-reset:figure-counter-minor;}
+  h1[data-number="53"]{counter-set:figure-counter-major 53;counter-reset:figure-counter-minor;}
+  h1[data-number="54"]{counter-set:figure-counter-major 54;counter-reset:figure-counter-minor;}
+  h1[data-number="55"]{counter-set:figure-counter-major 55;counter-reset:figure-counter-minor;}
+  h1[data-number="56"]{counter-set:figure-counter-major 56;counter-reset:figure-counter-minor;}
+  h1[data-number="57"]{counter-set:figure-counter-major 57;counter-reset:figure-counter-minor;}
+  h1[data-number="58"]{counter-set:figure-counter-major 58;counter-reset:figure-counter-minor;}
+  h1[data-number="59"]{counter-set:figure-counter-major 59;counter-reset:figure-counter-minor;}
+  h1[data-number="60"]{counter-set:figure-counter-major 60;counter-reset:figure-counter-minor;}
+  h1[data-number="61"]{counter-set:figure-counter-major 61;counter-reset:figure-counter-minor;}
+  h1[data-number="62"]{counter-set:figure-counter-major 62;counter-reset:figure-counter-minor;}
+  h1[data-number="63"]{counter-set:figure-counter-major 63;counter-reset:figure-counter-minor;}
+  h1[data-number="64"]{counter-set:figure-counter-major 64;counter-reset:figure-counter-minor;}
+  h1[data-number="65"]{counter-set:figure-counter-major 65;counter-reset:figure-counter-minor;}
+  h1[data-number="66"]{counter-set:figure-counter-major 66;counter-reset:figure-counter-minor;}
+  h1[data-number="67"]{counter-set:figure-counter-major 67;counter-reset:figure-counter-minor;}
+  h1[data-number="68"]{counter-set:figure-counter-major 68;counter-reset:figure-counter-minor;}
+  h1[data-number="69"]{counter-set:figure-counter-major 69;counter-reset:figure-counter-minor;}
+  h1[data-number="70"]{counter-set:figure-counter-major 70;counter-reset:figure-counter-minor;}
+  h1[data-number="71"]{counter-set:figure-counter-major 71;counter-reset:figure-counter-minor;}
+  h1[data-number="72"]{counter-set:figure-counter-major 72;counter-reset:figure-counter-minor;}
+  h1[data-number="73"]{counter-set:figure-counter-major 73;counter-reset:figure-counter-minor;}
+  h1[data-number="74"]{counter-set:figure-counter-major 74;counter-reset:figure-counter-minor;}
+  h1[data-number="75"]{counter-set:figure-counter-major 75;counter-reset:figure-counter-minor;}
+  h1[data-number="76"]{counter-set:figure-counter-major 76;counter-reset:figure-counter-minor;}
+  h1[data-number="77"]{counter-set:figure-counter-major 77;counter-reset:figure-counter-minor;}
+  h1[data-number="78"]{counter-set:figure-counter-major 78;counter-reset:figure-counter-minor;}
+  h1[data-number="79"]{counter-set:figure-counter-major 79;counter-reset:figure-counter-minor;}
+  h1[data-number="80"]{counter-set:figure-counter-major 80;counter-reset:figure-counter-minor;}
+  h1[data-number="81"]{counter-set:figure-counter-major 81;counter-reset:figure-counter-minor;}
+  h1[data-number="82"]{counter-set:figure-counter-major 82;counter-reset:figure-counter-minor;}
+  h1[data-number="83"]{counter-set:figure-counter-major 83;counter-reset:figure-counter-minor;}
+  h1[data-number="84"]{counter-set:figure-counter-major 84;counter-reset:figure-counter-minor;}
+  h1[data-number="85"]{counter-set:figure-counter-major 85;counter-reset:figure-counter-minor;}
+  h1[data-number="86"]{counter-set:figure-counter-major 86;counter-reset:figure-counter-minor;}
+  h1[data-number="87"]{counter-set:figure-counter-major 87;counter-reset:figure-counter-minor;}
+  h1[data-number="88"]{counter-set:figure-counter-major 88;counter-reset:figure-counter-minor;}
+  h1[data-number="89"]{counter-set:figure-counter-major 89;counter-reset:figure-counter-minor;}
+  h1[data-number="90"]{counter-set:figure-counter-major 90;counter-reset:figure-counter-minor;}
+  h1[data-number="91"]{counter-set:figure-counter-major 91;counter-reset:figure-counter-minor;}
+  h1[data-number="92"]{counter-set:figure-counter-major 92;counter-reset:figure-counter-minor;}
+  h1[data-number="93"]{counter-set:figure-counter-major 93;counter-reset:figure-counter-minor;}
+  h1[data-number="94"]{counter-set:figure-counter-major 94;counter-reset:figure-counter-minor;}
+  h1[data-number="95"]{counter-set:figure-counter-major 95;counter-reset:figure-counter-minor;}
+  h1[data-number="96"]{counter-set:figure-counter-major 96;counter-reset:figure-counter-minor;}
+  h1[data-number="97"]{counter-set:figure-counter-major 97;counter-reset:figure-counter-minor;}
+  h1[data-number="98"]{counter-set:figure-counter-major 98;counter-reset:figure-counter-minor;}
+  h1[data-number="99"]{counter-set:figure-counter-major 99;counter-reset:figure-counter-minor;}
+
+
+  </style>
+  <!-- BG custom styling for the wide body variant -->
+  <!-- Gets appended after bg-css.html -->
+
+  <style type="text/css">
+  body {
+      max-width: inherit;
+  }
+  </style>
+</head>
+<body>
+<div style="text-align:center"><span><a href="file-states.html" rel="prev">Prev</a> | </span><a href="index.html">Contents</a><span> | <a href="renaming-and-removing-files.html" rel="next">Next</a></span></div><hr>
+<h1 data-number="12" id="diff"><span class="header-section-number">12</span> Comparing Files with Diff</h1>
+<p></p>
+<p>The powerful <code>git diff</code> command can give you differences between two files or commits. We mentioned it briefly at the beginning, but here we’re going to delve more deeply into all the things you can do with it.</p>
+<p>It’s not the easiest thing to read at first, but you do get used to it after a while. My most common use case is to quickly scan to remember what I’ve changed in the working tree so I know what to add to the stage and what commit message to use.</p>
+<h2 data-number="12.1" id="basic-usage"><span class="header-section-number">12.1</span> Basic Usage</h2>
+<p></p>
+<p>The most basic use case is that you’ve modified some files in your working tree and you want to see what the differences are between what was there and what you added.</p>
+<p>For example, let’s say I’ve modified my <code>hello.py</code> file (but haven’t staged it yet). I can check out what I’ve changed like so:</p>
+<div class="sourceCode" id="cb136"><pre class="sourceCode default"><code class="sourceCode default"><span id="cb136-1"><a href="diff.html#cb136-1" aria-hidden="true" tabindex="-1"></a>$ git diff</span>
+<span id="cb136-2"><a href="diff.html#cb136-2" aria-hidden="true" tabindex="-1"></a>  diff --git a/hello.py b/hello.py</span>
+<span id="cb136-3"><a href="diff.html#cb136-3" aria-hidden="true" tabindex="-1"></a>  index 4a8f53f..8ee1fe4 100644</span>
+<span id="cb136-4"><a href="diff.html#cb136-4" aria-hidden="true" tabindex="-1"></a>  --- a/hello.py</span>
+<span id="cb136-5"><a href="diff.html#cb136-5" aria-hidden="true" tabindex="-1"></a>  +++ b/hello.py</span>
+<span id="cb136-6"><a href="diff.html#cb136-6" aria-hidden="true" tabindex="-1"></a>  @@ -1,4 +1,8 @@</span>
+<span id="cb136-7"><a href="diff.html#cb136-7" aria-hidden="true" tabindex="-1"></a>   def hello():</span>
+<span id="cb136-8"><a href="diff.html#cb136-8" aria-hidden="true" tabindex="-1"></a>  -    print(&quot;Hello, world!&quot;)</span>
+<span id="cb136-9"><a href="diff.html#cb136-9" aria-hidden="true" tabindex="-1"></a>  +    print(&quot;HELLO, WORLD!&quot;)</span>
+<span id="cb136-10"><a href="diff.html#cb136-10" aria-hidden="true" tabindex="-1"></a>  +</span>
+<span id="cb136-11"><a href="diff.html#cb136-11" aria-hidden="true" tabindex="-1"></a>  +def goodbye():</span>
+<span id="cb136-12"><a href="diff.html#cb136-12" aria-hidden="true" tabindex="-1"></a>  +    print(&quot;See ya!&quot;)</span>
+<span id="cb136-13"><a href="diff.html#cb136-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb136-14"><a href="diff.html#cb136-14" aria-hidden="true" tabindex="-1"></a>   hello()</span>
+<span id="cb136-15"><a href="diff.html#cb136-15" aria-hidden="true" tabindex="-1"></a>  +goodbye()</span></code></pre></div>
+<p>What do we have there? Why, it’s an impenetrable mess, of course!</p>
+<p><em>The End</em></p>
+<p>All right, take a deep breath and let’s figure it out.</p>
+<p>Since the output is plastered over with <code>hello.py</code>, we can safely assume this is the file we’re talking about. If the diff is reporting on multiple files (e.g. you’re comparing two commits), each file will have its own section in the output.</p>
+<blockquote>
+<p><strong>The <code>index</code> line has the blob hashes and file permissions.</strong> A blob hash is the hash of the specific file in the states being compared. This isn’t something you need to worry about, typically. Or maybe not even ever.</p>
+</blockquote>
+<p>After that we have a couple lines indicating that the old version of the file <code>a/hello.py</code> is the one marked with minus signs, and the new version (that you haven’t staged yet) is <code>b/hello.py</code> and is marked with plus signs.</p>
+<p>Then we have <code>@@ -1,4 +1,8 @@</code>. This means that lines 1-4 in the old version are shown, and lines 1-8 in the new version are shown. (So clearly we’ve at least added some lines here.)</p>
+<p>Finally, we get to the steak and potatoes of the whole thing—what has actually changed? Remembering that the old version is minus and the new version is plus, let’s look at just that part of the diff again:</p>
+<div class="sourceCode" id="cb137"><pre class="sourceCode default"><code class="sourceCode default"><span id="cb137-1"><a href="diff.html#cb137-1" aria-hidden="true" tabindex="-1"></a>   def hello():</span>
+<span id="cb137-2"><a href="diff.html#cb137-2" aria-hidden="true" tabindex="-1"></a>  -    print(&quot;Hello, world!&quot;)</span>
+<span id="cb137-3"><a href="diff.html#cb137-3" aria-hidden="true" tabindex="-1"></a>  +    print(&quot;HELLO, WORLD!&quot;)</span>
+<span id="cb137-4"><a href="diff.html#cb137-4" aria-hidden="true" tabindex="-1"></a>  +</span>
+<span id="cb137-5"><a href="diff.html#cb137-5" aria-hidden="true" tabindex="-1"></a>  +def goodbye():</span>
+<span id="cb137-6"><a href="diff.html#cb137-6" aria-hidden="true" tabindex="-1"></a>  +    print(&quot;See ya!&quot;)</span>
+<span id="cb137-7"><a href="diff.html#cb137-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb137-8"><a href="diff.html#cb137-8" aria-hidden="true" tabindex="-1"></a>   hello()</span>
+<span id="cb137-9"><a href="diff.html#cb137-9" aria-hidden="true" tabindex="-1"></a>  +goodbye()</span></code></pre></div>
+<p>Rules:</p>
+<ul>
+<li><p>If a line is prefixed with <code>-</code>, it means this is how the line was in the old version.</p></li>
+<li><p>If a line is prefixed with <code>+</code>, it means this is how the line is in the new, modified version.</p></li>
+<li><p>If a line is not prefixed with anything, it means it is unchanged between the versions.</p></li>
+</ul>
+<blockquote>
+<p><strong>The diff won’t show you all the lines of the file!</strong> It only shows you what’s changed and some of the surrounding lines. If there are changes in different parts of the file, the unchanged parts of the file will be skipped over in the diff.</p>
+</blockquote>
+<p>Another way to read the diff is that lines with a <code>-</code> have been removed and lines with a <code>+</code> have been added.</p>
+<p></p>
+<h2 data-number="12.2" id="diffing-the-stage"><span class="header-section-number">12.2</span> Diffing the Stage</h2>
+<p></p>
+<p>What if you’ve added some stuff to the stage and you want to diff it against the previous commit?</p>
+<p>Just typing <code>git diff</code> shows nothing!</p>
+<p>Why? It’s because diff, by default, is showing <em>the difference between your working tree and the stage</em>. You just staged that file, copying it from the working tree to the stage, so the two are identical. So a diff shows no differences.</p>
+<p>How do we diff the stage with the previous commit?</p>
+<p>The answer is really easy: <code>git diff --staged</code><a href="quick-reference.html#fn21" class="footnote-ref" id="fnref21" role="doc-noteref"><sup>21</sup></a>. Done.</p>
+<p>But I want to use this subsection to dig a little deeper into what’s happening so you can improve your understanding of how this works.</p>
+<p>Mental model time!</p>
+<p>Let’s say that these two things are true. Now, whether or not they’re true doesn’t really matter.</p>
+<blockquote>
+<p><em>“It’s only a model.”</em><br />
+            —Patsy, <em>Monty Python and the Holy Grail</em></p>
+</blockquote>
+<ol type="1">
+<li><p>The stage contains a <em>copy</em> of <strong>all</strong> unmodified files at your current commit.</p></li>
+<li><p>A <code>git status</code> or <code>git diff</code> only shows files that differ between your working tree and the stage.</p></li>
+</ol>
+<p>So if you don’t have any modifications, <code>git diff</code> won’t show any differences. Because the stage and working tree are the same.</p>
+<p>Now if you modify a file in your working tree and then <code>git diff</code>, you <em>will</em> see some changes, because the working tree differs from the stage.</p>
+<p>But then if you add the modified file to the stage, then the stage and working tree become the same again. And <code>git diff</code> will show no differences.</p>
+<p><em><code>git diff</code> <strong>always</strong> compares the working tree to the stage.</em> (Unless you’re diffing specific commits—see below.) And in this case, after you’ve added your modified file to the stage, it’s the same as the working tree. So no diffs.</p>
+<p>Contrast this to where you’ve modified the working tree but <em>haven’t</em> added the file to the stage. In this case, the file on the stage is just like the last commit, which is different than your working tree. So <code>git diff</code> shows the differences.</p>
+<p>Well, okay, then… what if you <em>want</em> to diff what’s on the stage with the last commit? That is, instead of diffing the working tree with the stage, you want to diff the stage with the <code>HEAD</code>?</p>
+<p>Back to the punchline:</p>
+<div class="sourceCode" id="cb138"><pre class="sourceCode default"><code class="sourceCode default"><span id="cb138-1"><a href="diff.html#cb138-1" aria-hidden="true" tabindex="-1"></a>$ git diff --staged</span></code></pre></div>
+<p>And that’ll do it. This will run a diff between what’s on the stage and the last commit, showing you the changes you’ve staged.</p>
+<p></p>
+<h2 data-number="12.3" id="more-diff-fun"><span class="header-section-number">12.3</span> More Diff Fun</h2>
+<p>Let’s speed through some examples of things you can do with diff.</p>
+<h3 data-number="12.3.1" id="diff-any-commits-or-branches"><span class="header-section-number">12.3.1</span> Diff Any Commits or Branches</h3>
+<p> You have more at your disposal than just diffing the working tree or stage. You can actually diff any two commits. This will show you all the differences between them.</p>
+<p>For example, if you know the commit hashes, you can diff them directly:</p>
+<div class="sourceCode" id="cb139"><pre class="sourceCode default"><code class="sourceCode default"><span id="cb139-1"><a href="diff.html#cb139-1" aria-hidden="true" tabindex="-1"></a>$ git diff d977 27a3</span></code></pre></div>
+<p>Or if you have two branch names:</p>
+<div class="sourceCode" id="cb140"><pre class="sourceCode default"><code class="sourceCode default"><span id="cb140-1"><a href="diff.html#cb140-1" aria-hidden="true" tabindex="-1"></a>$ git diff main topic</span></code></pre></div>
+<p>Or mix and match:</p>
+<div class="sourceCode" id="cb141"><pre class="sourceCode default"><code class="sourceCode default"><span id="cb141-1"><a href="diff.html#cb141-1" aria-hidden="true" tabindex="-1"></a>$ git diff main 27a3</span></code></pre></div>
+<p>Or use <code>HEAD</code>:</p>
+<div class="sourceCode" id="cb142"><pre class="sourceCode default"><code class="sourceCode default"><span id="cb142-1"><a href="diff.html#cb142-1" aria-hidden="true" tabindex="-1"></a>$ git diff HEAD 27a3</span></code></pre></div>
+<p>Or relative <code>HEAD</code>… This one diffs the previous-to-<code>HEAD</code> commit with the <code>HEAD</code>:</p>
+<div class="sourceCode" id="cb143"><pre class="sourceCode default"><code class="sourceCode default"><span id="cb143-1"><a href="diff.html#cb143-1" aria-hidden="true" tabindex="-1"></a>$ git diff HEAD^ HEAD</span></code></pre></div>
+<p>And this one diffs four commits before <code>HEAD</code> with three commits before <code>HEAD</code>:</p>
+<div class="sourceCode" id="cb144"><pre class="sourceCode default"><code class="sourceCode default"><span id="cb144-1"><a href="diff.html#cb144-1" aria-hidden="true" tabindex="-1"></a>$ git diff HEAD~4 HEAD~3</span></code></pre></div>
+<h3 data-number="12.3.2" id="diffing-order"><span class="header-section-number">12.3.2</span> Diffing Order</h3>
+<p>These are both valid ways to diff, but they give different (inverted) results:</p>
+<div class="sourceCode" id="cb145"><pre class="sourceCode default"><code class="sourceCode default"><span id="cb145-1"><a href="diff.html#cb145-1" aria-hidden="true" tabindex="-1"></a>$ git diff main topic</span>
+<span id="cb145-2"><a href="diff.html#cb145-2" aria-hidden="true" tabindex="-1"></a>$ git diff topic main</span></code></pre></div>
+<p>One way to think about this is that it’s like:</p>
+<div class="sourceCode" id="cb146"><pre class="sourceCode default"><code class="sourceCode default"><span id="cb146-1"><a href="diff.html#cb146-1" aria-hidden="true" tabindex="-1"></a>$ git diff FROM TO</span></code></pre></div>
+<p>That is, “Hey, Git, tell me the changes I need to make to get from commit <code>FROM</code> to commit <code>TO</code>.”</p>
+<p>Let’s say I made a file <code>foo.md</code> and committed it with a single line <code>First</code> in it. And then I overwrote it with <code>Second</code> and committed it again.</p>
+<p>In this example, I can ask, “What do I have to change from the previous-to-<code>HEAD</code> commit to the <code>HEAD</code> commit?”</p>
+<div class="sourceCode" id="cb147"><pre class="sourceCode default"><code class="sourceCode default"><span id="cb147-1"><a href="diff.html#cb147-1" aria-hidden="true" tabindex="-1"></a>$ git diff HEAD^ HEAD</span>
+<span id="cb147-2"><a href="diff.html#cb147-2" aria-hidden="true" tabindex="-1"></a>  diff --git a/foo.md b/foo.md</span>
+<span id="cb147-3"><a href="diff.html#cb147-3" aria-hidden="true" tabindex="-1"></a>  index d00491f..495a7e9 100644</span>
+<span id="cb147-4"><a href="diff.html#cb147-4" aria-hidden="true" tabindex="-1"></a>  --- a/foo.md</span>
+<span id="cb147-5"><a href="diff.html#cb147-5" aria-hidden="true" tabindex="-1"></a>  +++ b/foo.md</span>
+<span id="cb147-6"><a href="diff.html#cb147-6" aria-hidden="true" tabindex="-1"></a>  @@ -1 +1 @@</span>
+<span id="cb147-7"><a href="diff.html#cb147-7" aria-hidden="true" tabindex="-1"></a>  -First</span>
+<span id="cb147-8"><a href="diff.html#cb147-8" aria-hidden="true" tabindex="-1"></a>  +Second</span></code></pre></div>
+<p>It’s telling me to get from previous-to-<code>HEAD</code> to <code>HEAD</code>, I would need to delete <code>First</code> and add <code>Second</code>.</p>
+<p>But if I reverse it and ask, “What do I have to change from <code>HEAD</code> to get back to the previous-to-<code>HEAD</code> commit?” I’ll get the opposite:</p>
+<div class="sourceCode" id="cb148"><pre class="sourceCode default"><code class="sourceCode default"><span id="cb148-1"><a href="diff.html#cb148-1" aria-hidden="true" tabindex="-1"></a>$ git diff HEAD HEAD^</span>
+<span id="cb148-2"><a href="diff.html#cb148-2" aria-hidden="true" tabindex="-1"></a>  diff --git a/foo.md b/foo.md</span>
+<span id="cb148-3"><a href="diff.html#cb148-3" aria-hidden="true" tabindex="-1"></a>  index 495a7e9..d00491f 100644</span>
+<span id="cb148-4"><a href="diff.html#cb148-4" aria-hidden="true" tabindex="-1"></a>  --- a/foo.md</span>
+<span id="cb148-5"><a href="diff.html#cb148-5" aria-hidden="true" tabindex="-1"></a>  +++ b/foo.md</span>
+<span id="cb148-6"><a href="diff.html#cb148-6" aria-hidden="true" tabindex="-1"></a>  @@ -1 +1 @@</span>
+<span id="cb148-7"><a href="diff.html#cb148-7" aria-hidden="true" tabindex="-1"></a>  -Second</span>
+<span id="cb148-8"><a href="diff.html#cb148-8" aria-hidden="true" tabindex="-1"></a>  +First</span></code></pre></div>
+<p>There it’s telling me to get back to the previous-to-<code>HEAD</code> I’d need to delete <code>Second</code> and add <code>First</code>.</p>
+<p>So remember, <code>git diff FROM TO</code> is telling you the changes you have to make to get from the <code>FROM</code> commit to the <code>TO</code> commit.</p>
+<h3 data-number="12.3.3" id="diffing-with-parent-commit"><span class="header-section-number">12.3.3</span> Diffing with Parent Commit</h3>
+<p> We just showed this example:</p>
+<div class="sourceCode" id="cb149"><pre class="sourceCode default"><code class="sourceCode default"><span id="cb149-1"><a href="diff.html#cb149-1" aria-hidden="true" tabindex="-1"></a>$ git diff HEAD~4 HEAD~3</span></code></pre></div>
+<p>But since <code>HEAD~4</code> is the parent of <code>HEAD~3</code>, is there some shorthand we can use here? Yes!</p>
+<div class="sourceCode" id="cb150"><pre class="sourceCode default"><code class="sourceCode default"><span id="cb150-1"><a href="diff.html#cb150-1" aria-hidden="true" tabindex="-1"></a>$ git diff HEAD~4 HEAD~3</span>
+<span id="cb150-2"><a href="diff.html#cb150-2" aria-hidden="true" tabindex="-1"></a>$ git diff HEAD~3^!          # Same thing!</span></code></pre></div>
+<p>You can use it anywhere you want to compare a commit with its parent, which is really showing just what changes were in that one particular commit.</p>
+<div class="sourceCode" id="cb151"><pre class="sourceCode default"><code class="sourceCode default"><span id="cb151-1"><a href="diff.html#cb151-1" aria-hidden="true" tabindex="-1"></a>$ git diff HEAD^!</span>
+<span id="cb151-2"><a href="diff.html#cb151-2" aria-hidden="true" tabindex="-1"></a>$ git diff HEAD~3^!</span>
+<span id="cb151-3"><a href="diff.html#cb151-3" aria-hidden="true" tabindex="-1"></a>$ git diff main^!</span>
+<span id="cb151-4"><a href="diff.html#cb151-4" aria-hidden="true" tabindex="-1"></a>$ git diff 27a3^!</span></code></pre></div>
+<h3 data-number="12.3.4" id="more-context"><span class="header-section-number">12.3.4</span> More Context</h3>
+<p> By default, <code>git diff</code> shows 3 lines of context around the changes. If you want to see more, like 5 lines, use the <code>-U</code> switch.</p>
+<div class="sourceCode" id="cb152"><pre class="sourceCode default"><code class="sourceCode default"><span id="cb152-1"><a href="diff.html#cb152-1" aria-hidden="true" tabindex="-1"></a>$ git diff -U5</span></code></pre></div>
+<h3 data-number="12.3.5" id="just-the-file-names"><span class="header-section-number">12.3.5</span> Just the File Names</h3>
+<p> If you just want a list of files that have changed, you can use the <code>--name-only</code> option.</p>
+<div class="sourceCode" id="cb153"><pre class="sourceCode default"><code class="sourceCode default"><span id="cb153-1"><a href="diff.html#cb153-1" aria-hidden="true" tabindex="-1"></a>$ git diff --name-only</span></code></pre></div>
+<h3 data-number="12.3.6" id="ignoring-whitespace"><span class="header-section-number">12.3.6</span> Ignoring Whitespace</h3>
+<p> There might be a time when you get some tabs/spaces confusion in your source code, which is always painful. Protip: stick to one and force everyone else on the team to do the same under penalty of paying for lunch.</p>
+<p>But you can commit <code>git diff</code> to ignore whitespace in the comparison:</p>
+<div class="sourceCode" id="cb154"><pre class="sourceCode default"><code class="sourceCode default"><span id="cb154-1"><a href="diff.html#cb154-1" aria-hidden="true" tabindex="-1"></a>$ git diff -w</span>
+<span id="cb154-2"><a href="diff.html#cb154-2" aria-hidden="true" tabindex="-1"></a>$ git diff --ignore-all-space    # Same thing</span></code></pre></div>
+<h3 data-number="12.3.7" id="just-certain-files"><span class="header-section-number">12.3.7</span> Just Certain Files</h3>
+<p> You can just diff certain files.</p>
+<p>One way is to just put the file names after a <code>--</code>:</p>
+<div class="sourceCode" id="cb155"><pre class="sourceCode default"><code class="sourceCode default"><span id="cb155-1"><a href="diff.html#cb155-1" aria-hidden="true" tabindex="-1"></a>$ git diff -- hello.py</span>
+<span id="cb155-2"><a href="diff.html#cb155-2" aria-hidden="true" tabindex="-1"></a>$ git diff -- hello.py another_file.py</span></code></pre></div>
+<p>You can also specify commits or branches before the <code>--</code>:</p>
+<div class="sourceCode" id="cb156"><pre class="sourceCode default"><code class="sourceCode default"><span id="cb156-1"><a href="diff.html#cb156-1" aria-hidden="true" tabindex="-1"></a>$ git diff somebranch -- hello.py</span></code></pre></div>
+<p>That’ll compare <code>hello.py</code> at <code>HEAD</code> with the version on <code>somebranch</code>.</p>
+<p>Or you could give two commits or branches to compare the file there:</p>
+<div class="sourceCode" id="cb157"><pre class="sourceCode default"><code class="sourceCode default"><span id="cb157-1"><a href="diff.html#cb157-1" aria-hidden="true" tabindex="-1"></a>$ git diff main somebranch -- hello.py</span></code></pre></div>
+<p>Finally, you can restrict to a file extension using a glob and single quotes:</p>
+<div class="sourceCode" id="cb158"><pre class="sourceCode default"><code class="sourceCode default"><span id="cb158-1"><a href="diff.html#cb158-1" aria-hidden="true" tabindex="-1"></a>$ git diff &#39;*.py&#39;</span></code></pre></div>
+<p>That will just diff the Python files.</p>
+<h3 data-number="12.3.8" id="inter-branch-diffs"><span class="header-section-number">12.3.8</span> Inter-branch Diffs</h3>
+<p> This is an interesting version of comparing two branches.</p>
+<p>We already showed the following example for comparing the commits at two branches:</p>
+<div class="sourceCode" id="cb159"><pre class="sourceCode default"><code class="sourceCode default"><span id="cb159-1"><a href="diff.html#cb159-1" aria-hidden="true" tabindex="-1"></a>$ git diff branch1 branch2</span></code></pre></div>
+<p>But sometimes you want to know what changed in a branch <em>since the branches diverged</em>.</p>
+<p>That is, you don’t want to know what’s different <em>now</em> between <code>branch1</code> and <code>branch2</code>, which is what the above would give you.</p>
+<p>You want to know what <code>branch2</code> added or deleted that <code>branch1</code> did not.</p>
+<p>In order to see this, you can use this notation:</p>
+<div class="sourceCode" id="cb160"><pre class="sourceCode default"><code class="sourceCode default"><span id="cb160-1"><a href="diff.html#cb160-1" aria-hidden="true" tabindex="-1"></a>$ git diff branch1...branch2</span></code></pre></div>
+<p>This means “diff the common ancestor of <code>branch1</code> and <code>branch2</code> with <code>branch2</code>.”</p>
+<p>In other words, tell me all the changes that were made in <code>branch2</code> that <code>branch1</code> is unaware of. Don’t show me anything that <code>branch1</code> has changed since they diverged.</p>
+<h2 data-number="12.4" id="difftool"><span class="header-section-number">12.4</span> Difftool</h2>
+<p>I know the diff output is tough to read. I recommend practice and offer myself as living proof that with enough practice, the output becomes penetrable. And eventually it even becomes easy to read, which might be difficult to imagine. But it does!</p>
+<p>That said, there are third-party tools that exist to make diffs more manageable, and Git supports these tools. You can read more about it in the <a href="diff.html#difftool">diff tool</a> chapter.</p>
+<p></p>
+<!-- BG_NEW_CHAPTER -->
+<hr><div style="text-align:center"><span><a href="file-states.html" rel="prev">Prev</a> | </span><a href="index.html">Contents</a><span> | <a href="renaming-and-removing-files.html" rel="next">Next</a></span></div></body>
+</html>

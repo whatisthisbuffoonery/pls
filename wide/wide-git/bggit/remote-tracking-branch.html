@@ -1,0 +1,693 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <title>Beej's Guide to Git</title>
+  <style>
+    html {
+      color: #1a1a1a;
+      background-color: #fdfdfd;
+    }
+    body {
+      margin: 0 auto;
+      max-width: 36em;
+      padding-left: 50px;
+      padding-right: 50px;
+      padding-top: 50px;
+      padding-bottom: 50px;
+      hyphens: auto;
+      overflow-wrap: break-word;
+      text-rendering: optimizeLegibility;
+      font-kerning: normal;
+    }
+    @media (max-width: 600px) {
+      body {
+        font-size: 0.9em;
+        padding: 12px;
+      }
+      h1 {
+        font-size: 1.8em;
+      }
+    }
+    @media print {
+      html {
+        background-color: white;
+      }
+      body {
+        background-color: transparent;
+        color: black;
+        font-size: 12pt;
+      }
+      p, h2, h3 {
+        orphans: 3;
+        widows: 3;
+      }
+      h2, h3, h4 {
+        page-break-after: avoid;
+      }
+    }
+    p {
+      margin: 1em 0;
+    }
+    a {
+      color: #1a1a1a;
+    }
+    a:visited {
+      color: #1a1a1a;
+    }
+    img {
+      max-width: 100%;
+    }
+    svg {
+      height: auto;
+      max-width: 100%;
+    }
+    h1, h2, h3, h4, h5, h6 {
+      margin-top: 1.4em;
+    }
+    h5, h6 {
+      font-size: 1em;
+      font-style: italic;
+    }
+    h6 {
+      font-weight: normal;
+    }
+    ol, ul {
+      padding-left: 1.7em;
+      margin-top: 1em;
+    }
+    li > ol, li > ul {
+      margin-top: 0;
+    }
+    blockquote {
+      margin: 1em 0 1em 1.7em;
+      padding-left: 1em;
+      border-left: 2px solid #e6e6e6;
+      color: #606060;
+    }
+    code {
+      font-family: Menlo, Monaco, Consolas, 'Lucida Console', monospace;
+      font-size: 85%;
+      margin: 0;
+      hyphens: manual;
+    }
+    pre {
+      margin: 1em 0;
+      overflow: auto;
+    }
+    pre code {
+      padding: 0;
+      overflow: visible;
+      overflow-wrap: normal;
+    }
+    .sourceCode {
+     background-color: transparent;
+     overflow: visible;
+    }
+    hr {
+      background-color: #1a1a1a;
+      border: none;
+      height: 1px;
+      margin: 1em 0;
+    }
+    table {
+      margin: 1em 0;
+      border-collapse: collapse;
+      width: 100%;
+      overflow-x: auto;
+      display: block;
+      font-variant-numeric: lining-nums tabular-nums;
+    }
+    table caption {
+      margin-bottom: 0.75em;
+    }
+    tbody {
+      margin-top: 0.5em;
+      border-top: 1px solid #1a1a1a;
+      border-bottom: 1px solid #1a1a1a;
+    }
+    th {
+      border-top: 1px solid #1a1a1a;
+      padding: 0.25em 0.5em 0.25em 0.5em;
+    }
+    td {
+      padding: 0.125em 0.5em 0.25em 0.5em;
+    }
+    header {
+      margin-bottom: 4em;
+      text-align: center;
+    }
+    #TOC li {
+      list-style: none;
+    }
+    #TOC ul {
+      padding-left: 1.3em;
+    }
+    #TOC > ul {
+      padding-left: 0;
+    }
+    #TOC a:not(:hover) {
+      text-decoration: none;
+    }
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+    /* CSS for syntax highlighting */
+    html { -webkit-text-size-adjust: 100%; }
+    pre > code.sourceCode { white-space: pre; position: relative; }
+    pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+    pre > code.sourceCode > span:empty { height: 1.2em; }
+    .sourceCode { overflow: visible; }
+    code.sourceCode > span { color: inherit; text-decoration: inherit; }
+    div.sourceCode { margin: 1em 0; }
+    pre.sourceCode { margin: 0; }
+    @media screen {
+    div.sourceCode { overflow: auto; }
+    }
+    @media print {
+    pre > code.sourceCode { white-space: pre-wrap; }
+    pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+    }
+    pre.numberSource code
+      { counter-reset: source-line 0; }
+    pre.numberSource code > span
+      { position: relative; left: -4em; counter-increment: source-line; }
+    pre.numberSource code > span > a:first-child::before
+      { content: counter(source-line);
+        position: relative; left: -1em; text-align: right; vertical-align: baseline;
+        border: none; display: inline-block;
+        -webkit-touch-callout: none; -webkit-user-select: none;
+        -khtml-user-select: none; -moz-user-select: none;
+        -ms-user-select: none; user-select: none;
+        padding: 0 4px; width: 4em;
+        color: #aaaaaa;
+      }
+    pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+    div.sourceCode
+      {   }
+    @media screen {
+    pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+    }
+    code span.al { color: #ff0000; font-weight: bold; } /* Alert */
+    code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+    code span.at { color: #7d9029; } /* Attribute */
+    code span.bn { color: #40a070; } /* BaseN */
+    code span.bu { color: #008000; } /* BuiltIn */
+    code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+    code span.ch { color: #4070a0; } /* Char */
+    code span.cn { color: #880000; } /* Constant */
+    code span.co { color: #60a0b0; font-style: italic; } /* Comment */
+    code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+    code span.do { color: #ba2121; font-style: italic; } /* Documentation */
+    code span.dt { color: #902000; } /* DataType */
+    code span.dv { color: #40a070; } /* DecVal */
+    code span.er { color: #ff0000; font-weight: bold; } /* Error */
+    code span.ex { } /* Extension */
+    code span.fl { color: #40a070; } /* Float */
+    code span.fu { color: #06287e; } /* Function */
+    code span.im { color: #008000; font-weight: bold; } /* Import */
+    code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+    code span.kw { color: #007020; font-weight: bold; } /* Keyword */
+    code span.op { color: #666666; } /* Operator */
+    code span.ot { color: #007020; } /* Other */
+    code span.pp { color: #bc7a00; } /* Preprocessor */
+    code span.sc { color: #4070a0; } /* SpecialChar */
+    code span.ss { color: #bb6688; } /* SpecialString */
+    code span.st { color: #4070a0; } /* String */
+    code span.va { color: #19177c; } /* Variable */
+    code span.vs { color: #4070a0; } /* VerbatimString */
+    code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+  </style>
+  <!-- BG custom styling -->
+  <style type="text/css">
+  /* Fix for line numbers not visible */
+  pre.numberSource code > span {
+      left: -1em;
+  }
+  pre.numberSource {
+      margin-left: initial;
+  }
+
+  /* Put some space after the section numbers */
+  span.toc-section-number::after {
+      content: "\a0\a0\a0";  /* non-breaking whitespace */
+  }
+
+  /* Hide underlines on code number links */
+  pre > code.sourceCode > span > a:first-child::before {
+      text-decoration: none;
+  }
+
+  /* Color the source blocks */
+  div.sourceCode {
+      background-color: #f0f0f0;
+  }
+
+  /* Fix iOS big text rendering issue */
+  pre > code.sourceCode > span {
+      display: initial;
+  }
+
+
+  /* Color the inline code */
+  code:not(.sourceCode) {
+      background: #f0f0f0;
+      padding-left: 0.2em;
+      padding-right: 0.2em;
+      border-radius: 0.2em;
+  }
+
+  pre.sourceCode {
+      border: 1px solid #ccc;
+      padding: 0.5em;
+      border-radius: 0.2em;
+  }
+
+  /* Keep code tags from wrapping in tables */
+  tbody code {
+      white-space: nowrap;
+  }
+
+  /* Prevent hyphenation and hyphen breaks in code*/
+  code {
+      word-break: keep-all;
+  }
+
+  td {
+      vertical-align: top;
+  }
+
+  body {
+      font-size: 12pt;
+      max-width: 43em;
+      font-family: sans-serif;
+  }
+
+  html {
+      background: #f9f9f9;
+  }
+
+  figure > embed {
+      max-width: 100%;
+  }
+
+  figure {
+      text-align: center;
+      margin-top: 2em;
+      margin-bottom: 2em;
+  }
+
+  figcaption {
+      font-size: 0.9em;
+      font-style: italic;
+      margin-top: 0.6em;
+  }
+
+  body {
+      counter-reset: figure-counter-major;
+      counter-reset: figure-counter-minor;
+  }
+
+  figure {
+      counter-increment: figure-counter-minor;
+  }
+
+  figcaption::before {
+      content: "Figure " counter(figure-counter-major) "." counter(figure-counter-minor) ": ";
+  }
+
+  blockquote {
+      border-left: 2px solid #bbb;
+      color: #444;
+  }
+
+  /* Contents */
+
+  nav[role="doc-toc"] > ul > li {
+    font-weight: bold;
+    margin-top: 1.2em;
+  }
+
+  nav[role="doc-toc"] > ul > li:first {
+    font-weight: bold;
+    margin-top: initial;
+  }
+
+  nav[role="doc-toc"] > ul > li > ul {
+    font-weight: normal;
+    margin-top: 0.3em;
+  }
+
+  /*
+  In multipage, we need to reset the figure counter to the chapter
+  number. Luckily, this is in the <h1 data-number> attribute. Unluckily,
+  there is no way to get this in a general way.
+
+  This doesn't work:
+
+    h1[data-number] {
+      counter-set: figure-counter-major attr(data-number);
+    }
+
+  Nor this:
+
+    h1[data-number] {
+      --figure-counter-major-value: attr(data-number);
+      counter-set: figure-counter-major var(--figure-counter-major-value);
+    }
+
+  So, dumbly, we have a bunch of rules for all these sections, up to the
+  maximum possible section.
+
+  Here's a program to generate them:
+
+    for (let i = 1; i < 100; i++)
+        console.log(`h1[data-number="${i}"]{counter-set:figure-counter-major ${i};counter-reset:figure-counter-minor;}`);
+
+  Note to self: never write a book with more than 99 frickin' chapters.
+  */
+
+  h1[data-number="1"]{counter-set:figure-counter-major 1;counter-reset:figure-counter-minor;}
+  h1[data-number="2"]{counter-set:figure-counter-major 2;counter-reset:figure-counter-minor;}
+  h1[data-number="3"]{counter-set:figure-counter-major 3;counter-reset:figure-counter-minor;}
+  h1[data-number="4"]{counter-set:figure-counter-major 4;counter-reset:figure-counter-minor;}
+  h1[data-number="5"]{counter-set:figure-counter-major 5;counter-reset:figure-counter-minor;}
+  h1[data-number="6"]{counter-set:figure-counter-major 6;counter-reset:figure-counter-minor;}
+  h1[data-number="7"]{counter-set:figure-counter-major 7;counter-reset:figure-counter-minor;}
+  h1[data-number="8"]{counter-set:figure-counter-major 8;counter-reset:figure-counter-minor;}
+  h1[data-number="9"]{counter-set:figure-counter-major 9;counter-reset:figure-counter-minor;}
+  h1[data-number="10"]{counter-set:figure-counter-major 10;counter-reset:figure-counter-minor;}
+  h1[data-number="11"]{counter-set:figure-counter-major 11;counter-reset:figure-counter-minor;}
+  h1[data-number="12"]{counter-set:figure-counter-major 12;counter-reset:figure-counter-minor;}
+  h1[data-number="13"]{counter-set:figure-counter-major 13;counter-reset:figure-counter-minor;}
+  h1[data-number="14"]{counter-set:figure-counter-major 14;counter-reset:figure-counter-minor;}
+  h1[data-number="15"]{counter-set:figure-counter-major 15;counter-reset:figure-counter-minor;}
+  h1[data-number="16"]{counter-set:figure-counter-major 16;counter-reset:figure-counter-minor;}
+  h1[data-number="17"]{counter-set:figure-counter-major 17;counter-reset:figure-counter-minor;}
+  h1[data-number="18"]{counter-set:figure-counter-major 18;counter-reset:figure-counter-minor;}
+  h1[data-number="19"]{counter-set:figure-counter-major 19;counter-reset:figure-counter-minor;}
+  h1[data-number="20"]{counter-set:figure-counter-major 20;counter-reset:figure-counter-minor;}
+  h1[data-number="21"]{counter-set:figure-counter-major 21;counter-reset:figure-counter-minor;}
+  h1[data-number="22"]{counter-set:figure-counter-major 22;counter-reset:figure-counter-minor;}
+  h1[data-number="23"]{counter-set:figure-counter-major 23;counter-reset:figure-counter-minor;}
+  h1[data-number="24"]{counter-set:figure-counter-major 24;counter-reset:figure-counter-minor;}
+  h1[data-number="25"]{counter-set:figure-counter-major 25;counter-reset:figure-counter-minor;}
+  h1[data-number="26"]{counter-set:figure-counter-major 26;counter-reset:figure-counter-minor;}
+  h1[data-number="27"]{counter-set:figure-counter-major 27;counter-reset:figure-counter-minor;}
+  h1[data-number="28"]{counter-set:figure-counter-major 28;counter-reset:figure-counter-minor;}
+  h1[data-number="29"]{counter-set:figure-counter-major 29;counter-reset:figure-counter-minor;}
+  h1[data-number="30"]{counter-set:figure-counter-major 30;counter-reset:figure-counter-minor;}
+  h1[data-number="31"]{counter-set:figure-counter-major 31;counter-reset:figure-counter-minor;}
+  h1[data-number="32"]{counter-set:figure-counter-major 32;counter-reset:figure-counter-minor;}
+  h1[data-number="33"]{counter-set:figure-counter-major 33;counter-reset:figure-counter-minor;}
+  h1[data-number="34"]{counter-set:figure-counter-major 34;counter-reset:figure-counter-minor;}
+  h1[data-number="35"]{counter-set:figure-counter-major 35;counter-reset:figure-counter-minor;}
+  h1[data-number="36"]{counter-set:figure-counter-major 36;counter-reset:figure-counter-minor;}
+  h1[data-number="37"]{counter-set:figure-counter-major 37;counter-reset:figure-counter-minor;}
+  h1[data-number="38"]{counter-set:figure-counter-major 38;counter-reset:figure-counter-minor;}
+  h1[data-number="39"]{counter-set:figure-counter-major 39;counter-reset:figure-counter-minor;}
+  h1[data-number="40"]{counter-set:figure-counter-major 40;counter-reset:figure-counter-minor;}
+  h1[data-number="41"]{counter-set:figure-counter-major 41;counter-reset:figure-counter-minor;}
+  h1[data-number="42"]{counter-set:figure-counter-major 42;counter-reset:figure-counter-minor;}
+  h1[data-number="43"]{counter-set:figure-counter-major 43;counter-reset:figure-counter-minor;}
+  h1[data-number="44"]{counter-set:figure-counter-major 44;counter-reset:figure-counter-minor;}
+  h1[data-number="45"]{counter-set:figure-counter-major 45;counter-reset:figure-counter-minor;}
+  h1[data-number="46"]{counter-set:figure-counter-major 46;counter-reset:figure-counter-minor;}
+  h1[data-number="47"]{counter-set:figure-counter-major 47;counter-reset:figure-counter-minor;}
+  h1[data-number="48"]{counter-set:figure-counter-major 48;counter-reset:figure-counter-minor;}
+  h1[data-number="49"]{counter-set:figure-counter-major 49;counter-reset:figure-counter-minor;}
+  h1[data-number="50"]{counter-set:figure-counter-major 50;counter-reset:figure-counter-minor;}
+  h1[data-number="51"]{counter-set:figure-counter-major 51;counter-reset:figure-counter-minor;}
+  h1[data-number="52"]{counter-set:figure-counter-major 52;counter-reset:figure-counter-minor;}
+  h1[data-number="53"]{counter-set:figure-counter-major 53;counter-reset:figure-counter-minor;}
+  h1[data-number="54"]{counter-set:figure-counter-major 54;counter-reset:figure-counter-minor;}
+  h1[data-number="55"]{counter-set:figure-counter-major 55;counter-reset:figure-counter-minor;}
+  h1[data-number="56"]{counter-set:figure-counter-major 56;counter-reset:figure-counter-minor;}
+  h1[data-number="57"]{counter-set:figure-counter-major 57;counter-reset:figure-counter-minor;}
+  h1[data-number="58"]{counter-set:figure-counter-major 58;counter-reset:figure-counter-minor;}
+  h1[data-number="59"]{counter-set:figure-counter-major 59;counter-reset:figure-counter-minor;}
+  h1[data-number="60"]{counter-set:figure-counter-major 60;counter-reset:figure-counter-minor;}
+  h1[data-number="61"]{counter-set:figure-counter-major 61;counter-reset:figure-counter-minor;}
+  h1[data-number="62"]{counter-set:figure-counter-major 62;counter-reset:figure-counter-minor;}
+  h1[data-number="63"]{counter-set:figure-counter-major 63;counter-reset:figure-counter-minor;}
+  h1[data-number="64"]{counter-set:figure-counter-major 64;counter-reset:figure-counter-minor;}
+  h1[data-number="65"]{counter-set:figure-counter-major 65;counter-reset:figure-counter-minor;}
+  h1[data-number="66"]{counter-set:figure-counter-major 66;counter-reset:figure-counter-minor;}
+  h1[data-number="67"]{counter-set:figure-counter-major 67;counter-reset:figure-counter-minor;}
+  h1[data-number="68"]{counter-set:figure-counter-major 68;counter-reset:figure-counter-minor;}
+  h1[data-number="69"]{counter-set:figure-counter-major 69;counter-reset:figure-counter-minor;}
+  h1[data-number="70"]{counter-set:figure-counter-major 70;counter-reset:figure-counter-minor;}
+  h1[data-number="71"]{counter-set:figure-counter-major 71;counter-reset:figure-counter-minor;}
+  h1[data-number="72"]{counter-set:figure-counter-major 72;counter-reset:figure-counter-minor;}
+  h1[data-number="73"]{counter-set:figure-counter-major 73;counter-reset:figure-counter-minor;}
+  h1[data-number="74"]{counter-set:figure-counter-major 74;counter-reset:figure-counter-minor;}
+  h1[data-number="75"]{counter-set:figure-counter-major 75;counter-reset:figure-counter-minor;}
+  h1[data-number="76"]{counter-set:figure-counter-major 76;counter-reset:figure-counter-minor;}
+  h1[data-number="77"]{counter-set:figure-counter-major 77;counter-reset:figure-counter-minor;}
+  h1[data-number="78"]{counter-set:figure-counter-major 78;counter-reset:figure-counter-minor;}
+  h1[data-number="79"]{counter-set:figure-counter-major 79;counter-reset:figure-counter-minor;}
+  h1[data-number="80"]{counter-set:figure-counter-major 80;counter-reset:figure-counter-minor;}
+  h1[data-number="81"]{counter-set:figure-counter-major 81;counter-reset:figure-counter-minor;}
+  h1[data-number="82"]{counter-set:figure-counter-major 82;counter-reset:figure-counter-minor;}
+  h1[data-number="83"]{counter-set:figure-counter-major 83;counter-reset:figure-counter-minor;}
+  h1[data-number="84"]{counter-set:figure-counter-major 84;counter-reset:figure-counter-minor;}
+  h1[data-number="85"]{counter-set:figure-counter-major 85;counter-reset:figure-counter-minor;}
+  h1[data-number="86"]{counter-set:figure-counter-major 86;counter-reset:figure-counter-minor;}
+  h1[data-number="87"]{counter-set:figure-counter-major 87;counter-reset:figure-counter-minor;}
+  h1[data-number="88"]{counter-set:figure-counter-major 88;counter-reset:figure-counter-minor;}
+  h1[data-number="89"]{counter-set:figure-counter-major 89;counter-reset:figure-counter-minor;}
+  h1[data-number="90"]{counter-set:figure-counter-major 90;counter-reset:figure-counter-minor;}
+  h1[data-number="91"]{counter-set:figure-counter-major 91;counter-reset:figure-counter-minor;}
+  h1[data-number="92"]{counter-set:figure-counter-major 92;counter-reset:figure-counter-minor;}
+  h1[data-number="93"]{counter-set:figure-counter-major 93;counter-reset:figure-counter-minor;}
+  h1[data-number="94"]{counter-set:figure-counter-major 94;counter-reset:figure-counter-minor;}
+  h1[data-number="95"]{counter-set:figure-counter-major 95;counter-reset:figure-counter-minor;}
+  h1[data-number="96"]{counter-set:figure-counter-major 96;counter-reset:figure-counter-minor;}
+  h1[data-number="97"]{counter-set:figure-counter-major 97;counter-reset:figure-counter-minor;}
+  h1[data-number="98"]{counter-set:figure-counter-major 98;counter-reset:figure-counter-minor;}
+  h1[data-number="99"]{counter-set:figure-counter-major 99;counter-reset:figure-counter-minor;}
+
+
+  </style>
+  <!-- BG custom styling for the wide body variant -->
+  <!-- Gets appended after bg-css.html -->
+
+  <style type="text/css">
+  body {
+      max-width: inherit;
+  }
+  </style>
+</head>
+<body>
+<div style="text-align:center"><span><a href="remotes-repos-in-other-places.html" rel="prev">Prev</a> | </span><a href="index.html">Contents</a><span> | <a href="file-states.html" rel="next">Next</a></span></div><hr>
+<h1 data-number="10" id="remote-tracking-branch"><span class="header-section-number">10</span> Remote Tracking Branches</h1>
+<p></p>
+<p>We’ve seen how to create local branches that you do work on, then merge back into the <code>main</code> branch, then <code>git push</code> it up to a remote server.</p>
+<p>This part of the guide is going to try to clarify what’s actually going on behind the scenes, as well as give us a way to push our local branches to a remote for safe keeping.</p>
+<h2 data-number="10.1" id="branches-on-remotes"><span class="header-section-number">10.1</span> Branches on Remotes</h2>
+<p></p>
+<p>First, a refresher!</p>
+<p>Recall that the remote repo you cloned yours from is a complete copy of your repo. The remote repo has a <code>main</code> branch, and therefore your clone also has a <code>main</code> branch.</p>
+<p>That’s right! When you make a GitHub repo and then clone it, there are <strong>two</strong> <code>main</code> branches!</p>
+<p>How do we differentiate them?</p>
+<p>Well, on your local clone, we just refer to branches by their plain name. When we say <code>main</code> or <code>topic2</code>, we mean the local branch by that name on our repo.</p>
+<p>If we want to talk about a branch on a remote, we have to give the remote name along with the branch using that slash notation we’ve already seen:</p>
+<div class="sourceCode" id="cb111"><pre class="sourceCode default"><code class="sourceCode default"><span id="cb111-1"><a href="remote-tracking-branch.html#cb111-1" aria-hidden="true" tabindex="-1"></a>main            # main branch on your local repo</span>
+<span id="cb111-2"><a href="remote-tracking-branch.html#cb111-2" aria-hidden="true" tabindex="-1"></a>origin/main     # main branch on the remote named origin</span>
+<span id="cb111-3"><a href="remote-tracking-branch.html#cb111-3" aria-hidden="true" tabindex="-1"></a>upstream/main   # main branch on the remote named upstream</span>
+<span id="cb111-4"><a href="remote-tracking-branch.html#cb111-4" aria-hidden="true" tabindex="-1"></a>zork/mailbox    # mailbox branch on the remote named zork</span>
+<span id="cb111-5"><a href="remote-tracking-branch.html#cb111-5" aria-hidden="true" tabindex="-1"></a>mailbox         # mailbox branch on your local repo</span></code></pre></div>
+<p>Importantly, not only do the words <code>origin/main</code> refer to the <code>main</code> branch on <code>origin</code> in casual conversation, but <em>you actually have a branch on your local repo called <code>origin/main</code></em>.</p>
+<p>This is called a <em>remote-tracking branch</em>. It’s your local copy of the <code>main</code> branch on the remote. You can’t move your local <code>origin/main</code> branch directly; Git does it for you as a matter of course when you interact with the remote (e.g. when you push or pull).</p>
+<p>We’re going to call the <code>main</code> branch on our local machines the <em>local branch</em>, and we’ll call the one on <code>origin</code> the <em>upstream branch</em>.</p>
+<blockquote>
+<p><strong>And this is going to get confusing later</strong> when we name a remote <code>upstream</code> in a way that has nothing to do with the <em>upstream branch</em> terminology we’re using here.</p>
+</blockquote>
+<p>I want to go over that one more time to drive it home.</p>
+<p>Let’s say you have these two branches on your computer because you’ve just cloned the remote repo at the <code>origin</code>:</p>
+<div class="sourceCode" id="cb112"><pre class="sourceCode default"><code class="sourceCode default"><span id="cb112-1"><a href="remote-tracking-branch.html#cb112-1" aria-hidden="true" tabindex="-1"></a>main            # main branch on your local repo</span>
+<span id="cb112-2"><a href="remote-tracking-branch.html#cb112-2" aria-hidden="true" tabindex="-1"></a>origin/main     # main branch on the remote named origin</span></code></pre></div>
+<p>When you have those two branches on your computer, <em>there are actually three branches in the world</em>.</p>
+<ol type="1">
+<li><code>main</code> on your computer.</li>
+<li><code>origin/main</code> on your computer.</li>
+<li><code>main</code> on the <code>origin</code> computer, usually a different computer than yours, e.g. one at GitHub or something.</li>
+</ol>
+<p>Notice that the first two of these are on the repo on your computer!</p>
+<p>The branch <code>origin/main</code> is just where your computer <em>thinks</em> that <code>main</code> on the <code>origin</code> is. Your computer got this information the last time you pulled or fetched from <code>origin</code>.</p>
+<p>If other people have pushed to <code>main</code> on <code>origin</code> since your last pull, your <code>origin/main</code> on your local computer won’t be up to date.</p>
+<p>And normally you don’t have to worry about this much; when you try to push, Git will tell you if someone else has pushed changes in the meantime and you have to pull first to update your <code>origin/main</code> branch. No biggie.</p>
+<p>But I wanted to spell that out so you had a more complete mental model of what’s happening behind the curtain, here.</p>
+<p></p>
+<h2 data-number="10.2" id="listing-remote-tracking-branches"><span class="header-section-number">10.2</span> Listing Remote Tracking Branches</h2>
+<p></p>
+<p>Remember how <code>git branch</code> listed the branches you had? Let’s power it up so you can see all the remote tracking branches, as well. This will help in the following sections.</p>
+<p>Basically, we just give it the <code>-avv</code> switch for “all” (to list the remote tracking branches) and “verbose” (to give info about which commits they’re pointing to) and “verbose” again (to give info about which remote branches map to which remote branches.</p>
+<p>Here’s the result for the repo that holds the source for this book:</p>
+<div class="sourceCode" id="cb113"><pre class="sourceCode default"><code class="sourceCode default"><span id="cb113-1"><a href="remote-tracking-branch.html#cb113-1" aria-hidden="true" tabindex="-1"></a>% git branch -avv</span>
+<span id="cb113-2"><a href="remote-tracking-branch.html#cb113-2" aria-hidden="true" tabindex="-1"></a>  * main                  2d63af5 [origin/main] indexing</span>
+<span id="cb113-3"><a href="remote-tracking-branch.html#cb113-3" aria-hidden="true" tabindex="-1"></a>    sphinx                cdac325 [origin/sphinx] partial port</span>
+<span id="cb113-4"><a href="remote-tracking-branch.html#cb113-4" aria-hidden="true" tabindex="-1"></a>    remotes/origin/HEAD   -&gt; origin/main</span>
+<span id="cb113-5"><a href="remote-tracking-branch.html#cb113-5" aria-hidden="true" tabindex="-1"></a>    remotes/origin/main   2d63af5 indexing</span>
+<span id="cb113-6"><a href="remote-tracking-branch.html#cb113-6" aria-hidden="true" tabindex="-1"></a>    remotes/origin/sphinx cdac325 partial port</span></code></pre></div>
+<p>We see my two local branches (<code>main</code> and <code>sphinx</code>). Looking on those two top lines, you see remote tracking branches in brackets (<code>origin/main</code> and <code>origin/sphinx</code>). When I push or pull from <code>main</code> or <code>sphinx</code>, those are the remote tracking branches that are merged to.</p>
+<p>Additionally, we see information about the remote below that.</p>
+<p>The first line about <code>remotes/origin/HEAD</code> is a little strange. It just points to <code>origin/main</code> which simply lets us know that <code>main</code> is the initial branch for the repo that Git will use when you clone it. You typically don’t need to think about this line.</p>
+<p>The remaining two lines tell us what commits the remote tracking branches <code>origin/main</code> and <code>origin/sphinx</code> are pointing at. Looking closely, we see they’re pointing to the same commits as our local <code>main</code> and <code>sphinx</code> indicating that everything is in sync. (As far as we know—someone else might have pushed something to the repo since our last pull and we don’t know about that yet.)</p>
+<p></p>
+<h2 data-number="10.3" id="pushing-to-a-remote"><span class="header-section-number">10.3</span> Pushing to a Remote</h2>
+<p></p>
+<p>Fun Fact: when you push or pull, you technically specify the remote and the branch you want to use. This is me saying, “Push the branch I’m on right now (presumably <code>main</code>) and merge it into <code>main</code> on <code>origin</code>.</p>
+<p> </p>
+<div class="sourceCode" id="cb114"><pre class="sourceCode default"><code class="sourceCode default"><span id="cb114-1"><a href="remote-tracking-branch.html#cb114-1" aria-hidden="true" tabindex="-1"></a>$ git push origin main</span></code></pre></div>
+<p>“But wait! I haven’t been doing that!”</p>
+<p>It turns out there’s an option you can set to make it happen automatically. Let’s say you’re on the <code>main</code> branch and then run this:</p>
+<div class="sourceCode" id="cb115"><pre class="sourceCode default"><code class="sourceCode default"><span id="cb115-1"><a href="remote-tracking-branch.html#cb115-1" aria-hidden="true" tabindex="-1"></a>$ git push --set-upstream origin main</span>
+<span id="cb115-2"><a href="remote-tracking-branch.html#cb115-2" aria-hidden="true" tabindex="-1"></a>$ git push -u origin main              # same thing, shorthand</span></code></pre></div>
+<p>This will do a couple things:</p>
+<ol type="1">
+<li>It’ll push changes on your local <code>main</code> to the remote server (that’s the <code>push origin main</code> part).</li>
+<li>It’ll remember that the remote branch <code>origin/main</code> is tracking your local <code>main</code> branch (that’s the <code>-u</code> part).</li>
+</ol>
+<p>And then, from then on, from the <code>main</code> branch, you can just:</p>
+<div class="sourceCode" id="cb116"><pre class="sourceCode default"><code class="sourceCode default"><span id="cb116-1"><a href="remote-tracking-branch.html#cb116-1" aria-hidden="true" tabindex="-1"></a>$ git push</span></code></pre></div>
+<p>and it’ll automatically push to <code>origin/main</code> thanks to your earlier usage of <code>--set-upstream</code>.</p>
+<p>And <code>git pull</code> has the same option, as well, though you only need to do it once with either push or pull.</p>
+<p>“But wait! I’ve never used <code>--set-upstream</code>, either!”</p>
+<p>That’s because by default when you clone a repo, Git automagically sets up a local branch to track the <code>main</code> branch on the remote.</p>
+<blockquote>
+<p><strong>Depending on how you made your repo, you might also have a reference to <code>origin/HEAD</code>.</strong> It might be weird to think that there’s a <code>HEAD</code> ref on a remote server that you can see, but in this case it’s just referring to the branch that you’ll be checking out by default when you clone the repo.</p>
+</blockquote>
+<p>“OK, so what you’re telling me is that I can just <code>git push</code> and <code>git pull</code> like always and just ignore everything you wrote in this section?”</p>
+<p>Well… yes. Ish. No. We’re going to make use of this to push other branches to the remote!</p>
+<p></p>
+<h2 data-number="10.4" id="making-a-branch-and-pushing-to-remote"><span class="header-section-number">10.4</span> Making a Branch and Pushing to Remote</h2>
+<p></p>
+<p>I’m going to make a new local branch <code>topic99</code>:</p>
+<div class="sourceCode" id="cb117"><pre class="sourceCode default"><code class="sourceCode default"><span id="cb117-1"><a href="remote-tracking-branch.html#cb117-1" aria-hidden="true" tabindex="-1"></a>$ git switch -c topic99</span>
+<span id="cb117-2"><a href="remote-tracking-branch.html#cb117-2" aria-hidden="true" tabindex="-1"></a>  Switched to a new branch &#39;topic99&#39;</span></code></pre></div>
+<p>And make some changes:</p>
+<div class="sourceCode" id="cb118"><pre class="sourceCode default"><code class="sourceCode default"><span id="cb118-1"><a href="remote-tracking-branch.html#cb118-1" aria-hidden="true" tabindex="-1"></a>$ vim README.md        # Create and edit a README</span>
+<span id="cb118-2"><a href="remote-tracking-branch.html#cb118-2" aria-hidden="true" tabindex="-1"></a>$ git add README.md</span>
+<span id="cb118-3"><a href="remote-tracking-branch.html#cb118-3" aria-hidden="true" tabindex="-1"></a>$ git commit -m &quot;Some important additions&quot;</span></code></pre></div>
+<p>In our log, we can see where all the branches are:</p>
+<div class="sourceCode" id="cb119"><pre class="sourceCode default"><code class="sourceCode default"><span id="cb119-1"><a href="remote-tracking-branch.html#cb119-1" aria-hidden="true" tabindex="-1"></a>commit 79ddba75b144bad89e1cbd862e5f3b3409f6c498 (HEAD -&gt; topic99)</span>
+<span id="cb119-2"><a href="remote-tracking-branch.html#cb119-2" aria-hidden="true" tabindex="-1"></a>Author: User Name &lt;user@example.com&gt;</span>
+<span id="cb119-3"><a href="remote-tracking-branch.html#cb119-3" aria-hidden="true" tabindex="-1"></a>Date:   Fri Feb 16 16:44:50 2024 -0800</span>
+<span id="cb119-4"><a href="remote-tracking-branch.html#cb119-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb119-5"><a href="remote-tracking-branch.html#cb119-5" aria-hidden="true" tabindex="-1"></a>    Some important additions</span>
+<span id="cb119-6"><a href="remote-tracking-branch.html#cb119-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb119-7"><a href="remote-tracking-branch.html#cb119-7" aria-hidden="true" tabindex="-1"></a>commit 3be2ad2c31b627b431af8c8e592c01f4b989d621 (origin/main, main)</span>
+<span id="cb119-8"><a href="remote-tracking-branch.html#cb119-8" aria-hidden="true" tabindex="-1"></a>Author: User Name &lt;user@example.com&gt;</span>
+<span id="cb119-9"><a href="remote-tracking-branch.html#cb119-9" aria-hidden="true" tabindex="-1"></a>Date:   Fri Feb 16 16:14:13 2024 -0800</span>
+<span id="cb119-10"><a href="remote-tracking-branch.html#cb119-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb119-11"><a href="remote-tracking-branch.html#cb119-11" aria-hidden="true" tabindex="-1"></a>    Initial checkin</span></code></pre></div>
+<p><code>HEAD</code> refers to <code>topic99</code>, and that’s one commit ahead of <code>main</code> (local) and <code>main</code> (upstream on the <code>origin</code> remote), as far as we know. And we know this because it’s one commit ahead of our remote-tracking branch <code>origin/main</code>.</p>
+<p>Now let’s push!</p>
+<div class="sourceCode" id="cb120"><pre class="sourceCode default"><code class="sourceCode default"><span id="cb120-1"><a href="remote-tracking-branch.html#cb120-1" aria-hidden="true" tabindex="-1"></a>$ git push</span>
+<span id="cb120-2"><a href="remote-tracking-branch.html#cb120-2" aria-hidden="true" tabindex="-1"></a>  fatal: The current branch topic99 has no upstream branch.</span>
+<span id="cb120-3"><a href="remote-tracking-branch.html#cb120-3" aria-hidden="true" tabindex="-1"></a>  To push the current branch and set the remote as upstream, use</span>
+<span id="cb120-4"><a href="remote-tracking-branch.html#cb120-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb120-5"><a href="remote-tracking-branch.html#cb120-5" aria-hidden="true" tabindex="-1"></a>      git push --set-upstream origin topic99</span>
+<span id="cb120-6"><a href="remote-tracking-branch.html#cb120-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb120-7"><a href="remote-tracking-branch.html#cb120-7" aria-hidden="true" tabindex="-1"></a>  To have this happen automatically for branches without a tracking</span>
+<span id="cb120-8"><a href="remote-tracking-branch.html#cb120-8" aria-hidden="true" tabindex="-1"></a>  upstream, see &#39;push.autoSetupRemote&#39; in &#39;git help config&#39;.</span></code></pre></div>
+<p>Ouch. The short of all this is that we said “push”, and Git said, “To what? You haven’t associated this branch with anything on the remote!”</p>
+<p>And we haven’t. There’s no <code>origin/topic99</code> remote-tracking branch, and certainly no <code>topic99</code> branch on that remote. Yet.</p>
+<p>The fix is easy enough—Git already told us what to do.</p>
+<p></p>
+<div class="sourceCode" id="cb121"><pre class="sourceCode default"><code class="sourceCode default"><span id="cb121-1"><a href="remote-tracking-branch.html#cb121-1" aria-hidden="true" tabindex="-1"></a>$ git push --set-upstream origin topic99</span></code></pre></div>
+<p>And that will do it.</p>
+<p></p>
+<p>At this point, assuming you’ve pushed to GitHub, you could go to your GitHub page for the project, and near the top left you should see something that looks like Figure 10.1.</p>
+<figure>
+<img src="img_080_010.png" title="Two branches on GitHub" alt="Two branches on GitHub" />
+<figcaption aria-hidden="true">Two branches on GitHub</figcaption>
+</figure>
+<p>If you pull down that <code>main</code> button, you’ll see <code>topic99</code> there as well. You can select either branch and view it in the GitHub interface.</p>
+<p></p>
+<h2 data-number="10.5" id="deleting-remote-tracking-branches"><span class="header-section-number">10.5</span> Deleting Remote Tracking Branches</h2>
+<p> </p>
+<p>There are few things that can happen here.</p>
+<ol type="1">
+<li><p>Someone deletes the branch on the remote, but your corresponding remote tracking branch (the one on your clone) still exists and you want to delete it.</p></li>
+<li><p>You want to delete your remote tracking branch, and you want to leave the corresponding branch untouched on the remote.</p></li>
+<li><p>You delete your remote tracking branch and you want to delete the corresponding branch on the remote, too.</p></li>
+</ol>
+<p>For all of these, it’s good to have your working tree clean, of course.</p>
+<h3 data-number="10.5.1" id="fetching-deleted-remote-branches"><span class="header-section-number">10.5.1</span> Fetching Deleted Remote Branches</h3>
+<p>The first one is pretty easy. Let’s tell Git to delete all our remote tracking branches that no longer exist on the <code>origin</code> remote:</p>
+<p></p>
+<div class="sourceCode" id="cb122"><pre class="sourceCode default"><code class="sourceCode default"><span id="cb122-1"><a href="remote-tracking-branch.html#cb122-1" aria-hidden="true" tabindex="-1"></a>$ git fetch --prune</span></code></pre></div>
+<p>or if you want to specify a remote:</p>
+<div class="sourceCode" id="cb123"><pre class="sourceCode default"><code class="sourceCode default"><span id="cb123-1"><a href="remote-tracking-branch.html#cb123-1" aria-hidden="true" tabindex="-1"></a>$ git fetch --prune someremote</span></code></pre></div>
+<p>or if you want to prune all remotes:</p>
+<div class="sourceCode" id="cb124"><pre class="sourceCode default"><code class="sourceCode default"><span id="cb124-1"><a href="remote-tracking-branch.html#cb124-1" aria-hidden="true" tabindex="-1"></a>$ git fetch --prune --all</span></code></pre></div>
+<h3 data-number="10.5.2" id="deleting-your-remote-tracking-branch"><span class="header-section-number">10.5.2</span> Deleting Your Remote Tracking Branch</h3>
+<p>In this case, you have a remote tracking branch on your clone that you want to delete. But you don’t want to delete that branch from the server.</p>
+<p>Use <code>-d</code> for delete and <code>-r</code> for remote:</p>
+<div class="sourceCode" id="cb125"><pre class="sourceCode default"><code class="sourceCode default"><span id="cb125-1"><a href="remote-tracking-branch.html#cb125-1" aria-hidden="true" tabindex="-1"></a>$ git branch -dr remote/branch</span></code></pre></div>
+<p>For example:</p>
+<div class="sourceCode" id="cb126"><pre class="sourceCode default"><code class="sourceCode default"><span id="cb126-1"><a href="remote-tracking-branch.html#cb126-1" aria-hidden="true" tabindex="-1"></a>$ git branch -dr origin/topic99</span></code></pre></div>
+<h3 data-number="10.5.3" id="deleting-a-branch-on-a-remote"><span class="header-section-number">10.5.3</span> Deleting a Branch on a Remote</h3>
+<p>Finally, let’s say you’ve deleted your remote tracking branch on your clone, as per above, and you also want to delete it on the remote.</p>
+<p>We’re going to (perhaps surprisingly) use <code>git push</code> for this.</p>
+<p>To delete a branch on the remote, you:</p>
+<div class="sourceCode" id="cb127"><pre class="sourceCode default"><code class="sourceCode default"><span id="cb127-1"><a href="remote-tracking-branch.html#cb127-1" aria-hidden="true" tabindex="-1"></a>$ git push someremote --delete branchname</span></code></pre></div>
+<p>For example:</p>
+<div class="sourceCode" id="cb128"><pre class="sourceCode default"><code class="sourceCode default"><span id="cb128-1"><a href="remote-tracking-branch.html#cb128-1" aria-hidden="true" tabindex="-1"></a>$ git push origin --delete topic99</span></code></pre></div>
+<p>And that’s it! Make sure you delete your remote tracking branch if you haven’t done so already.</p>
+<p> </p>
+<h2 data-number="10.6" id="multiple-remotes"><span class="header-section-number">10.6</span> Multiple Remotes</h2>
+<p></p>
+<p>It’s possible that you might have multiple remotes. (This is commonly put in place when you’ve forked someone’s repo on GitHub.)</p>
+<p>How do remote tracking branches work in that case?</p>
+<p>Let’s say your main remote is called <code>origin</code> as usual. But you’ve also set another remote called <code>remote2</code>, unoriginally.</p>
+<p>Someone else pushes a new branch called <code>foobranch</code> (slightly more originally) up to <code>remote2</code> and you’d like to get it.</p>
+<p>So you do this:</p>
+<p></p>
+<div class="sourceCode" id="cb129"><pre class="sourceCode default"><code class="sourceCode default"><span id="cb129-1"><a href="remote-tracking-branch.html#cb129-1" aria-hidden="true" tabindex="-1"></a>$ git fetch remote2</span>
+<span id="cb129-2"><a href="remote-tracking-branch.html#cb129-2" aria-hidden="true" tabindex="-1"></a>  remote: Enumerating objects: 15, done.</span>
+<span id="cb129-3"><a href="remote-tracking-branch.html#cb129-3" aria-hidden="true" tabindex="-1"></a>  remote: Counting objects: 100% (15/15), done.</span>
+<span id="cb129-4"><a href="remote-tracking-branch.html#cb129-4" aria-hidden="true" tabindex="-1"></a>  remote: Compressing objects: 100% (4/4), done.</span>
+<span id="cb129-5"><a href="remote-tracking-branch.html#cb129-5" aria-hidden="true" tabindex="-1"></a>  remote: Total 12 (delta 6), reused 11 (delta 5), pack-reused 0</span>
+<span id="cb129-6"><a href="remote-tracking-branch.html#cb129-6" aria-hidden="true" tabindex="-1"></a>  Unpacking objects: 100% (12/12), 1.61 KiB | 34.00 KiB/s, done.</span>
+<span id="cb129-7"><a href="remote-tracking-branch.html#cb129-7" aria-hidden="true" tabindex="-1"></a>  From github.com:user/somerepo</span>
+<span id="cb129-8"><a href="remote-tracking-branch.html#cb129-8" aria-hidden="true" tabindex="-1"></a>   * [new branch]      foobranch -&gt; remote2/foobranch</span></code></pre></div>
+<p>So far so good. Let’s switch to it:</p>
+<div class="sourceCode" id="cb130"><pre class="sourceCode default"><code class="sourceCode default"><span id="cb130-1"><a href="remote-tracking-branch.html#cb130-1" aria-hidden="true" tabindex="-1"></a>$ git switch foobranch</span>
+<span id="cb130-2"><a href="remote-tracking-branch.html#cb130-2" aria-hidden="true" tabindex="-1"></a>  branch &#39;foobranch&#39; set up to track &#39;remote2/foobranch&#39;.</span>
+<span id="cb130-3"><a href="remote-tracking-branch.html#cb130-3" aria-hidden="true" tabindex="-1"></a>  Switched to a new branch &#39;foobranch&#39;</span></code></pre></div>
+<p>Wait! We’re tracking at <code>remote2</code>? That’s a little weird because it’s the other person’s repo. Maybe you have permission to write to it, and that’s what you want to do. But it’s more probably you’d like your own version of this branch on your repo as well.</p>
+<p>You can do that by pushing it to your remote with <code>-u</code> again.</p>
+<div class="sourceCode" id="cb131"><pre class="sourceCode default"><code class="sourceCode default"><span id="cb131-1"><a href="remote-tracking-branch.html#cb131-1" aria-hidden="true" tabindex="-1"></a>$ git push -u origin foobranch</span></code></pre></div>
+<p>And that’ll do it.</p>
+<p>If you look at your branches with <code>git branch -avv</code> you’ll see now several <code>foobranch</code> variants for different clones.</p>
+<div class="sourceCode" id="cb132"><pre class="sourceCode default"><code class="sourceCode default"><span id="cb132-1"><a href="remote-tracking-branch.html#cb132-1" aria-hidden="true" tabindex="-1"></a>foobranch</span>
+<span id="cb132-2"><a href="remote-tracking-branch.html#cb132-2" aria-hidden="true" tabindex="-1"></a>remotes/origin/foobranch</span>
+<span id="cb132-3"><a href="remote-tracking-branch.html#cb132-3" aria-hidden="true" tabindex="-1"></a>remotes/remote2/foobranch</span></code></pre></div>
+<p>If you want to keep your <code>origin/foobranch</code> in sync with that on <code>remote2</code>, you’ll have to do a bunch of merging.</p>
+<p></p>
+<div class="sourceCode" id="cb133"><pre class="sourceCode default"><code class="sourceCode default"><span id="cb133-1"><a href="remote-tracking-branch.html#cb133-1" aria-hidden="true" tabindex="-1"></a>$ git fetch remote2            # Get remote2 changes</span>
+<span id="cb133-2"><a href="remote-tracking-branch.html#cb133-2" aria-hidden="true" tabindex="-1"></a>$ git switch foobranch         # Get onto the merge-into branch</span>
+<span id="cb133-3"><a href="remote-tracking-branch.html#cb133-3" aria-hidden="true" tabindex="-1"></a>$ git merge remote2/foobranch  # Merge changes from remote2</span>
+<span id="cb133-4"><a href="remote-tracking-branch.html#cb133-4" aria-hidden="true" tabindex="-1"></a>$ git push origin foobranch    # Push changes back to origin</span></code></pre></div>
+<p>(You can leave the <code>origin foobranch</code> off the <code>push</code> if you’ve already pushed it with <code>-u</code> earlier, of course.)</p>
+<p>At that point, every <code>foobranch</code> should be on the same commit.</p>
+<p> </p>
+<!-- BG_NEW_CHAPTER -->
+<hr><div style="text-align:center"><span><a href="remotes-repos-in-other-places.html" rel="prev">Prev</a> | </span><a href="index.html">Contents</a><span> | <a href="file-states.html" rel="next">Next</a></span></div></body>
+</html>

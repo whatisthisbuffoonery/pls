@@ -1,0 +1,639 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <title>Beej's Guide to Learning Computer Science</title>
+  <style>
+    html {
+      color: #1a1a1a;
+      background-color: #fdfdfd;
+    }
+    body {
+      margin: 0 auto;
+      max-width: 36em;
+      padding-left: 50px;
+      padding-right: 50px;
+      padding-top: 50px;
+      padding-bottom: 50px;
+      hyphens: auto;
+      overflow-wrap: break-word;
+      text-rendering: optimizeLegibility;
+      font-kerning: normal;
+    }
+    @media (max-width: 600px) {
+      body {
+        font-size: 0.9em;
+        padding: 12px;
+      }
+      h1 {
+        font-size: 1.8em;
+      }
+    }
+    @media print {
+      html {
+        background-color: white;
+      }
+      body {
+        background-color: transparent;
+        color: black;
+        font-size: 12pt;
+      }
+      p, h2, h3 {
+        orphans: 3;
+        widows: 3;
+      }
+      h2, h3, h4 {
+        page-break-after: avoid;
+      }
+    }
+    p {
+      margin: 1em 0;
+    }
+    a {
+      color: #1a1a1a;
+    }
+    a:visited {
+      color: #1a1a1a;
+    }
+    img {
+      max-width: 100%;
+    }
+    svg {
+      height: auto;
+      max-width: 100%;
+    }
+    h1, h2, h3, h4, h5, h6 {
+      margin-top: 1.4em;
+    }
+    h5, h6 {
+      font-size: 1em;
+      font-style: italic;
+    }
+    h6 {
+      font-weight: normal;
+    }
+    ol, ul {
+      padding-left: 1.7em;
+      margin-top: 1em;
+    }
+    li > ol, li > ul {
+      margin-top: 0;
+    }
+    blockquote {
+      margin: 1em 0 1em 1.7em;
+      padding-left: 1em;
+      border-left: 2px solid #e6e6e6;
+      color: #606060;
+    }
+    code {
+      font-family: Menlo, Monaco, Consolas, 'Lucida Console', monospace;
+      font-size: 85%;
+      margin: 0;
+      hyphens: manual;
+    }
+    pre {
+      margin: 1em 0;
+      overflow: auto;
+    }
+    pre code {
+      padding: 0;
+      overflow: visible;
+      overflow-wrap: normal;
+    }
+    .sourceCode {
+     background-color: transparent;
+     overflow: visible;
+    }
+    hr {
+      border: none;
+      border-top: 1px solid #1a1a1a;
+      height: 1px;
+      margin: 1em 0;
+    }
+    table {
+      margin: 1em 0;
+      border-collapse: collapse;
+      width: 100%;
+      overflow-x: auto;
+      display: block;
+      font-variant-numeric: lining-nums tabular-nums;
+    }
+    table caption {
+      margin-bottom: 0.75em;
+    }
+    tbody {
+      margin-top: 0.5em;
+      border-top: 1px solid #1a1a1a;
+      border-bottom: 1px solid #1a1a1a;
+    }
+    th {
+      border-top: 1px solid #1a1a1a;
+      padding: 0.25em 0.5em 0.25em 0.5em;
+    }
+    td {
+      padding: 0.125em 0.5em 0.25em 0.5em;
+    }
+    header {
+      margin-bottom: 4em;
+      text-align: center;
+    }
+    #TOC li {
+      list-style: none;
+    }
+    #TOC ul {
+      padding-left: 1.3em;
+    }
+    #TOC > ul {
+      padding-left: 0;
+    }
+    #TOC a:not(:hover) {
+      text-decoration: none;
+    }
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+    /* CSS for syntax highlighting */
+    html { -webkit-text-size-adjust: 100%; }
+    pre > code.sourceCode { white-space: pre; position: relative; }
+    pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+    pre > code.sourceCode > span:empty { height: 1.2em; }
+    .sourceCode { overflow: visible; }
+    code.sourceCode > span { color: inherit; text-decoration: inherit; }
+    div.sourceCode { margin: 1em 0; }
+    pre.sourceCode { margin: 0; }
+    @media screen {
+    div.sourceCode { overflow: auto; }
+    }
+    @media print {
+    pre > code.sourceCode { white-space: pre-wrap; }
+    pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+    }
+    pre.numberSource code
+      { counter-reset: source-line 0; }
+    pre.numberSource code > span
+      { position: relative; left: -4em; counter-increment: source-line; }
+    pre.numberSource code > span > a:first-child::before
+      { content: counter(source-line);
+        position: relative; left: -1em; text-align: right; vertical-align: baseline;
+        border: none; display: inline-block;
+        -webkit-touch-callout: none; -webkit-user-select: none;
+        -khtml-user-select: none; -moz-user-select: none;
+        -ms-user-select: none; user-select: none;
+        padding: 0 4px; width: 4em;
+        color: #aaaaaa;
+      }
+    pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+    div.sourceCode
+      {   }
+    @media screen {
+    pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+    }
+    code span.al { color: #ff0000; font-weight: bold; } /* Alert */
+    code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+    code span.at { color: #7d9029; } /* Attribute */
+    code span.bn { color: #40a070; } /* BaseN */
+    code span.bu { color: #008000; } /* BuiltIn */
+    code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+    code span.ch { color: #4070a0; } /* Char */
+    code span.cn { color: #880000; } /* Constant */
+    code span.co { color: #60a0b0; font-style: italic; } /* Comment */
+    code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+    code span.do { color: #ba2121; font-style: italic; } /* Documentation */
+    code span.dt { color: #902000; } /* DataType */
+    code span.dv { color: #40a070; } /* DecVal */
+    code span.er { color: #ff0000; font-weight: bold; } /* Error */
+    code span.ex { } /* Extension */
+    code span.fl { color: #40a070; } /* Float */
+    code span.fu { color: #06287e; } /* Function */
+    code span.im { color: #008000; font-weight: bold; } /* Import */
+    code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+    code span.kw { color: #007020; font-weight: bold; } /* Keyword */
+    code span.op { color: #666666; } /* Operator */
+    code span.ot { color: #007020; } /* Other */
+    code span.pp { color: #bc7a00; } /* Preprocessor */
+    code span.sc { color: #4070a0; } /* SpecialChar */
+    code span.ss { color: #bb6688; } /* SpecialString */
+    code span.st { color: #4070a0; } /* String */
+    code span.va { color: #19177c; } /* Variable */
+    code span.vs { color: #4070a0; } /* VerbatimString */
+    code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+  </style>
+  <!-- BG custom styling -->
+  <style type="text/css">
+  /* Fix for line numbers not visible */
+  pre.numberSource code > span {
+      left: -1em;
+  }
+  pre.numberSource {
+      margin-left: initial;
+  }
+
+  /* Put some space after the section numbers */
+  span.toc-section-number::after {
+      content: "\a0\a0\a0";  /* non-breaking whitespace */
+  }
+
+  /* Hide underlines on code number links */
+  pre > code.sourceCode > span > a:first-child::before {
+      text-decoration: none;
+  }
+
+  /* Color the source blocks */
+  div.sourceCode {
+      background-color: #f0f0f0;
+  }
+
+  /* Fix iOS big text rendering issue */
+  pre > code.sourceCode > span {
+      display: initial;
+  }
+
+
+  /* Color the inline code */
+  code:not(.sourceCode) {
+      background: #f0f0f0;
+      padding-left: 0.2em;
+      padding-right: 0.2em;
+      border-radius: 0.2em;
+  }
+
+  pre.sourceCode {
+      border: 1px solid #ccc;
+      padding: 0.5em;
+      border-radius: 0.2em;
+  }
+
+  /* Keep code tags from wrapping in tables */
+  tbody code {
+      white-space: nowrap;
+  }
+
+  /* Prevent hyphenation and hyphen breaks in code*/
+  code {
+      word-break: keep-all;
+  }
+
+  td {
+      vertical-align: top;
+  }
+
+  body {
+      font-size: 12pt;
+      max-width: 43em;
+      font-family: sans-serif;
+  }
+
+  html {
+      background: #f9f9f9;
+  }
+
+  figure > embed {
+      max-width: 100%;
+  }
+
+  figure {
+      text-align: center;
+      margin-top: 2em;
+      margin-bottom: 2em;
+  }
+
+  figcaption {
+      font-size: 0.9em;
+      font-style: italic;
+      margin-top: 0.6em;
+  }
+
+  body {
+      counter-reset: figure-counter-major;
+      counter-reset: figure-counter-minor;
+  }
+
+  figure {
+      counter-increment: figure-counter-minor;
+  }
+
+  figcaption::before {
+      content: "Figure " counter(figure-counter-major) "." counter(figure-counter-minor) ": ";
+  }
+
+  blockquote {
+      border-left: 2px solid #bbb;
+      color: #444;
+  }
+
+  /* Contents */
+
+  nav[role="doc-toc"] > ul > li {
+    font-weight: bold;
+    margin-top: 1.2em;
+  }
+
+  nav[role="doc-toc"] > ul > li:first {
+    font-weight: bold;
+    margin-top: initial;
+  }
+
+  nav[role="doc-toc"] > ul > li > ul {
+    font-weight: normal;
+    margin-top: 0.3em;
+  }
+
+  /*
+  In multipage, we need to reset the figure counter to the chapter
+  number. Luckily, this is in the <h1 data-number> attribute. Unluckily,
+  there is no way to get this in a general way.
+
+  This doesn't work:
+
+    h1[data-number] {
+      counter-set: figure-counter-major attr(data-number);
+    }
+
+  Nor this:
+
+    h1[data-number] {
+      --figure-counter-major-value: attr(data-number);
+      counter-set: figure-counter-major var(--figure-counter-major-value);
+    }
+
+  So, dumbly, we have a bunch of rules for all these sections, up to the
+  maximum possible section.
+
+  Here's a program to generate them:
+
+    for (let i = 1; i < 100; i++)
+        console.log(`h1[data-number="${i}"]{counter-set:figure-counter-major ${i};counter-reset:figure-counter-minor;}`);
+
+  Note to self: never write a book with more than 99 frickin' chapters.
+  */
+
+  h1[data-number="1"]{counter-set:figure-counter-major 1;counter-reset:figure-counter-minor;}
+  h1[data-number="2"]{counter-set:figure-counter-major 2;counter-reset:figure-counter-minor;}
+  h1[data-number="3"]{counter-set:figure-counter-major 3;counter-reset:figure-counter-minor;}
+  h1[data-number="4"]{counter-set:figure-counter-major 4;counter-reset:figure-counter-minor;}
+  h1[data-number="5"]{counter-set:figure-counter-major 5;counter-reset:figure-counter-minor;}
+  h1[data-number="6"]{counter-set:figure-counter-major 6;counter-reset:figure-counter-minor;}
+  h1[data-number="7"]{counter-set:figure-counter-major 7;counter-reset:figure-counter-minor;}
+  h1[data-number="8"]{counter-set:figure-counter-major 8;counter-reset:figure-counter-minor;}
+  h1[data-number="9"]{counter-set:figure-counter-major 9;counter-reset:figure-counter-minor;}
+  h1[data-number="10"]{counter-set:figure-counter-major 10;counter-reset:figure-counter-minor;}
+  h1[data-number="11"]{counter-set:figure-counter-major 11;counter-reset:figure-counter-minor;}
+  h1[data-number="12"]{counter-set:figure-counter-major 12;counter-reset:figure-counter-minor;}
+  h1[data-number="13"]{counter-set:figure-counter-major 13;counter-reset:figure-counter-minor;}
+  h1[data-number="14"]{counter-set:figure-counter-major 14;counter-reset:figure-counter-minor;}
+  h1[data-number="15"]{counter-set:figure-counter-major 15;counter-reset:figure-counter-minor;}
+  h1[data-number="16"]{counter-set:figure-counter-major 16;counter-reset:figure-counter-minor;}
+  h1[data-number="17"]{counter-set:figure-counter-major 17;counter-reset:figure-counter-minor;}
+  h1[data-number="18"]{counter-set:figure-counter-major 18;counter-reset:figure-counter-minor;}
+  h1[data-number="19"]{counter-set:figure-counter-major 19;counter-reset:figure-counter-minor;}
+  h1[data-number="20"]{counter-set:figure-counter-major 20;counter-reset:figure-counter-minor;}
+  h1[data-number="21"]{counter-set:figure-counter-major 21;counter-reset:figure-counter-minor;}
+  h1[data-number="22"]{counter-set:figure-counter-major 22;counter-reset:figure-counter-minor;}
+  h1[data-number="23"]{counter-set:figure-counter-major 23;counter-reset:figure-counter-minor;}
+  h1[data-number="24"]{counter-set:figure-counter-major 24;counter-reset:figure-counter-minor;}
+  h1[data-number="25"]{counter-set:figure-counter-major 25;counter-reset:figure-counter-minor;}
+  h1[data-number="26"]{counter-set:figure-counter-major 26;counter-reset:figure-counter-minor;}
+  h1[data-number="27"]{counter-set:figure-counter-major 27;counter-reset:figure-counter-minor;}
+  h1[data-number="28"]{counter-set:figure-counter-major 28;counter-reset:figure-counter-minor;}
+  h1[data-number="29"]{counter-set:figure-counter-major 29;counter-reset:figure-counter-minor;}
+  h1[data-number="30"]{counter-set:figure-counter-major 30;counter-reset:figure-counter-minor;}
+  h1[data-number="31"]{counter-set:figure-counter-major 31;counter-reset:figure-counter-minor;}
+  h1[data-number="32"]{counter-set:figure-counter-major 32;counter-reset:figure-counter-minor;}
+  h1[data-number="33"]{counter-set:figure-counter-major 33;counter-reset:figure-counter-minor;}
+  h1[data-number="34"]{counter-set:figure-counter-major 34;counter-reset:figure-counter-minor;}
+  h1[data-number="35"]{counter-set:figure-counter-major 35;counter-reset:figure-counter-minor;}
+  h1[data-number="36"]{counter-set:figure-counter-major 36;counter-reset:figure-counter-minor;}
+  h1[data-number="37"]{counter-set:figure-counter-major 37;counter-reset:figure-counter-minor;}
+  h1[data-number="38"]{counter-set:figure-counter-major 38;counter-reset:figure-counter-minor;}
+  h1[data-number="39"]{counter-set:figure-counter-major 39;counter-reset:figure-counter-minor;}
+  h1[data-number="40"]{counter-set:figure-counter-major 40;counter-reset:figure-counter-minor;}
+  h1[data-number="41"]{counter-set:figure-counter-major 41;counter-reset:figure-counter-minor;}
+  h1[data-number="42"]{counter-set:figure-counter-major 42;counter-reset:figure-counter-minor;}
+  h1[data-number="43"]{counter-set:figure-counter-major 43;counter-reset:figure-counter-minor;}
+  h1[data-number="44"]{counter-set:figure-counter-major 44;counter-reset:figure-counter-minor;}
+  h1[data-number="45"]{counter-set:figure-counter-major 45;counter-reset:figure-counter-minor;}
+  h1[data-number="46"]{counter-set:figure-counter-major 46;counter-reset:figure-counter-minor;}
+  h1[data-number="47"]{counter-set:figure-counter-major 47;counter-reset:figure-counter-minor;}
+  h1[data-number="48"]{counter-set:figure-counter-major 48;counter-reset:figure-counter-minor;}
+  h1[data-number="49"]{counter-set:figure-counter-major 49;counter-reset:figure-counter-minor;}
+  h1[data-number="50"]{counter-set:figure-counter-major 50;counter-reset:figure-counter-minor;}
+  h1[data-number="51"]{counter-set:figure-counter-major 51;counter-reset:figure-counter-minor;}
+  h1[data-number="52"]{counter-set:figure-counter-major 52;counter-reset:figure-counter-minor;}
+  h1[data-number="53"]{counter-set:figure-counter-major 53;counter-reset:figure-counter-minor;}
+  h1[data-number="54"]{counter-set:figure-counter-major 54;counter-reset:figure-counter-minor;}
+  h1[data-number="55"]{counter-set:figure-counter-major 55;counter-reset:figure-counter-minor;}
+  h1[data-number="56"]{counter-set:figure-counter-major 56;counter-reset:figure-counter-minor;}
+  h1[data-number="57"]{counter-set:figure-counter-major 57;counter-reset:figure-counter-minor;}
+  h1[data-number="58"]{counter-set:figure-counter-major 58;counter-reset:figure-counter-minor;}
+  h1[data-number="59"]{counter-set:figure-counter-major 59;counter-reset:figure-counter-minor;}
+  h1[data-number="60"]{counter-set:figure-counter-major 60;counter-reset:figure-counter-minor;}
+  h1[data-number="61"]{counter-set:figure-counter-major 61;counter-reset:figure-counter-minor;}
+  h1[data-number="62"]{counter-set:figure-counter-major 62;counter-reset:figure-counter-minor;}
+  h1[data-number="63"]{counter-set:figure-counter-major 63;counter-reset:figure-counter-minor;}
+  h1[data-number="64"]{counter-set:figure-counter-major 64;counter-reset:figure-counter-minor;}
+  h1[data-number="65"]{counter-set:figure-counter-major 65;counter-reset:figure-counter-minor;}
+  h1[data-number="66"]{counter-set:figure-counter-major 66;counter-reset:figure-counter-minor;}
+  h1[data-number="67"]{counter-set:figure-counter-major 67;counter-reset:figure-counter-minor;}
+  h1[data-number="68"]{counter-set:figure-counter-major 68;counter-reset:figure-counter-minor;}
+  h1[data-number="69"]{counter-set:figure-counter-major 69;counter-reset:figure-counter-minor;}
+  h1[data-number="70"]{counter-set:figure-counter-major 70;counter-reset:figure-counter-minor;}
+  h1[data-number="71"]{counter-set:figure-counter-major 71;counter-reset:figure-counter-minor;}
+  h1[data-number="72"]{counter-set:figure-counter-major 72;counter-reset:figure-counter-minor;}
+  h1[data-number="73"]{counter-set:figure-counter-major 73;counter-reset:figure-counter-minor;}
+  h1[data-number="74"]{counter-set:figure-counter-major 74;counter-reset:figure-counter-minor;}
+  h1[data-number="75"]{counter-set:figure-counter-major 75;counter-reset:figure-counter-minor;}
+  h1[data-number="76"]{counter-set:figure-counter-major 76;counter-reset:figure-counter-minor;}
+  h1[data-number="77"]{counter-set:figure-counter-major 77;counter-reset:figure-counter-minor;}
+  h1[data-number="78"]{counter-set:figure-counter-major 78;counter-reset:figure-counter-minor;}
+  h1[data-number="79"]{counter-set:figure-counter-major 79;counter-reset:figure-counter-minor;}
+  h1[data-number="80"]{counter-set:figure-counter-major 80;counter-reset:figure-counter-minor;}
+  h1[data-number="81"]{counter-set:figure-counter-major 81;counter-reset:figure-counter-minor;}
+  h1[data-number="82"]{counter-set:figure-counter-major 82;counter-reset:figure-counter-minor;}
+  h1[data-number="83"]{counter-set:figure-counter-major 83;counter-reset:figure-counter-minor;}
+  h1[data-number="84"]{counter-set:figure-counter-major 84;counter-reset:figure-counter-minor;}
+  h1[data-number="85"]{counter-set:figure-counter-major 85;counter-reset:figure-counter-minor;}
+  h1[data-number="86"]{counter-set:figure-counter-major 86;counter-reset:figure-counter-minor;}
+  h1[data-number="87"]{counter-set:figure-counter-major 87;counter-reset:figure-counter-minor;}
+  h1[data-number="88"]{counter-set:figure-counter-major 88;counter-reset:figure-counter-minor;}
+  h1[data-number="89"]{counter-set:figure-counter-major 89;counter-reset:figure-counter-minor;}
+  h1[data-number="90"]{counter-set:figure-counter-major 90;counter-reset:figure-counter-minor;}
+  h1[data-number="91"]{counter-set:figure-counter-major 91;counter-reset:figure-counter-minor;}
+  h1[data-number="92"]{counter-set:figure-counter-major 92;counter-reset:figure-counter-minor;}
+  h1[data-number="93"]{counter-set:figure-counter-major 93;counter-reset:figure-counter-minor;}
+  h1[data-number="94"]{counter-set:figure-counter-major 94;counter-reset:figure-counter-minor;}
+  h1[data-number="95"]{counter-set:figure-counter-major 95;counter-reset:figure-counter-minor;}
+  h1[data-number="96"]{counter-set:figure-counter-major 96;counter-reset:figure-counter-minor;}
+  h1[data-number="97"]{counter-set:figure-counter-major 97;counter-reset:figure-counter-minor;}
+  h1[data-number="98"]{counter-set:figure-counter-major 98;counter-reset:figure-counter-minor;}
+  h1[data-number="99"]{counter-set:figure-counter-major 99;counter-reset:figure-counter-minor;}
+
+
+  </style>
+  <!-- BG custom styling for the wide body variant -->
+  <!-- Gets appended after bg-css.html -->
+
+  <style type="text/css">
+  body {
+      max-width: inherit;
+  }
+  </style>
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
+</head>
+<body>
+<div style="text-align:center"><span><a href="hacks-and-techniques-for-learning.html" rel="prev">Prev</a> | </span><a href="index.html">Contents</a><span> | <a href="learning-a-new-language.html" rel="next">Next</a></span></div><hr>
+<h1 data-number="8" id="debugging"><span class="header-section-number">8</span> Debugging</h1>
+<p></p>
+<p>Before we begin, the best way to debug a program is to not have bugs to begin with. Though we’re only human and we’ll certainly mak mstakes, <!-- sic --> the best way to avoid bugs is to adhere to the problem solving framework. Remember that the programming battle is in the <em>Understand</em> and <em>Plan</em> phases. The more completely and correctly you complete those phases, the fewer bugs you’ll have when coding it up.</p>
+<p>That said, let’s talk about what to do when the inevitable happens.</p>
+<h2 data-number="8.1" id="mental-model"><span class="header-section-number">8.1</span> Mental Model</h2>
+<p></p>
+<p>This is one of the most important things about being a developer: <em>have a mental model of computation</em>.</p>
+<p>That is, you should be able to read code and know what’s going to happen.</p>
+<div class="sourceCode" id="cb5"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb5-1"><a href="debugging.html#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> foo(n):</span>
+<span id="cb5-2"><a href="debugging.html#cb5-2" aria-hidden="true" tabindex="-1"></a>    i <span class="op">=</span> <span class="dv">0</span></span>
+<span id="cb5-3"><a href="debugging.html#cb5-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-4"><a href="debugging.html#cb5-4" aria-hidden="true" tabindex="-1"></a>    <span class="cf">while</span> i <span class="op">&lt;</span> n:</span>
+<span id="cb5-5"><a href="debugging.html#cb5-5" aria-hidden="true" tabindex="-1"></a>        i <span class="op">=</span> i <span class="op">+</span> <span class="dv">1</span> <span class="op">+</span> (i <span class="op">%</span> <span class="dv">2</span>)</span>
+<span id="cb5-6"><a href="debugging.html#cb5-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-7"><a href="debugging.html#cb5-7" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(i)</span>
+<span id="cb5-8"><a href="debugging.html#cb5-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-9"><a href="debugging.html#cb5-9" aria-hidden="true" tabindex="-1"></a>foo(<span class="dv">5</span>)</span></code></pre></div>
+<p>Read the nonsense Python code, above. Mentally compute the output. Then see if you’re right. (I wrote the code, and it still took me a solid minute to mentally model the answer. But I was right!)</p>
+<p><strong><em>If you cannot “run” the code in your head, you cannot debug.</em></strong> Yes, I’m going that strong. I’m sure some people disagree with me, but I want to drive home how important this is.</p>
+<p><em>Debugging is the art of finding the part of the code where your mental model of the computation and the reality of the computation diverge.</em> And then fixing it.</p>
+<p>If you don’t have a mental model, you don’t have anything to compare against and you’ll make little progress.</p>
+<p>How do your improve your mental model of computation?</p>
+<ul>
+<li><p><strong>Study code</strong>. Trace through it. There’s a ton of code out there to practice with, e.g. on GitHub, on HackerRank, your peers’ codebases, your own stuff that you wrote four months ago and have forgotten how it works, etc.</p></li>
+<li><p><strong>Predict the output</strong>. As you learn the code, try to predict how it will behave when run.</p></li>
+<li><p><strong>Manually trace a run</strong>. Use a whiteboard to manually track what values variables take on, what functions get called, and what line of code is executing.</p></li>
+<li><p><strong>Write a specification</strong>. Study some code and “reverse engineer” it. Figure out what it does, then write a human-readable spec that perfectly describes the algorithm or codebase to the degree that a reader could reimplement it from scratch.</p></li>
+<li><p><strong>Single-step through with a debugger</strong>. Have the computer show you how the program is flowing. We’ll talk more about that, below.</p></li>
+</ul>
+<p>You’ll definitely improve this skill with practice.</p>
+<p></p>
+<h2 data-number="8.2" id="reproducing-the-bug"><span class="header-section-number">8.2</span> Reproducing the Bug</h2>
+<p></p>
+<p>First things first: see if you can get the bug to happen consistently. Being able reproduce (“repro”) the bug is the first step in being able to squash it.</p>
+<p>Sometimes this is actually the hard part. You saw something go wrong once (or someone reported they saw it), and now you can’t repro it.</p>
+<blockquote>
+<p><strong>At this point you might be tempted to utilize a programming technique known as “prayer”</strong> in that you’re praying that either you didn’t really see it or the bug will never rear its ugly face again in this world. But here’s the unfortunate truth: if someone saw this rare bug <em>just once</em> in testing, thousands or millions of people will see the bug when it goes into production. Murphy’s Law <em>and</em> statistics? You have no chance against that.</p>
+</blockquote>
+<p>If you can’t repro it, you’d just be shooting in the dark trying to fix it. Your goal at this point is to just get it to happen at all. Work backward logically. What <em>must</em> have happened in the program flow in order to see what the bug reporter saw? Look there first. Even if you’re sure some condition <em>can’t possibly</em> be true, if it must have been true to see the bug, then it <em>must</em> have been true! Keep tracking back, looking for where your mental model and the code diverge and use that to repro it yourself.</p>
+<p>If you can only sporadically repro it, you have a chance, but it’s going to be hard work. Your goal is to get it to repro consistently. This saves you spending forever trying to get a rare repo. If you could make it happen consistently, that’s a big time saver, and it helps you narrow down where the bug can be.</p>
+<p>Once you find how to repro it consistently, now you can get even more systematic about things. You want to find the minimum number of steps that can cause the bug to manifest. For example, you’re playing a game and you find a bug when you complete 20 laps around the race course and then drive into a tree. Maybe try just driving into the tree first. If you’re lucky, you saved yourself 20 laps and narrowed the bug down to the tree. If nothing happens, you know that the 20 laps is an integral part of the bug. Maybe try a single lap followed by the tree. Does that repro?</p>
+<p>Getting the minimum number of steps not only helps you narrow down even further where the bug is in the code, but it makes it easier to test fixes because you don’t have to spend so long reproing the issue.</p>
+<p></p>
+<h2 data-number="8.3" id="finding-the-bug"><span class="header-section-number">8.3</span> Finding the Bug</h2>
+<p></p>
+<p>There is a bug somewhere. You know that because when you give your code some input, and it cranks away at it, eventually it gives you unexpected output.</p>
+<p>Somewhere in that big process the reality of the computation diverges from your mental model of the computation.</p>
+<p>At first, all you might know is that somewhere in 10,000 lines of code something went wrong. So you’ve narrowed it down to that. Your mental model said that if the input was <code>2</code>, the output would be <code>3490</code>. And instead the output was <code>299792458</code>.</p>
+<p>Therefore you know the bug is somewhere between the input and the output.</p>
+<p>You <em>could</em> just start changing random things in the code to see if it gets fixed. This is sometimes called <em>shotgun debugging</em> or <em>prayer debugging</em>, and it very, very, very, very, <em>very</em> rarely works. Way more often you’ll just mess things up and make the problem even harder to find. It’s like trying to fix your car’s electrical issues by randomly adding and cutting wires. It’s not even worth debugging this way.</p>
+<p>And yet despite that, it’s a very common technique practiced, in vain, by students worldwide. You, however, should not use it.</p>
+<p>Instead, it’s time to be systematic. Somewhere in that pipeline of computation the intermediate computed values diverge from your mental model. Your job is to find out where.</p>
+<p>So you start probing <em>inside</em> the program at various points to see where things go off the rails. Binary search is great—jump to the middle of the process and examine the values during a run (see below). If they are as expected, the bug must therefore be between the middle of the program and the end! You’ve just halved your search space. Now do it again until you narrow it down far enough to see the bug.</p>
+<p>I would contend, though some might disagree, <em>the bug is not found until you understand it</em>. That is, you <strong>must</strong> understand exactly how your program was giving the output <code>299792458</code> instead of the expected <code>3490</code>. Gaining that full understanding has a number of benefits:</p>
+<ul>
+<li>You can be more confident you’ve fixed the bug for-realsies.</li>
+<li>You will learn to recognize the patterns that led to this bug, allowing you to better avoid it in the future.</li>
+<li>You’re working out your problem-solving skills while you do this.</li>
+</ul>
+<p>Once you understand how the wrong output was produced, then decisively and correctly fix the issue, and know why the fix will work.</p>
+<p>Finally, if you’re just filing a bug report (i.e. someone else will fix it), being able to give them the minimum steps needed to repro will make you their hero for the day. Consider it from the reverse perspective; would you rather fix a bug with a vague, long sequence of steps to repro, or one with a few steps that caused it to repro every time? The more specific things are, the happier the bug-fixer is, whether that’s you or someone else.</p>
+<p></p>
+<h2 data-number="8.4" id="print-debugging"><span class="header-section-number">8.4</span> Print Debugging</h2>
+<p></p>
+<p>The good old-fashioned standard way of probing software in the middle of a run is called <em>print debugging</em>, or, if you’re a C programmer, <em>printf debugging</em> (pronounced “print eff”).</p>
+<p>This is basically just tactically placing print statements inside your code to see what state your program is in.</p>
+<p>There are a couple common uses of this:</p>
+<ul>
+<li><p>Print anything at all to see if some part of the code actually executes.</p>
+<div class="sourceCode" id="cb6"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb6-1"><a href="debugging.html#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">&quot;A&quot;</span>)</span>
+<span id="cb6-2"><a href="debugging.html#cb6-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-3"><a href="debugging.html#cb6-3" aria-hidden="true" tabindex="-1"></a>x <span class="op">=</span> foo()</span>
+<span id="cb6-4"><a href="debugging.html#cb6-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-5"><a href="debugging.html#cb6-5" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">&quot;B&quot;</span>)</span>
+<span id="cb6-6"><a href="debugging.html#cb6-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-7"><a href="debugging.html#cb6-7" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> x <span class="op">==</span> <span class="dv">3</span>:</span>
+<span id="cb6-8"><a href="debugging.html#cb6-8" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="st">&quot;C&quot;</span>)</span>
+<span id="cb6-9"><a href="debugging.html#cb6-9" aria-hidden="true" tabindex="-1"></a>    x <span class="op">*=</span> <span class="dv">2</span></span>
+<span id="cb6-10"><a href="debugging.html#cb6-10" aria-hidden="true" tabindex="-1"></a><span class="cf">else</span>:</span>
+<span id="cb6-11"><a href="debugging.html#cb6-11" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="st">&quot;D&quot;</span>)</span>
+<span id="cb6-12"><a href="debugging.html#cb6-12" aria-hidden="true" tabindex="-1"></a>    bar()</span>
+<span id="cb6-13"><a href="debugging.html#cb6-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-14"><a href="debugging.html#cb6-14" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">&quot;E&quot;</span>)</span></code></pre></div>
+<p>Notice that when I run the code, I can see how far it gets before a crash, and I can determine if <code>x</code> were <code>3</code> or not.</p></li>
+<li><p>Print some specific values to see what they are.</p>
+<p>Here’s an example where we’re getting data from some sensor in a loop for processing. We suspect that some of the data is wonky (maybe the sensor is busted) so we’re printing it out to see what we get.</p>
+<div class="sourceCode" id="cb7"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb7-1"><a href="debugging.html#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="cf">while</span> <span class="kw">not</span> done:</span>
+<span id="cb7-2"><a href="debugging.html#cb7-2" aria-hidden="true" tabindex="-1"></a>    data <span class="op">=</span> get_sensor_data()</span>
+<span id="cb7-3"><a href="debugging.html#cb7-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-4"><a href="debugging.html#cb7-4" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="ss">f&quot;Got sensor data: </span><span class="sc">{</span>data<span class="sc">}</span><span class="ss">&quot;</span>)</span>
+<span id="cb7-5"><a href="debugging.html#cb7-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-6"><a href="debugging.html#cb7-6" aria-hidden="true" tabindex="-1"></a>    process_sensor_data(data)</span>
+<span id="cb7-7"><a href="debugging.html#cb7-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-8"><a href="debugging.html#cb7-8" aria-hidden="true" tabindex="-1"></a>    done <span class="op">=</span> data <span class="op">&lt;</span> <span class="dv">0</span></span></code></pre></div></li>
+</ul>
+<blockquote>
+<p><strong>Don’t f---ing use profanity in your debugging statements.</strong> Murphy’s Law says that if you do use profanity, you’ll forget to take it out, and even though it was in some part of the code that you’re certain will never run, it will inevitably pop onto the screen while you’re doing a client demo with your boss on the day he’s assessing you for a raise.</p>
+<p>I know as well as anyone how infuriating programming can be. And when I’m feeling that way and forget to take a deep breath and recenter, I print this:</p>
+<div class="sourceCode" id="cb8"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb8-1"><a href="debugging.html#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">&quot;AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA&quot;</span>)<span class="op">;</span></span></code></pre></div>
+<!-- ` -->
+<p>Not only does it stand out nice and clear on the screen, but it’s really easy to type in frustration and helps dispel some of my bad energy. And if the client sees it, it’s a minor transgression.</p>
+<p>Another friend of mine suggested printing various non-offensive emojis, as well, which seems like a fun way to diffuse ones frustration.</p>
+</blockquote>
+<p>Now, print debugging is kinda frowned upon as a lesser means of debugging compared to using a real debugger (as in the following section). But everyone does it at some point or another, and some people even swear by it.</p>
+<p>The place that I think it really shines is when you need to gather a lot of data about the run to see a larger pattern emerge, or when you need to catch an infrequent event. If something happens one run in 10,000, single stepping through with a standard debugger is going to take forever. You can add some print statements and script a run 10,000 times and watch the output to see when it manifests.</p>
+<p>One thing to watch out for is that if you’re printing a lot, it can be tough to visually parse the output, and error messages might be lost in it. I’d recommend redirecting the output to a file and then bringing it up in an editor to search.</p>
+<p>And, finally, don’t forget to remove all your print statements before you ship your work!</p>
+<p></p>
+<h2 data-number="8.5" id="debuggers"><span class="header-section-number">8.5</span> Debuggers</h2>
+<p></p>
+<p>Debuggers are tools that help you find bugs. There are many different debuggers, but virtually all of them share a common set of features. The main features are:</p>
+<ul>
+<li>Add <em>breakpoints</em> where the program will stop running and you’ll get control in the debugger</li>
+<li>“Single step” through a program a line at a time</li>
+<li>Examine the values of variables</li>
+</ul>
+<p>Additional features that are common are:</p>
+<ul>
+<li>Stepping into a function</li>
+<li>Continuing out of a function</li>
+<li>Stepping over a function</li>
+<li>Setting the values of variables</li>
+<li>Examining the call stack</li>
+<li>Setting breakpoints that trigger conditionally</li>
+</ul>
+<p>Rarer are <em>time-travel debuggers</em>. In addition to allowing you to step forward through your program, they allow you to step backward, as well! This is great if you step past the bug by accident and want to step back to see it.</p>
+<p>All major <a href="https://en.wikipedia.org/wiki/Integrated_development_environment">IDEs</a><a href="use-of-ai.html#fn35" class="footnote-ref" id="fnref35" role="doc-noteref"><sup>35</sup></a> have debugger functionality. (It’s part of what’s “integrated”, the “I” in “IDE”.) There are also standalone debuggers that you can run. And all mainstream languages have some kind of debugger support.</p>
+<p>As you might imagine, with those features, debuggers are really powerful.</p>
+<p>If you suspect a bug in function <code>foo()</code>, you can set a breakpoint there, run the code, and then get control of the debugger when <code>foo()</code> executes. Then you can step through it a line at a time, looking at how the values of variables change. And there’s no need to add any print statements.</p>
+<p>Note that in VS Code, getting your debugger set up might be trivial, or you might have to edit some esoteric JSON files to get it going.</p>
+<p>In any case, learning to use a debugger is a valuable skill that can save you massive amounts of time while you’re trying to track down that pesky gremlin in your code.</p>
+<p></p>
+<h2 data-number="8.6" id="chapter-reflection-6"><span class="header-section-number">8.6</span> Chapter Reflection</h2>
+<ul>
+<li><p>What is the <em>mental model of computation</em> and how is it important for debugging?</p></li>
+<li><p>Why is finding a bug’s minimum reproduction case an important step in fixing that bug?</p></li>
+<li><p>How do you narrow down where a bug is in your code?</p></li>
+<li><p>Contrast print debugging versus using a debugger. What do you think the relative strengths and weaknesses are?</p></li>
+</ul>
+<p></p>
+<!-- BG_NEW_CHAPTER -->
+<hr><div style="text-align:center"><span><a href="hacks-and-techniques-for-learning.html" rel="prev">Prev</a> | </span><a href="index.html">Contents</a><span> | <a href="learning-a-new-language.html" rel="next">Next</a></span></div></body>
+</html>

@@ -1,5 +1,0 @@
-argc argv
-
-make addrinfo
-	just family and tcp
-	

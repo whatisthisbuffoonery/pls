@@ -1,0 +1,679 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <title>Beej's Guide to Interprocess Communication</title>
+  <style>
+    html {
+      color: #1a1a1a;
+      background-color: #fdfdfd;
+    }
+    body {
+      margin: 0 auto;
+      max-width: 36em;
+      padding-left: 50px;
+      padding-right: 50px;
+      padding-top: 50px;
+      padding-bottom: 50px;
+      hyphens: auto;
+      overflow-wrap: break-word;
+      text-rendering: optimizeLegibility;
+      font-kerning: normal;
+    }
+    @media (max-width: 600px) {
+      body {
+        font-size: 0.9em;
+        padding: 12px;
+      }
+      h1 {
+        font-size: 1.8em;
+      }
+    }
+    @media print {
+      html {
+        background-color: white;
+      }
+      body {
+        background-color: transparent;
+        color: black;
+        font-size: 12pt;
+      }
+      p, h2, h3 {
+        orphans: 3;
+        widows: 3;
+      }
+      h2, h3, h4 {
+        page-break-after: avoid;
+      }
+    }
+    p {
+      margin: 1em 0;
+    }
+    a {
+      color: #1a1a1a;
+    }
+    a:visited {
+      color: #1a1a1a;
+    }
+    img {
+      max-width: 100%;
+    }
+    svg {
+      height: auto;
+      max-width: 100%;
+    }
+    h1, h2, h3, h4, h5, h6 {
+      margin-top: 1.4em;
+    }
+    h5, h6 {
+      font-size: 1em;
+      font-style: italic;
+    }
+    h6 {
+      font-weight: normal;
+    }
+    ol, ul {
+      padding-left: 1.7em;
+      margin-top: 1em;
+    }
+    li > ol, li > ul {
+      margin-top: 0;
+    }
+    blockquote {
+      margin: 1em 0 1em 1.7em;
+      padding-left: 1em;
+      border-left: 2px solid #e6e6e6;
+      color: #606060;
+    }
+    code {
+      font-family: Menlo, Monaco, Consolas, 'Lucida Console', monospace;
+      font-size: 85%;
+      margin: 0;
+      hyphens: manual;
+    }
+    pre {
+      margin: 1em 0;
+      overflow: auto;
+    }
+    pre code {
+      padding: 0;
+      overflow: visible;
+      overflow-wrap: normal;
+    }
+    .sourceCode {
+     background-color: transparent;
+     overflow: visible;
+    }
+    hr {
+      background-color: #1a1a1a;
+      border: none;
+      height: 1px;
+      margin: 1em 0;
+    }
+    table {
+      margin: 1em 0;
+      border-collapse: collapse;
+      width: 100%;
+      overflow-x: auto;
+      display: block;
+      font-variant-numeric: lining-nums tabular-nums;
+    }
+    table caption {
+      margin-bottom: 0.75em;
+    }
+    tbody {
+      margin-top: 0.5em;
+      border-top: 1px solid #1a1a1a;
+      border-bottom: 1px solid #1a1a1a;
+    }
+    th {
+      border-top: 1px solid #1a1a1a;
+      padding: 0.25em 0.5em 0.25em 0.5em;
+    }
+    td {
+      padding: 0.125em 0.5em 0.25em 0.5em;
+    }
+    header {
+      margin-bottom: 4em;
+      text-align: center;
+    }
+    #TOC li {
+      list-style: none;
+    }
+    #TOC ul {
+      padding-left: 1.3em;
+    }
+    #TOC > ul {
+      padding-left: 0;
+    }
+    #TOC a:not(:hover) {
+      text-decoration: none;
+    }
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+    /* CSS for syntax highlighting */
+    pre > code.sourceCode { white-space: pre; position: relative; }
+    pre > code.sourceCode > span { line-height: 1.25; }
+    pre > code.sourceCode > span:empty { height: 1.2em; }
+    .sourceCode { overflow: visible; }
+    code.sourceCode > span { color: inherit; text-decoration: inherit; }
+    div.sourceCode { margin: 1em 0; }
+    pre.sourceCode { margin: 0; }
+    @media screen {
+    div.sourceCode { overflow: auto; }
+    }
+    @media print {
+    pre > code.sourceCode { white-space: pre-wrap; }
+    pre > code.sourceCode > span { display: inline-block; text-indent: -5em; padding-left: 5em; }
+    }
+    pre.numberSource code
+      { counter-reset: source-line 0; }
+    pre.numberSource code > span
+      { position: relative; left: -4em; counter-increment: source-line; }
+    pre.numberSource code > span > a:first-child::before
+      { content: counter(source-line);
+        position: relative; left: -1em; text-align: right; vertical-align: baseline;
+        border: none; display: inline-block;
+        -webkit-touch-callout: none; -webkit-user-select: none;
+        -khtml-user-select: none; -moz-user-select: none;
+        -ms-user-select: none; user-select: none;
+        padding: 0 4px; width: 4em;
+        color: #aaaaaa;
+      }
+    pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+    div.sourceCode
+      {   }
+    @media screen {
+    pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+    }
+    code span.al { color: #ff0000; font-weight: bold; } /* Alert */
+    code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+    code span.at { color: #7d9029; } /* Attribute */
+    code span.bn { color: #40a070; } /* BaseN */
+    code span.bu { color: #008000; } /* BuiltIn */
+    code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+    code span.ch { color: #4070a0; } /* Char */
+    code span.cn { color: #880000; } /* Constant */
+    code span.co { color: #60a0b0; font-style: italic; } /* Comment */
+    code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+    code span.do { color: #ba2121; font-style: italic; } /* Documentation */
+    code span.dt { color: #902000; } /* DataType */
+    code span.dv { color: #40a070; } /* DecVal */
+    code span.er { color: #ff0000; font-weight: bold; } /* Error */
+    code span.ex { } /* Extension */
+    code span.fl { color: #40a070; } /* Float */
+    code span.fu { color: #06287e; } /* Function */
+    code span.im { color: #008000; font-weight: bold; } /* Import */
+    code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+    code span.kw { color: #007020; font-weight: bold; } /* Keyword */
+    code span.op { color: #666666; } /* Operator */
+    code span.ot { color: #007020; } /* Other */
+    code span.pp { color: #bc7a00; } /* Preprocessor */
+    code span.sc { color: #4070a0; } /* SpecialChar */
+    code span.ss { color: #bb6688; } /* SpecialString */
+    code span.st { color: #4070a0; } /* String */
+    code span.va { color: #19177c; } /* Variable */
+    code span.vs { color: #4070a0; } /* VerbatimString */
+    code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+  </style>
+  <!-- BG custom styling -->
+  <style type="text/css">
+  /* Fix for line numbers not visible */
+  pre.numberSource code > span {
+      left: -1em;
+  }
+  pre.numberSource {
+      margin-left: initial;
+  }
+
+  /* Put some space after the section numbers */
+  span.toc-section-number::after {
+      content: "\a0\a0\a0";  /* non-breaking whitespace */
+  }
+
+  /* Hide underlines on code number links */
+  pre > code.sourceCode > span > a:first-child::before {
+      text-decoration: none;
+  }
+
+  /* Color the source blocks */
+  div.sourceCode {
+      background-color: #f0f0f0;
+  }
+
+  /* Fix iOS big text rendering issue */
+  pre > code.sourceCode > span {
+      display: initial;
+  }
+
+
+  /* Color the inline code */
+  code:not(.sourceCode) {
+      background: #f0f0f0;
+      padding-left: 0.2em;
+      padding-right: 0.2em;
+      border-radius: 0.2em;
+  }
+
+  pre.sourceCode {
+      border: 1px solid #ccc;
+      padding: 0.5em;
+      border-radius: 0.2em;
+  }
+
+  /* Keep code tags from wrapping in tables */
+  tbody code {
+      white-space: nowrap;
+  }
+
+  /* Prevent hyphenation and hyphen breaks in code*/
+  code {
+      word-break: keep-all;
+  }
+
+  td {
+      vertical-align: top;
+  }
+
+  body {
+      font-size: 12pt;
+      max-width: 43em;
+      font-family: sans-serif;
+  }
+
+  html {
+      background: #f9f9f9;
+  }
+
+  figure > embed {
+      max-width: 100%;
+  }
+
+  figure {
+      text-align: center;
+      margin-top: 2em;
+      margin-bottom: 2em;
+  }
+
+  figcaption {
+      font-size: 0.9em;
+      font-style: italic;
+      margin-top: 0.6em;
+  }
+
+  body {
+      counter-reset: figure-counter-major;
+      counter-reset: figure-counter-minor;
+  }
+
+  figure {
+      counter-increment: figure-counter-minor;
+  }
+
+  figcaption::before {
+      content: "Figure " counter(figure-counter-major) "." counter(figure-counter-minor) ": ";
+  }
+
+  blockquote {
+      border-left: 2px solid #bbb;
+      color: #444;
+  }
+
+  /* Contents */
+
+  nav[role="doc-toc"] > ul > li {
+    font-weight: bold;
+    margin-top: 1.2em;
+  }
+
+  nav[role="doc-toc"] > ul > li:first {
+    font-weight: bold;
+    margin-top: initial;
+  }
+
+  nav[role="doc-toc"] > ul > li > ul {
+    font-weight: normal;
+    margin-top: 0.3em;
+  }
+
+  /*
+  In multipage, we need to reset the figure counter to the chapter
+  number. Luckily, this is in the <h1 data-number> attribute. Unluckily,
+  there is no way to get this in a general way.
+
+  This doesn't work:
+
+    h1[data-number] {
+      counter-set: figure-counter-major attr(data-number);
+    }
+
+  Nor this:
+
+    h1[data-number] {
+      --figure-counter-major-value: attr(data-number);
+      counter-set: figure-counter-major var(--figure-counter-major-value);
+    }
+
+  So, dumbly, we have a bunch of rules for all these sections, up to the
+  maximum possible section.
+
+  Here's a program to generate them:
+
+    for (let i = 1; i < 100; i++)
+        console.log(`h1[data-number="${i}"]{counter-set:figure-counter-major ${i};counter-reset:figure-counter-minor;}`);
+
+  Note to self: never write a book with more than 99 frickin' chapters.
+  */
+
+  h1[data-number="1"]{counter-set:figure-counter-major 1;counter-reset:figure-counter-minor;}
+  h1[data-number="2"]{counter-set:figure-counter-major 2;counter-reset:figure-counter-minor;}
+  h1[data-number="3"]{counter-set:figure-counter-major 3;counter-reset:figure-counter-minor;}
+  h1[data-number="4"]{counter-set:figure-counter-major 4;counter-reset:figure-counter-minor;}
+  h1[data-number="5"]{counter-set:figure-counter-major 5;counter-reset:figure-counter-minor;}
+  h1[data-number="6"]{counter-set:figure-counter-major 6;counter-reset:figure-counter-minor;}
+  h1[data-number="7"]{counter-set:figure-counter-major 7;counter-reset:figure-counter-minor;}
+  h1[data-number="8"]{counter-set:figure-counter-major 8;counter-reset:figure-counter-minor;}
+  h1[data-number="9"]{counter-set:figure-counter-major 9;counter-reset:figure-counter-minor;}
+  h1[data-number="10"]{counter-set:figure-counter-major 10;counter-reset:figure-counter-minor;}
+  h1[data-number="11"]{counter-set:figure-counter-major 11;counter-reset:figure-counter-minor;}
+  h1[data-number="12"]{counter-set:figure-counter-major 12;counter-reset:figure-counter-minor;}
+  h1[data-number="13"]{counter-set:figure-counter-major 13;counter-reset:figure-counter-minor;}
+  h1[data-number="14"]{counter-set:figure-counter-major 14;counter-reset:figure-counter-minor;}
+  h1[data-number="15"]{counter-set:figure-counter-major 15;counter-reset:figure-counter-minor;}
+  h1[data-number="16"]{counter-set:figure-counter-major 16;counter-reset:figure-counter-minor;}
+  h1[data-number="17"]{counter-set:figure-counter-major 17;counter-reset:figure-counter-minor;}
+  h1[data-number="18"]{counter-set:figure-counter-major 18;counter-reset:figure-counter-minor;}
+  h1[data-number="19"]{counter-set:figure-counter-major 19;counter-reset:figure-counter-minor;}
+  h1[data-number="20"]{counter-set:figure-counter-major 20;counter-reset:figure-counter-minor;}
+  h1[data-number="21"]{counter-set:figure-counter-major 21;counter-reset:figure-counter-minor;}
+  h1[data-number="22"]{counter-set:figure-counter-major 22;counter-reset:figure-counter-minor;}
+  h1[data-number="23"]{counter-set:figure-counter-major 23;counter-reset:figure-counter-minor;}
+  h1[data-number="24"]{counter-set:figure-counter-major 24;counter-reset:figure-counter-minor;}
+  h1[data-number="25"]{counter-set:figure-counter-major 25;counter-reset:figure-counter-minor;}
+  h1[data-number="26"]{counter-set:figure-counter-major 26;counter-reset:figure-counter-minor;}
+  h1[data-number="27"]{counter-set:figure-counter-major 27;counter-reset:figure-counter-minor;}
+  h1[data-number="28"]{counter-set:figure-counter-major 28;counter-reset:figure-counter-minor;}
+  h1[data-number="29"]{counter-set:figure-counter-major 29;counter-reset:figure-counter-minor;}
+  h1[data-number="30"]{counter-set:figure-counter-major 30;counter-reset:figure-counter-minor;}
+  h1[data-number="31"]{counter-set:figure-counter-major 31;counter-reset:figure-counter-minor;}
+  h1[data-number="32"]{counter-set:figure-counter-major 32;counter-reset:figure-counter-minor;}
+  h1[data-number="33"]{counter-set:figure-counter-major 33;counter-reset:figure-counter-minor;}
+  h1[data-number="34"]{counter-set:figure-counter-major 34;counter-reset:figure-counter-minor;}
+  h1[data-number="35"]{counter-set:figure-counter-major 35;counter-reset:figure-counter-minor;}
+  h1[data-number="36"]{counter-set:figure-counter-major 36;counter-reset:figure-counter-minor;}
+  h1[data-number="37"]{counter-set:figure-counter-major 37;counter-reset:figure-counter-minor;}
+  h1[data-number="38"]{counter-set:figure-counter-major 38;counter-reset:figure-counter-minor;}
+  h1[data-number="39"]{counter-set:figure-counter-major 39;counter-reset:figure-counter-minor;}
+  h1[data-number="40"]{counter-set:figure-counter-major 40;counter-reset:figure-counter-minor;}
+  h1[data-number="41"]{counter-set:figure-counter-major 41;counter-reset:figure-counter-minor;}
+  h1[data-number="42"]{counter-set:figure-counter-major 42;counter-reset:figure-counter-minor;}
+  h1[data-number="43"]{counter-set:figure-counter-major 43;counter-reset:figure-counter-minor;}
+  h1[data-number="44"]{counter-set:figure-counter-major 44;counter-reset:figure-counter-minor;}
+  h1[data-number="45"]{counter-set:figure-counter-major 45;counter-reset:figure-counter-minor;}
+  h1[data-number="46"]{counter-set:figure-counter-major 46;counter-reset:figure-counter-minor;}
+  h1[data-number="47"]{counter-set:figure-counter-major 47;counter-reset:figure-counter-minor;}
+  h1[data-number="48"]{counter-set:figure-counter-major 48;counter-reset:figure-counter-minor;}
+  h1[data-number="49"]{counter-set:figure-counter-major 49;counter-reset:figure-counter-minor;}
+  h1[data-number="50"]{counter-set:figure-counter-major 50;counter-reset:figure-counter-minor;}
+  h1[data-number="51"]{counter-set:figure-counter-major 51;counter-reset:figure-counter-minor;}
+  h1[data-number="52"]{counter-set:figure-counter-major 52;counter-reset:figure-counter-minor;}
+  h1[data-number="53"]{counter-set:figure-counter-major 53;counter-reset:figure-counter-minor;}
+  h1[data-number="54"]{counter-set:figure-counter-major 54;counter-reset:figure-counter-minor;}
+  h1[data-number="55"]{counter-set:figure-counter-major 55;counter-reset:figure-counter-minor;}
+  h1[data-number="56"]{counter-set:figure-counter-major 56;counter-reset:figure-counter-minor;}
+  h1[data-number="57"]{counter-set:figure-counter-major 57;counter-reset:figure-counter-minor;}
+  h1[data-number="58"]{counter-set:figure-counter-major 58;counter-reset:figure-counter-minor;}
+  h1[data-number="59"]{counter-set:figure-counter-major 59;counter-reset:figure-counter-minor;}
+  h1[data-number="60"]{counter-set:figure-counter-major 60;counter-reset:figure-counter-minor;}
+  h1[data-number="61"]{counter-set:figure-counter-major 61;counter-reset:figure-counter-minor;}
+  h1[data-number="62"]{counter-set:figure-counter-major 62;counter-reset:figure-counter-minor;}
+  h1[data-number="63"]{counter-set:figure-counter-major 63;counter-reset:figure-counter-minor;}
+  h1[data-number="64"]{counter-set:figure-counter-major 64;counter-reset:figure-counter-minor;}
+  h1[data-number="65"]{counter-set:figure-counter-major 65;counter-reset:figure-counter-minor;}
+  h1[data-number="66"]{counter-set:figure-counter-major 66;counter-reset:figure-counter-minor;}
+  h1[data-number="67"]{counter-set:figure-counter-major 67;counter-reset:figure-counter-minor;}
+  h1[data-number="68"]{counter-set:figure-counter-major 68;counter-reset:figure-counter-minor;}
+  h1[data-number="69"]{counter-set:figure-counter-major 69;counter-reset:figure-counter-minor;}
+  h1[data-number="70"]{counter-set:figure-counter-major 70;counter-reset:figure-counter-minor;}
+  h1[data-number="71"]{counter-set:figure-counter-major 71;counter-reset:figure-counter-minor;}
+  h1[data-number="72"]{counter-set:figure-counter-major 72;counter-reset:figure-counter-minor;}
+  h1[data-number="73"]{counter-set:figure-counter-major 73;counter-reset:figure-counter-minor;}
+  h1[data-number="74"]{counter-set:figure-counter-major 74;counter-reset:figure-counter-minor;}
+  h1[data-number="75"]{counter-set:figure-counter-major 75;counter-reset:figure-counter-minor;}
+  h1[data-number="76"]{counter-set:figure-counter-major 76;counter-reset:figure-counter-minor;}
+  h1[data-number="77"]{counter-set:figure-counter-major 77;counter-reset:figure-counter-minor;}
+  h1[data-number="78"]{counter-set:figure-counter-major 78;counter-reset:figure-counter-minor;}
+  h1[data-number="79"]{counter-set:figure-counter-major 79;counter-reset:figure-counter-minor;}
+  h1[data-number="80"]{counter-set:figure-counter-major 80;counter-reset:figure-counter-minor;}
+  h1[data-number="81"]{counter-set:figure-counter-major 81;counter-reset:figure-counter-minor;}
+  h1[data-number="82"]{counter-set:figure-counter-major 82;counter-reset:figure-counter-minor;}
+  h1[data-number="83"]{counter-set:figure-counter-major 83;counter-reset:figure-counter-minor;}
+  h1[data-number="84"]{counter-set:figure-counter-major 84;counter-reset:figure-counter-minor;}
+  h1[data-number="85"]{counter-set:figure-counter-major 85;counter-reset:figure-counter-minor;}
+  h1[data-number="86"]{counter-set:figure-counter-major 86;counter-reset:figure-counter-minor;}
+  h1[data-number="87"]{counter-set:figure-counter-major 87;counter-reset:figure-counter-minor;}
+  h1[data-number="88"]{counter-set:figure-counter-major 88;counter-reset:figure-counter-minor;}
+  h1[data-number="89"]{counter-set:figure-counter-major 89;counter-reset:figure-counter-minor;}
+  h1[data-number="90"]{counter-set:figure-counter-major 90;counter-reset:figure-counter-minor;}
+  h1[data-number="91"]{counter-set:figure-counter-major 91;counter-reset:figure-counter-minor;}
+  h1[data-number="92"]{counter-set:figure-counter-major 92;counter-reset:figure-counter-minor;}
+  h1[data-number="93"]{counter-set:figure-counter-major 93;counter-reset:figure-counter-minor;}
+  h1[data-number="94"]{counter-set:figure-counter-major 94;counter-reset:figure-counter-minor;}
+  h1[data-number="95"]{counter-set:figure-counter-major 95;counter-reset:figure-counter-minor;}
+  h1[data-number="96"]{counter-set:figure-counter-major 96;counter-reset:figure-counter-minor;}
+  h1[data-number="97"]{counter-set:figure-counter-major 97;counter-reset:figure-counter-minor;}
+  h1[data-number="98"]{counter-set:figure-counter-major 98;counter-reset:figure-counter-minor;}
+  h1[data-number="99"]{counter-set:figure-counter-major 99;counter-reset:figure-counter-minor;}
+
+
+  </style>
+  <!-- BG custom styling for the wide body variant -->
+  <!-- Gets appended after bg-css.html -->
+
+  <style type="text/css">
+  body {
+      max-width: inherit;
+  }
+  </style>
+</head>
+<body>
+<div style="text-align:center"><span><a href="unixsock.html" rel="prev">Prev</a> | </span><a href="index.html">Contents</a><span style="visibility: hidden"> | <a href="" rel="next">Next</a></span></div><hr>
+<h1 data-number="12" id="references"><span class="header-section-number">12</span> More IPC Resources</h1>
+<h2 data-number="12.1" id="books"><span class="header-section-number">12.1</span> Books</h2>
+<p>Here are some books that describe some of the procedures I’ve discussed in this guide, as well as Unix details in specific:</p>
+<p>Bach, Maurice J. <em>The Design of the UNIX Operating System</em>. Published by Prentice-Hall, 1986. ISBN <a href="https://beej.us/guide/url/unixdesign">0132017997</a><a href="references.html#fn48" class="footnote-ref" id="fnref48" role="doc-noteref"><sup>48</sup></a>.</p>
+<p>W. Richard Stevens. <em>Unix Network Programming, volumes 1-2</em>. Published by Prentice Hall. ISBNs for volumes 1-2: <a href="https://beej.us/guide/url/unixnet1">0131411551</a><a href="references.html#fn49" class="footnote-ref" id="fnref49" role="doc-noteref"><sup>49</sup></a>, <a href="https://beej.us/guide/url/unixnet2">0130810819</a><a href="references.html#fn50" class="footnote-ref" id="fnref50" role="doc-noteref"><sup>50</sup></a>.</p>
+<p>W. Richard Stevens. <em>Advanced Programming in the UNIX Environment</em>. Published by Addison Wesley. ISBN <a href="https://beej.us/guide/url/advunix">0201433079</a><a href="references.html#fn51" class="footnote-ref" id="fnref51" role="doc-noteref"><sup>51</sup></a>.</p>
+<h2 data-number="12.2" id="other-online-documentation"><span class="header-section-number">12.2</span> Other online documentation</h2>
+<p><a href="http://www.kohala.com/start/unpv22e/unpv22e.html"><strong>UNIX Network Programming Volume 2 home page</strong></a><a href="references.html#fn52" class="footnote-ref" id="fnref52" role="doc-noteref"><sup>52</sup></a>—includes source code from Stevens’ superfine book.</p>
+<p><a href="http://tldp.org/LDP/lpg/node7.html"><strong>The Linux Programmer’s Guide</strong></a><a href="references.html#fn53" class="footnote-ref" id="fnref53" role="doc-noteref"><sup>53</sup></a>—in-depth section on IPC.</p>
+<p><a href="https://users.cs.cf.ac.uk/Dave.Marshall/C/"><strong>UNIX System Calls and Subroutines using C</strong></a><a href="references.html#fn54" class="footnote-ref" id="fnref54" role="doc-noteref"><sup>54</sup></a>—contains modest IPC information.</p>
+<p><a href="https://tldp.org/LDP/tlk/ipc/ipc.html"><strong>The Linux Kernel</strong></a><a href="references.html#fn55" class="footnote-ref" id="fnref55" role="doc-noteref"><sup>55</sup></a>—how the Linux kernel implements IPC.</p>
+<!-- ======================================================= -->
+<!-- Linux man pages -->
+<!-- ======================================================= -->
+<h2 data-number="12.3" id="linux-man-pages"><span class="header-section-number">12.3</span> Linux man pages</h2>
+<p>There are Linux manual pages. If you run another flavor of Unix, please look at your own man pages, as these might not work on your system.</p>
+<ul>
+<li><a href="https://man.archlinux.org/man/accept.2"><code>accept()</code></a><a href="references.html#fn56" class="footnote-ref" id="fnref56" role="doc-noteref"><sup>56</sup></a>,</li>
+<li><a href="https://man.archlinux.org/man/bind.2"><code>bind()</code></a><a href="references.html#fn57" class="footnote-ref" id="fnref57" role="doc-noteref"><sup>57</sup></a>,</li>
+<li><a href="https://man.archlinux.org/man/connect.2"><code>connect()</code></a><a href="references.html#fn58" class="footnote-ref" id="fnref58" role="doc-noteref"><sup>58</sup></a>,</li>
+<li><a href="https://man.archlinux.org/man/dup.2"><code>dup()</code></a><a href="references.html#fn59" class="footnote-ref" id="fnref59" role="doc-noteref"><sup>59</sup></a>,</li>
+<li><a href="https://man.archlinux.org/man/exec.2"><code>exec()</code></a><a href="references.html#fn60" class="footnote-ref" id="fnref60" role="doc-noteref"><sup>60</sup></a>,</li>
+<li><a href="https://man.archlinux.org/man/exit.2"><code>exit()</code></a><a href="references.html#fn61" class="footnote-ref" id="fnref61" role="doc-noteref"><sup>61</sup></a>,</li>
+<li><a href="https://man.archlinux.org/man/fcntl.2"><code>fcntl()</code></a><a href="references.html#fn62" class="footnote-ref" id="fnref62" role="doc-noteref"><sup>62</sup></a>,</li>
+<li><a href="https://man.archlinux.org/man/fileno.3"><code>fileno()</code></a><a href="references.html#fn63" class="footnote-ref" id="fnref63" role="doc-noteref"><sup>63</sup></a>,</li>
+<li><a href="https://man.archlinux.org/man/fork.2"><code>fork()</code></a><a href="references.html#fn64" class="footnote-ref" id="fnref64" role="doc-noteref"><sup>64</sup></a>,</li>
+<li><a href="https://man.archlinux.org/man/ftok.3"><code>ftok()</code></a><a href="references.html#fn65" class="footnote-ref" id="fnref65" role="doc-noteref"><sup>65</sup></a>,</li>
+<li><a href="https://man.archlinux.org/man/getpagesize.2"><code>getpagesize()</code></a><a href="references.html#fn66" class="footnote-ref" id="fnref66" role="doc-noteref"><sup>66</sup></a>,</li>
+<li><a href="https://man.archlinux.org/man/ipcrm.8"><code>ipcrm</code></a><a href="references.html#fn67" class="footnote-ref" id="fnref67" role="doc-noteref"><sup>67</sup></a>,</li>
+<li><a href="https://man.archlinux.org/man/ipcs.8"><code>ipcs</code></a><a href="references.html#fn68" class="footnote-ref" id="fnref68" role="doc-noteref"><sup>68</sup></a>,</li>
+<li><a href="https://man.archlinux.org/man/kill.1"><code>kill</code></a><a href="references.html#fn69" class="footnote-ref" id="fnref69" role="doc-noteref"><sup>69</sup></a>,</li>
+<li><a href="https://man.archlinux.org/man/kill.2"><code>kill()</code></a><a href="references.html#fn70" class="footnote-ref" id="fnref70" role="doc-noteref"><sup>70</sup></a>,</li>
+<li><a href="https://man.archlinux.org/man/listen.2"><code>listen()</code></a><a href="references.html#fn71" class="footnote-ref" id="fnref71" role="doc-noteref"><sup>71</sup></a>,</li>
+<li><a href="https://man.archlinux.org/man/lockf.2"><code>lockf()</code></a><a href="references.html#fn72" class="footnote-ref" id="fnref72" role="doc-noteref"><sup>72</sup></a>,</li>
+<li><a href="https://man.archlinux.org/man/lseek.2"><code>lseek()</code></a><a href="references.html#fn73" class="footnote-ref" id="fnref73" role="doc-noteref"><sup>73</sup></a> (for the <code>l_whence</code> field in <code>struct flock</code>),</li>
+<li><a href="https://man.archlinux.org/man/mknod.1"><code>mknod</code></a><a href="references.html#fn74" class="footnote-ref" id="fnref74" role="doc-noteref"><sup>74</sup></a>,</li>
+<li><a href="https://man.archlinux.org/man/mknod.2"><code>mknod()</code></a><a href="references.html#fn75" class="footnote-ref" id="fnref75" role="doc-noteref"><sup>75</sup></a>,</li>
+<li><a href="https://man.archlinux.org/man/mmap.2"><code>mmap()</code></a><a href="references.html#fn76" class="footnote-ref" id="fnref76" role="doc-noteref"><sup>76</sup></a>,</li>
+<li><a href="https://man.archlinux.org/man/msgctl.2"><code>msgctl()</code></a><a href="references.html#fn77" class="footnote-ref" id="fnref77" role="doc-noteref"><sup>77</sup></a>,</li>
+<li><a href="https://man.archlinux.org/man/msgget.2"><code>msgget()</code></a><a href="references.html#fn78" class="footnote-ref" id="fnref78" role="doc-noteref"><sup>78</sup></a>,</li>
+<li><a href="https://man.archlinux.org/man/msgsnd.2"><code>msgsnd()</code></a><a href="references.html#fn79" class="footnote-ref" id="fnref79" role="doc-noteref"><sup>79</sup></a>,</li>
+<li><a href="https://man.archlinux.org/man/munmap.2"><code>munmap()</code></a><a href="references.html#fn80" class="footnote-ref" id="fnref80" role="doc-noteref"><sup>80</sup></a>,</li>
+<li><a href="https://man.archlinux.org/man/open.2"><code>open()</code></a><a href="references.html#fn81" class="footnote-ref" id="fnref81" role="doc-noteref"><sup>81</sup></a>,</li>
+<li><a href="https://man.archlinux.org/man/pipe.2"><code>pipe()</code></a><a href="references.html#fn82" class="footnote-ref" id="fnref82" role="doc-noteref"><sup>82</sup></a>,</li>
+<li><a href="https://man.archlinux.org/man/ps.1"><code>ps</code></a><a href="references.html#fn83" class="footnote-ref" id="fnref83" role="doc-noteref"><sup>83</sup></a>,</li>
+<li><a href="https://man.archlinux.org/man/raise.3"><code>raise()</code></a><a href="references.html#fn84" class="footnote-ref" id="fnref84" role="doc-noteref"><sup>84</sup></a>,</li>
+<li><a href="https://man.archlinux.org/man/read.2"><code>read()</code></a><a href="references.html#fn85" class="footnote-ref" id="fnref85" role="doc-noteref"><sup>85</sup></a>,</li>
+<li><a href="https://man.archlinux.org/man/recv.2"><code>recv()</code></a><a href="references.html#fn86" class="footnote-ref" id="fnref86" role="doc-noteref"><sup>86</sup></a>,</li>
+<li><a href="https://man.archlinux.org/man/semctl.2"><code>semctl()</code></a><a href="references.html#fn87" class="footnote-ref" id="fnref87" role="doc-noteref"><sup>87</sup></a>,</li>
+<li><a href="https://man.archlinux.org/man/semget.2"><code>semget()</code></a><a href="references.html#fn88" class="footnote-ref" id="fnref88" role="doc-noteref"><sup>88</sup></a>,</li>
+<li><a href="https://man.archlinux.org/man/semop.2"><code>semop()</code></a><a href="references.html#fn89" class="footnote-ref" id="fnref89" role="doc-noteref"><sup>89</sup></a>,</li>
+<li><a href="https://man.archlinux.org/man/send.2"><code>send()</code></a><a href="references.html#fn90" class="footnote-ref" id="fnref90" role="doc-noteref"><sup>90</sup></a>,</li>
+<li><a href="https://man.archlinux.org/man/shmat.2"><code>shmat()</code></a><a href="references.html#fn91" class="footnote-ref" id="fnref91" role="doc-noteref"><sup>91</sup></a>,</li>
+<li><a href="https://man.archlinux.org/man/shmctl.2"><code>shmctl()</code></a><a href="references.html#fn92" class="footnote-ref" id="fnref92" role="doc-noteref"><sup>92</sup></a>,</li>
+<li><a href="https://man.archlinux.org/man/shmdt.2"><code>shmdt()</code></a><a href="references.html#fn93" class="footnote-ref" id="fnref93" role="doc-noteref"><sup>93</sup></a>,</li>
+<li><a href="https://man.archlinux.org/man/shmget.2"><code>shmget()</code></a><a href="references.html#fn94" class="footnote-ref" id="fnref94" role="doc-noteref"><sup>94</sup></a>,</li>
+<li><a href="https://man.archlinux.org/man/sigaction.2"><code>sigaction()</code></a><a href="references.html#fn95" class="footnote-ref" id="fnref95" role="doc-noteref"><sup>95</sup></a>,</li>
+<li><a href="https://man.archlinux.org/man/signal.2"><code>signal()</code></a><a href="references.html#fn96" class="footnote-ref" id="fnref96" role="doc-noteref"><sup>96</sup></a>,</li>
+<li><a href="https://man.archlinux.org/man/signal.7">signals</a><a href="references.html#fn97" class="footnote-ref" id="fnref97" role="doc-noteref"><sup>97</sup></a>,</li>
+<li><a href="https://man.archlinux.org/man/sigpending.2"><code>sigpending()</code></a><a href="references.html#fn98" class="footnote-ref" id="fnref98" role="doc-noteref"><sup>98</sup></a>,</li>
+<li><a href="https://man.archlinux.org/man/sigprocmask.2"><code>sigprocmask()</code></a><a href="references.html#fn99" class="footnote-ref" id="fnref99" role="doc-noteref"><sup>99</sup></a>,</li>
+<li><a href="https://man.archlinux.org/man/sigsetopts.2">sigsetops</a><a href="references.html#fn100" class="footnote-ref" id="fnref100" role="doc-noteref"><sup>100</sup></a>,</li>
+<li><a href="https://man.archlinux.org/man/sigsuspend.2"><code>sigsuspend()</code></a><a href="references.html#fn101" class="footnote-ref" id="fnref101" role="doc-noteref"><sup>101</sup></a>,</li>
+<li><a href="https://man.archlinux.org/man/socket.2"><code>socket()</code></a><a href="references.html#fn102" class="footnote-ref" id="fnref102" role="doc-noteref"><sup>102</sup></a>,</li>
+<li><a href="https://man.archlinux.org/man/socketpair.2"><code>socketpair()</code></a><a href="references.html#fn103" class="footnote-ref" id="fnref103" role="doc-noteref"><sup>103</sup></a>,</li>
+<li><a href="https://man.archlinux.org/man/stat.2"><code>stat()</code></a><a href="references.html#fn104" class="footnote-ref" id="fnref104" role="doc-noteref"><sup>104</sup></a>,</li>
+<li><a href="https://man.archlinux.org/man/wait.2"><code>wait()</code></a><a href="references.html#fn105" class="footnote-ref" id="fnref105" role="doc-noteref"><sup>105</sup></a>,</li>
+<li><a href="https://man.archlinux.org/man/waitpid.2"><code>waitpid()</code></a><a href="references.html#fn106" class="footnote-ref" id="fnref106" role="doc-noteref"><sup>106</sup></a>,</li>
+<li><a href="https://man.archlinux.org/man/write.2"><code>write()</code></a><a href="references.html#fn107" class="footnote-ref" id="fnref107" role="doc-noteref"><sup>107</sup></a>.</li>
+</ul>
+<section id="footnotes" class="footnotes footnotes-end-of-document" role="doc-endnotes">
+<hr />
+<ol>
+<li id="fn1"><p>https://beej.us/guide/bgnet<a href="intro.html#fnref1" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+<li id="fn2"><p>https://beej.us/guide/bgipc<a href="intro.html#fnref2" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+<li id="fn3"><p>https://beej.us/guide/bgipc/source/examples/fork1.c<a href="fork.html#fnref3" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+<li id="fn4"><p>https://beej.us/guide/bgipc/source/examples/sigint.c<a href="signals.html#fnref4" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+<li id="fn5"><p>https://beej.us/guide/bgipc/source/examples/sigusr.c<a href="signals.html#fnref5" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+<li id="fn6"><p>https://man.archlinux.org/man/sigaction.2<a href="signals.html#fnref6" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+<li id="fn7"><p>https://man.archlinux.org/man/sigwait.3<a href="signals.html#fnref7" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+<li id="fn8"><p>https://man.archlinux.org/man/sigwaitinfo.2<a href="signals.html#fnref8" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+<li id="fn9"><p>https://man.archlinux.org/man/sigtimedwait.2<a href="signals.html#fnref9" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+<li id="fn10"><p>https://man.archlinux.org/man/sigsuspend.2<a href="signals.html#fnref10" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+<li id="fn11"><p>https://man.archlinux.org/man/sigpending.2<a href="signals.html#fnref11" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+<li id="fn12"><p>https://man.archlinux.org/man/kill.2<a href="signals.html#fnref12" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+<li id="fn13"><p>https://man.archlinux.org/man/raise.3<a href="signals.html#fnref13" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+<li id="fn14"><p>https://man.archlinux.org/man/sigqueue.3<a href="signals.html#fnref14" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+<li id="fn15"><p>https://man.archlinux.org/man/sigemptyset.3<a href="signals.html#fnref15" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+<li id="fn16"><p>https://man.archlinux.org/man/sigfillset.3<a href="signals.html#fnref16" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+<li id="fn17"><p>https://man.archlinux.org/man/sigaddset.3<a href="signals.html#fnref17" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+<li id="fn18"><p>https://man.archlinux.org/man/sigdelset.3<a href="signals.html#fnref18" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+<li id="fn19"><p>https://man.archlinux.org/man/sigismember.3<a href="signals.html#fnref19" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+<li id="fn20"><p>https://man.archlinux.org/man/sigprocmask.2<a href="signals.html#fnref20" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+<li id="fn21"><p>https://man.archlinux.org/man/sigaltstack.2<a href="signals.html#fnref21" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+<li id="fn22"><p>https://man.archlinux.org/man/siginterrupt.3<a href="signals.html#fnref22" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+<li id="fn23"><p>https://man.archlinux.org/man/sigsetjmp.3<a href="signals.html#fnref23" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+<li id="fn24"><p>https://man.archlinux.org/man/siglongjmp.3<a href="signals.html#fnref24" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+<li id="fn25"><p>https://man.archlinux.org/man/signal.2<a href="signals.html#fnref25" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+<li id="fn26"><p>https://beej.us/guide/bgipc/source/examples/pipe1.c<a href="pipes.html#fnref26" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+<li id="fn27"><p>https://beej.us/guide/bgipc/source/examples/pipe2.c<a href="pipes.html#fnref27" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+<li id="fn28"><p>https://beej.us/guide/bgipc/source/examples/pipe3.c<a href="pipes.html#fnref28" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+<li id="fn29"><p>https://beej.us/guide/bgipc/source/examples/speak.c<a href="fifos.html#fnref29" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+<li id="fn30"><p>https://beej.us/guide/bgipc/source/examples/tick.c<a href="fifos.html#fnref30" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+<li id="fn31"><p>https://beej.us/guide/bgipc/source/examples/lockdemo.c<a href="flocking.html#fnref31" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+<li id="fn32"><p>https://beej.us/guide/bgipc/source/examples/kirk.c<a href="mq.html#fnref32" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+<li id="fn33"><p>https://beej.us/guide/bgipc/source/examples/spock.c<a href="mq.html#fnref33" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+<li id="fn34"><p>https://beej.us/guide/bgipc/source/examples/semdemo.c<a href="semaphores.html#fnref34" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+<li id="fn35"><p>https://beej.us/guide/bgipc/source/examples/semdemo.c<a href="semaphores.html#fnref35" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+<li id="fn36"><p>https://beej.us/guide/bgipc/source/examples/semrm.c<a href="semaphores.html#fnref36" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+<li id="fn37"><p>Or whatever the current addictive FPS game is these days.<a href="semaphores.html#fnref37" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+<li id="fn38"><p>https://en.wikipedia.org/wiki/Concurrency<a href="shm.html#fnref38" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+<li id="fn39"><p>https://beej.us/guide/bgipc/source/examples/shmdemo.c<a href="shm.html#fnref39" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+<li id="fn40"><p>https://beej.us/guide/bgipc/source/examples/mmapdemo.c<a href="mmap.html#fnref40" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+<li id="fn41"><p>https://beej.us/guide/bgnet<a href="unixsock.html#fnref41" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+<li id="fn42"><p>https://beej.us/guide/bgnet<a href="unixsock.html#fnref42" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+<li id="fn43"><p>https://beej.us/guide/bgnet<a href="unixsock.html#fnref43" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+<li id="fn44"><p>https://man.archlinux.org/man/shutdown.2<a href="unixsock.html#fnref44" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+<li id="fn45"><p>https://beej.us/guide/bgipc/source/examples/echos.c<a href="unixsock.html#fnref45" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+<li id="fn46"><p>https://beej.us/guide/bgipc/source/examples/echoc.c<a href="unixsock.html#fnref46" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+<li id="fn47"><p>https://beej.us/guide/bgipc/source/examples/spair.c<a href="unixsock.html#fnref47" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+<li id="fn48"><p>https://beej.us/guide/url/unixdesign<a href="references.html#fnref48" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+<li id="fn49"><p>https://beej.us/guide/url/unixnet1<a href="references.html#fnref49" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+<li id="fn50"><p>https://beej.us/guide/url/unixnet2<a href="references.html#fnref50" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+<li id="fn51"><p>https://beej.us/guide/url/advunix<a href="references.html#fnref51" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+<li id="fn52"><p>http://www.kohala.com/start/unpv22e/unpv22e.html<a href="references.html#fnref52" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+<li id="fn53"><p>http://tldp.org/LDP/lpg/node7.html<a href="references.html#fnref53" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+<li id="fn54"><p>https://users.cs.cf.ac.uk/Dave.Marshall/C/<a href="references.html#fnref54" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+<li id="fn55"><p>https://tldp.org/LDP/tlk/ipc/ipc.html<a href="references.html#fnref55" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+<li id="fn56"><p>https://man.archlinux.org/man/accept.2<a href="references.html#fnref56" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+<li id="fn57"><p>https://man.archlinux.org/man/bind.2<a href="references.html#fnref57" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+<li id="fn58"><p>https://man.archlinux.org/man/connect.2<a href="references.html#fnref58" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+<li id="fn59"><p>https://man.archlinux.org/man/dup.2<a href="references.html#fnref59" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+<li id="fn60"><p>https://man.archlinux.org/man/exec.2<a href="references.html#fnref60" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+<li id="fn61"><p>https://man.archlinux.org/man/exit.2<a href="references.html#fnref61" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+<li id="fn62"><p>https://man.archlinux.org/man/fcntl.2<a href="references.html#fnref62" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+<li id="fn63"><p>https://man.archlinux.org/man/fileno.3<a href="references.html#fnref63" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+<li id="fn64"><p>https://man.archlinux.org/man/fork.2<a href="references.html#fnref64" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+<li id="fn65"><p>https://man.archlinux.org/man/ftok.3<a href="references.html#fnref65" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+<li id="fn66"><p>https://man.archlinux.org/man/getpagesize.2<a href="references.html#fnref66" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+<li id="fn67"><p>https://man.archlinux.org/man/ipcrm.8<a href="references.html#fnref67" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+<li id="fn68"><p>https://man.archlinux.org/man/ipcs.8<a href="references.html#fnref68" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+<li id="fn69"><p>https://man.archlinux.org/man/kill.1<a href="references.html#fnref69" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+<li id="fn70"><p>https://man.archlinux.org/man/kill.2<a href="references.html#fnref70" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+<li id="fn71"><p>https://man.archlinux.org/man/listen.2<a href="references.html#fnref71" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+<li id="fn72"><p>https://man.archlinux.org/man/lockf.2<a href="references.html#fnref72" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+<li id="fn73"><p>https://man.archlinux.org/man/lseek.2<a href="references.html#fnref73" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+<li id="fn74"><p>https://man.archlinux.org/man/mknod.1<a href="references.html#fnref74" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+<li id="fn75"><p>https://man.archlinux.org/man/mknod.2<a href="references.html#fnref75" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+<li id="fn76"><p>https://man.archlinux.org/man/mmap.2<a href="references.html#fnref76" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+<li id="fn77"><p>https://man.archlinux.org/man/msgctl.2<a href="references.html#fnref77" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+<li id="fn78"><p>https://man.archlinux.org/man/msgget.2<a href="references.html#fnref78" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+<li id="fn79"><p>https://man.archlinux.org/man/msgsnd.2<a href="references.html#fnref79" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+<li id="fn80"><p>https://man.archlinux.org/man/munmap.2<a href="references.html#fnref80" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+<li id="fn81"><p>https://man.archlinux.org/man/open.2<a href="references.html#fnref81" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+<li id="fn82"><p>https://man.archlinux.org/man/pipe.2<a href="references.html#fnref82" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+<li id="fn83"><p>https://man.archlinux.org/man/ps.1<a href="references.html#fnref83" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+<li id="fn84"><p>https://man.archlinux.org/man/raise.3<a href="references.html#fnref84" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+<li id="fn85"><p>https://man.archlinux.org/man/read.2<a href="references.html#fnref85" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+<li id="fn86"><p>https://man.archlinux.org/man/recv.2<a href="references.html#fnref86" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+<li id="fn87"><p>https://man.archlinux.org/man/semctl.2<a href="references.html#fnref87" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+<li id="fn88"><p>https://man.archlinux.org/man/semget.2<a href="references.html#fnref88" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+<li id="fn89"><p>https://man.archlinux.org/man/semop.2<a href="references.html#fnref89" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+<li id="fn90"><p>https://man.archlinux.org/man/send.2<a href="references.html#fnref90" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+<li id="fn91"><p>https://man.archlinux.org/man/shmat.2<a href="references.html#fnref91" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+<li id="fn92"><p>https://man.archlinux.org/man/shmctl.2<a href="references.html#fnref92" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+<li id="fn93"><p>https://man.archlinux.org/man/shmdt.2<a href="references.html#fnref93" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+<li id="fn94"><p>https://man.archlinux.org/man/shmget.2<a href="references.html#fnref94" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+<li id="fn95"><p>https://man.archlinux.org/man/sigaction.2<a href="references.html#fnref95" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+<li id="fn96"><p>https://man.archlinux.org/man/signal.2<a href="references.html#fnref96" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+<li id="fn97"><p>https://man.archlinux.org/man/signal.7<a href="references.html#fnref97" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+<li id="fn98"><p>https://man.archlinux.org/man/sigpending.2<a href="references.html#fnref98" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+<li id="fn99"><p>https://man.archlinux.org/man/sigprocmask.2<a href="references.html#fnref99" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+<li id="fn100"><p>https://man.archlinux.org/man/sigsetopts.2<a href="references.html#fnref100" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+<li id="fn101"><p>https://man.archlinux.org/man/sigsuspend.2<a href="references.html#fnref101" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+<li id="fn102"><p>https://man.archlinux.org/man/socket.2<a href="references.html#fnref102" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+<li id="fn103"><p>https://man.archlinux.org/man/socketpair.2<a href="references.html#fnref103" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+<li id="fn104"><p>https://man.archlinux.org/man/stat.2<a href="references.html#fnref104" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+<li id="fn105"><p>https://man.archlinux.org/man/wait.2<a href="references.html#fnref105" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+<li id="fn106"><p>https://man.archlinux.org/man/waitpid.2<a href="references.html#fnref106" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+<li id="fn107"><p>https://man.archlinux.org/man/write.2<a href="references.html#fnref107" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+</ol>
+</section>
+</body>
+<hr><div style="text-align:center"><span><a href="unixsock.html" rel="prev">Prev</a> | </span><a href="index.html">Contents</a><span style="visibility: hidden"> | <a href="" rel="next">Next</a></span></div></body>
+</html>

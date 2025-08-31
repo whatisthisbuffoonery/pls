@@ -1,0 +1,740 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <title>Beej's Guide to Git</title>
+  <style>
+    html {
+      color: #1a1a1a;
+      background-color: #fdfdfd;
+    }
+    body {
+      margin: 0 auto;
+      max-width: 36em;
+      padding-left: 50px;
+      padding-right: 50px;
+      padding-top: 50px;
+      padding-bottom: 50px;
+      hyphens: auto;
+      overflow-wrap: break-word;
+      text-rendering: optimizeLegibility;
+      font-kerning: normal;
+    }
+    @media (max-width: 600px) {
+      body {
+        font-size: 0.9em;
+        padding: 12px;
+      }
+      h1 {
+        font-size: 1.8em;
+      }
+    }
+    @media print {
+      html {
+        background-color: white;
+      }
+      body {
+        background-color: transparent;
+        color: black;
+        font-size: 12pt;
+      }
+      p, h2, h3 {
+        orphans: 3;
+        widows: 3;
+      }
+      h2, h3, h4 {
+        page-break-after: avoid;
+      }
+    }
+    p {
+      margin: 1em 0;
+    }
+    a {
+      color: #1a1a1a;
+    }
+    a:visited {
+      color: #1a1a1a;
+    }
+    img {
+      max-width: 100%;
+    }
+    svg {
+      height: auto;
+      max-width: 100%;
+    }
+    h1, h2, h3, h4, h5, h6 {
+      margin-top: 1.4em;
+    }
+    h5, h6 {
+      font-size: 1em;
+      font-style: italic;
+    }
+    h6 {
+      font-weight: normal;
+    }
+    ol, ul {
+      padding-left: 1.7em;
+      margin-top: 1em;
+    }
+    li > ol, li > ul {
+      margin-top: 0;
+    }
+    blockquote {
+      margin: 1em 0 1em 1.7em;
+      padding-left: 1em;
+      border-left: 2px solid #e6e6e6;
+      color: #606060;
+    }
+    code {
+      font-family: Menlo, Monaco, Consolas, 'Lucida Console', monospace;
+      font-size: 85%;
+      margin: 0;
+      hyphens: manual;
+    }
+    pre {
+      margin: 1em 0;
+      overflow: auto;
+    }
+    pre code {
+      padding: 0;
+      overflow: visible;
+      overflow-wrap: normal;
+    }
+    .sourceCode {
+     background-color: transparent;
+     overflow: visible;
+    }
+    hr {
+      background-color: #1a1a1a;
+      border: none;
+      height: 1px;
+      margin: 1em 0;
+    }
+    table {
+      margin: 1em 0;
+      border-collapse: collapse;
+      width: 100%;
+      overflow-x: auto;
+      display: block;
+      font-variant-numeric: lining-nums tabular-nums;
+    }
+    table caption {
+      margin-bottom: 0.75em;
+    }
+    tbody {
+      margin-top: 0.5em;
+      border-top: 1px solid #1a1a1a;
+      border-bottom: 1px solid #1a1a1a;
+    }
+    th {
+      border-top: 1px solid #1a1a1a;
+      padding: 0.25em 0.5em 0.25em 0.5em;
+    }
+    td {
+      padding: 0.125em 0.5em 0.25em 0.5em;
+    }
+    header {
+      margin-bottom: 4em;
+      text-align: center;
+    }
+    #TOC li {
+      list-style: none;
+    }
+    #TOC ul {
+      padding-left: 1.3em;
+    }
+    #TOC > ul {
+      padding-left: 0;
+    }
+    #TOC a:not(:hover) {
+      text-decoration: none;
+    }
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+    /* CSS for syntax highlighting */
+    html { -webkit-text-size-adjust: 100%; }
+    pre > code.sourceCode { white-space: pre; position: relative; }
+    pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+    pre > code.sourceCode > span:empty { height: 1.2em; }
+    .sourceCode { overflow: visible; }
+    code.sourceCode > span { color: inherit; text-decoration: inherit; }
+    div.sourceCode { margin: 1em 0; }
+    pre.sourceCode { margin: 0; }
+    @media screen {
+    div.sourceCode { overflow: auto; }
+    }
+    @media print {
+    pre > code.sourceCode { white-space: pre-wrap; }
+    pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+    }
+    pre.numberSource code
+      { counter-reset: source-line 0; }
+    pre.numberSource code > span
+      { position: relative; left: -4em; counter-increment: source-line; }
+    pre.numberSource code > span > a:first-child::before
+      { content: counter(source-line);
+        position: relative; left: -1em; text-align: right; vertical-align: baseline;
+        border: none; display: inline-block;
+        -webkit-touch-callout: none; -webkit-user-select: none;
+        -khtml-user-select: none; -moz-user-select: none;
+        -ms-user-select: none; user-select: none;
+        padding: 0 4px; width: 4em;
+        color: #aaaaaa;
+      }
+    pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+    div.sourceCode
+      {   }
+    @media screen {
+    pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+    }
+    code span.al { color: #ff0000; font-weight: bold; } /* Alert */
+    code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+    code span.at { color: #7d9029; } /* Attribute */
+    code span.bn { color: #40a070; } /* BaseN */
+    code span.bu { color: #008000; } /* BuiltIn */
+    code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+    code span.ch { color: #4070a0; } /* Char */
+    code span.cn { color: #880000; } /* Constant */
+    code span.co { color: #60a0b0; font-style: italic; } /* Comment */
+    code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+    code span.do { color: #ba2121; font-style: italic; } /* Documentation */
+    code span.dt { color: #902000; } /* DataType */
+    code span.dv { color: #40a070; } /* DecVal */
+    code span.er { color: #ff0000; font-weight: bold; } /* Error */
+    code span.ex { } /* Extension */
+    code span.fl { color: #40a070; } /* Float */
+    code span.fu { color: #06287e; } /* Function */
+    code span.im { color: #008000; font-weight: bold; } /* Import */
+    code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+    code span.kw { color: #007020; font-weight: bold; } /* Keyword */
+    code span.op { color: #666666; } /* Operator */
+    code span.ot { color: #007020; } /* Other */
+    code span.pp { color: #bc7a00; } /* Preprocessor */
+    code span.sc { color: #4070a0; } /* SpecialChar */
+    code span.ss { color: #bb6688; } /* SpecialString */
+    code span.st { color: #4070a0; } /* String */
+    code span.va { color: #19177c; } /* Variable */
+    code span.vs { color: #4070a0; } /* VerbatimString */
+    code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+  </style>
+  <!-- BG custom styling -->
+  <style type="text/css">
+  /* Fix for line numbers not visible */
+  pre.numberSource code > span {
+      left: -1em;
+  }
+  pre.numberSource {
+      margin-left: initial;
+  }
+
+  /* Put some space after the section numbers */
+  span.toc-section-number::after {
+      content: "\a0\a0\a0";  /* non-breaking whitespace */
+  }
+
+  /* Hide underlines on code number links */
+  pre > code.sourceCode > span > a:first-child::before {
+      text-decoration: none;
+  }
+
+  /* Color the source blocks */
+  div.sourceCode {
+      background-color: #f0f0f0;
+  }
+
+  /* Fix iOS big text rendering issue */
+  pre > code.sourceCode > span {
+      display: initial;
+  }
+
+
+  /* Color the inline code */
+  code:not(.sourceCode) {
+      background: #f0f0f0;
+      padding-left: 0.2em;
+      padding-right: 0.2em;
+      border-radius: 0.2em;
+  }
+
+  pre.sourceCode {
+      border: 1px solid #ccc;
+      padding: 0.5em;
+      border-radius: 0.2em;
+  }
+
+  /* Keep code tags from wrapping in tables */
+  tbody code {
+      white-space: nowrap;
+  }
+
+  /* Prevent hyphenation and hyphen breaks in code*/
+  code {
+      word-break: keep-all;
+  }
+
+  td {
+      vertical-align: top;
+  }
+
+  body {
+      font-size: 12pt;
+      max-width: 43em;
+      font-family: sans-serif;
+  }
+
+  html {
+      background: #f9f9f9;
+  }
+
+  figure > embed {
+      max-width: 100%;
+  }
+
+  figure {
+      text-align: center;
+      margin-top: 2em;
+      margin-bottom: 2em;
+  }
+
+  figcaption {
+      font-size: 0.9em;
+      font-style: italic;
+      margin-top: 0.6em;
+  }
+
+  body {
+      counter-reset: figure-counter-major;
+      counter-reset: figure-counter-minor;
+  }
+
+  figure {
+      counter-increment: figure-counter-minor;
+  }
+
+  figcaption::before {
+      content: "Figure " counter(figure-counter-major) "." counter(figure-counter-minor) ": ";
+  }
+
+  blockquote {
+      border-left: 2px solid #bbb;
+      color: #444;
+  }
+
+  /* Contents */
+
+  nav[role="doc-toc"] > ul > li {
+    font-weight: bold;
+    margin-top: 1.2em;
+  }
+
+  nav[role="doc-toc"] > ul > li:first {
+    font-weight: bold;
+    margin-top: initial;
+  }
+
+  nav[role="doc-toc"] > ul > li > ul {
+    font-weight: normal;
+    margin-top: 0.3em;
+  }
+
+  /*
+  In multipage, we need to reset the figure counter to the chapter
+  number. Luckily, this is in the <h1 data-number> attribute. Unluckily,
+  there is no way to get this in a general way.
+
+  This doesn't work:
+
+    h1[data-number] {
+      counter-set: figure-counter-major attr(data-number);
+    }
+
+  Nor this:
+
+    h1[data-number] {
+      --figure-counter-major-value: attr(data-number);
+      counter-set: figure-counter-major var(--figure-counter-major-value);
+    }
+
+  So, dumbly, we have a bunch of rules for all these sections, up to the
+  maximum possible section.
+
+  Here's a program to generate them:
+
+    for (let i = 1; i < 100; i++)
+        console.log(`h1[data-number="${i}"]{counter-set:figure-counter-major ${i};counter-reset:figure-counter-minor;}`);
+
+  Note to self: never write a book with more than 99 frickin' chapters.
+  */
+
+  h1[data-number="1"]{counter-set:figure-counter-major 1;counter-reset:figure-counter-minor;}
+  h1[data-number="2"]{counter-set:figure-counter-major 2;counter-reset:figure-counter-minor;}
+  h1[data-number="3"]{counter-set:figure-counter-major 3;counter-reset:figure-counter-minor;}
+  h1[data-number="4"]{counter-set:figure-counter-major 4;counter-reset:figure-counter-minor;}
+  h1[data-number="5"]{counter-set:figure-counter-major 5;counter-reset:figure-counter-minor;}
+  h1[data-number="6"]{counter-set:figure-counter-major 6;counter-reset:figure-counter-minor;}
+  h1[data-number="7"]{counter-set:figure-counter-major 7;counter-reset:figure-counter-minor;}
+  h1[data-number="8"]{counter-set:figure-counter-major 8;counter-reset:figure-counter-minor;}
+  h1[data-number="9"]{counter-set:figure-counter-major 9;counter-reset:figure-counter-minor;}
+  h1[data-number="10"]{counter-set:figure-counter-major 10;counter-reset:figure-counter-minor;}
+  h1[data-number="11"]{counter-set:figure-counter-major 11;counter-reset:figure-counter-minor;}
+  h1[data-number="12"]{counter-set:figure-counter-major 12;counter-reset:figure-counter-minor;}
+  h1[data-number="13"]{counter-set:figure-counter-major 13;counter-reset:figure-counter-minor;}
+  h1[data-number="14"]{counter-set:figure-counter-major 14;counter-reset:figure-counter-minor;}
+  h1[data-number="15"]{counter-set:figure-counter-major 15;counter-reset:figure-counter-minor;}
+  h1[data-number="16"]{counter-set:figure-counter-major 16;counter-reset:figure-counter-minor;}
+  h1[data-number="17"]{counter-set:figure-counter-major 17;counter-reset:figure-counter-minor;}
+  h1[data-number="18"]{counter-set:figure-counter-major 18;counter-reset:figure-counter-minor;}
+  h1[data-number="19"]{counter-set:figure-counter-major 19;counter-reset:figure-counter-minor;}
+  h1[data-number="20"]{counter-set:figure-counter-major 20;counter-reset:figure-counter-minor;}
+  h1[data-number="21"]{counter-set:figure-counter-major 21;counter-reset:figure-counter-minor;}
+  h1[data-number="22"]{counter-set:figure-counter-major 22;counter-reset:figure-counter-minor;}
+  h1[data-number="23"]{counter-set:figure-counter-major 23;counter-reset:figure-counter-minor;}
+  h1[data-number="24"]{counter-set:figure-counter-major 24;counter-reset:figure-counter-minor;}
+  h1[data-number="25"]{counter-set:figure-counter-major 25;counter-reset:figure-counter-minor;}
+  h1[data-number="26"]{counter-set:figure-counter-major 26;counter-reset:figure-counter-minor;}
+  h1[data-number="27"]{counter-set:figure-counter-major 27;counter-reset:figure-counter-minor;}
+  h1[data-number="28"]{counter-set:figure-counter-major 28;counter-reset:figure-counter-minor;}
+  h1[data-number="29"]{counter-set:figure-counter-major 29;counter-reset:figure-counter-minor;}
+  h1[data-number="30"]{counter-set:figure-counter-major 30;counter-reset:figure-counter-minor;}
+  h1[data-number="31"]{counter-set:figure-counter-major 31;counter-reset:figure-counter-minor;}
+  h1[data-number="32"]{counter-set:figure-counter-major 32;counter-reset:figure-counter-minor;}
+  h1[data-number="33"]{counter-set:figure-counter-major 33;counter-reset:figure-counter-minor;}
+  h1[data-number="34"]{counter-set:figure-counter-major 34;counter-reset:figure-counter-minor;}
+  h1[data-number="35"]{counter-set:figure-counter-major 35;counter-reset:figure-counter-minor;}
+  h1[data-number="36"]{counter-set:figure-counter-major 36;counter-reset:figure-counter-minor;}
+  h1[data-number="37"]{counter-set:figure-counter-major 37;counter-reset:figure-counter-minor;}
+  h1[data-number="38"]{counter-set:figure-counter-major 38;counter-reset:figure-counter-minor;}
+  h1[data-number="39"]{counter-set:figure-counter-major 39;counter-reset:figure-counter-minor;}
+  h1[data-number="40"]{counter-set:figure-counter-major 40;counter-reset:figure-counter-minor;}
+  h1[data-number="41"]{counter-set:figure-counter-major 41;counter-reset:figure-counter-minor;}
+  h1[data-number="42"]{counter-set:figure-counter-major 42;counter-reset:figure-counter-minor;}
+  h1[data-number="43"]{counter-set:figure-counter-major 43;counter-reset:figure-counter-minor;}
+  h1[data-number="44"]{counter-set:figure-counter-major 44;counter-reset:figure-counter-minor;}
+  h1[data-number="45"]{counter-set:figure-counter-major 45;counter-reset:figure-counter-minor;}
+  h1[data-number="46"]{counter-set:figure-counter-major 46;counter-reset:figure-counter-minor;}
+  h1[data-number="47"]{counter-set:figure-counter-major 47;counter-reset:figure-counter-minor;}
+  h1[data-number="48"]{counter-set:figure-counter-major 48;counter-reset:figure-counter-minor;}
+  h1[data-number="49"]{counter-set:figure-counter-major 49;counter-reset:figure-counter-minor;}
+  h1[data-number="50"]{counter-set:figure-counter-major 50;counter-reset:figure-counter-minor;}
+  h1[data-number="51"]{counter-set:figure-counter-major 51;counter-reset:figure-counter-minor;}
+  h1[data-number="52"]{counter-set:figure-counter-major 52;counter-reset:figure-counter-minor;}
+  h1[data-number="53"]{counter-set:figure-counter-major 53;counter-reset:figure-counter-minor;}
+  h1[data-number="54"]{counter-set:figure-counter-major 54;counter-reset:figure-counter-minor;}
+  h1[data-number="55"]{counter-set:figure-counter-major 55;counter-reset:figure-counter-minor;}
+  h1[data-number="56"]{counter-set:figure-counter-major 56;counter-reset:figure-counter-minor;}
+  h1[data-number="57"]{counter-set:figure-counter-major 57;counter-reset:figure-counter-minor;}
+  h1[data-number="58"]{counter-set:figure-counter-major 58;counter-reset:figure-counter-minor;}
+  h1[data-number="59"]{counter-set:figure-counter-major 59;counter-reset:figure-counter-minor;}
+  h1[data-number="60"]{counter-set:figure-counter-major 60;counter-reset:figure-counter-minor;}
+  h1[data-number="61"]{counter-set:figure-counter-major 61;counter-reset:figure-counter-minor;}
+  h1[data-number="62"]{counter-set:figure-counter-major 62;counter-reset:figure-counter-minor;}
+  h1[data-number="63"]{counter-set:figure-counter-major 63;counter-reset:figure-counter-minor;}
+  h1[data-number="64"]{counter-set:figure-counter-major 64;counter-reset:figure-counter-minor;}
+  h1[data-number="65"]{counter-set:figure-counter-major 65;counter-reset:figure-counter-minor;}
+  h1[data-number="66"]{counter-set:figure-counter-major 66;counter-reset:figure-counter-minor;}
+  h1[data-number="67"]{counter-set:figure-counter-major 67;counter-reset:figure-counter-minor;}
+  h1[data-number="68"]{counter-set:figure-counter-major 68;counter-reset:figure-counter-minor;}
+  h1[data-number="69"]{counter-set:figure-counter-major 69;counter-reset:figure-counter-minor;}
+  h1[data-number="70"]{counter-set:figure-counter-major 70;counter-reset:figure-counter-minor;}
+  h1[data-number="71"]{counter-set:figure-counter-major 71;counter-reset:figure-counter-minor;}
+  h1[data-number="72"]{counter-set:figure-counter-major 72;counter-reset:figure-counter-minor;}
+  h1[data-number="73"]{counter-set:figure-counter-major 73;counter-reset:figure-counter-minor;}
+  h1[data-number="74"]{counter-set:figure-counter-major 74;counter-reset:figure-counter-minor;}
+  h1[data-number="75"]{counter-set:figure-counter-major 75;counter-reset:figure-counter-minor;}
+  h1[data-number="76"]{counter-set:figure-counter-major 76;counter-reset:figure-counter-minor;}
+  h1[data-number="77"]{counter-set:figure-counter-major 77;counter-reset:figure-counter-minor;}
+  h1[data-number="78"]{counter-set:figure-counter-major 78;counter-reset:figure-counter-minor;}
+  h1[data-number="79"]{counter-set:figure-counter-major 79;counter-reset:figure-counter-minor;}
+  h1[data-number="80"]{counter-set:figure-counter-major 80;counter-reset:figure-counter-minor;}
+  h1[data-number="81"]{counter-set:figure-counter-major 81;counter-reset:figure-counter-minor;}
+  h1[data-number="82"]{counter-set:figure-counter-major 82;counter-reset:figure-counter-minor;}
+  h1[data-number="83"]{counter-set:figure-counter-major 83;counter-reset:figure-counter-minor;}
+  h1[data-number="84"]{counter-set:figure-counter-major 84;counter-reset:figure-counter-minor;}
+  h1[data-number="85"]{counter-set:figure-counter-major 85;counter-reset:figure-counter-minor;}
+  h1[data-number="86"]{counter-set:figure-counter-major 86;counter-reset:figure-counter-minor;}
+  h1[data-number="87"]{counter-set:figure-counter-major 87;counter-reset:figure-counter-minor;}
+  h1[data-number="88"]{counter-set:figure-counter-major 88;counter-reset:figure-counter-minor;}
+  h1[data-number="89"]{counter-set:figure-counter-major 89;counter-reset:figure-counter-minor;}
+  h1[data-number="90"]{counter-set:figure-counter-major 90;counter-reset:figure-counter-minor;}
+  h1[data-number="91"]{counter-set:figure-counter-major 91;counter-reset:figure-counter-minor;}
+  h1[data-number="92"]{counter-set:figure-counter-major 92;counter-reset:figure-counter-minor;}
+  h1[data-number="93"]{counter-set:figure-counter-major 93;counter-reset:figure-counter-minor;}
+  h1[data-number="94"]{counter-set:figure-counter-major 94;counter-reset:figure-counter-minor;}
+  h1[data-number="95"]{counter-set:figure-counter-major 95;counter-reset:figure-counter-minor;}
+  h1[data-number="96"]{counter-set:figure-counter-major 96;counter-reset:figure-counter-minor;}
+  h1[data-number="97"]{counter-set:figure-counter-major 97;counter-reset:figure-counter-minor;}
+  h1[data-number="98"]{counter-set:figure-counter-major 98;counter-reset:figure-counter-minor;}
+  h1[data-number="99"]{counter-set:figure-counter-major 99;counter-reset:figure-counter-minor;}
+
+
+  </style>
+  <!-- BG custom styling for the wide body variant -->
+  <!-- Gets appended after bg-css.html -->
+
+  <style type="text/css">
+  body {
+      max-width: inherit;
+  }
+  </style>
+</head>
+<body>
+<div style="text-align:center"><span><a href="stash.html" rel="prev">Prev</a> | </span><a href="index.html">Contents</a><span> | <a href="revert.html" rel="next">Next</a></span></div><hr>
+<h1 data-number="17" id="github-forking-and-pull-requests"><span class="header-section-number">17</span> GitHub: Forking and Pull Requests</h1>
+<p> </p>
+<p>For a lot of projects you’re on, maybe you have write permission to the main repo that everyone is using. That is, you’ve been added as a collaborator and you can just push directly.</p>
+<p>If that’s the case, you don’t need to fork GitHub repos or create pull requests. You can just keep committing and pushing as always.</p>
+<p>But what if you want to make changes to a repo on GitHub but you don’t have write permission? This might happen if you forked a repo that you want to make changes to. You can write to your fork, but not to the repo you forked from. How do you get the changes you made to your fork into the original repo?</p>
+<p>Let’s check it out.</p>
+<p>A <strong><em>fork</em></strong> is a clone of someone else’s GitHub repo that you’ve made on GitHub using their “Fork” command. It’s a regular clone except that GitHub is doing some bookkeeping to track which repo you forked from.</p>
+<p>The <strong><em>upstream</em></strong> is by convention the name of the remote that you forked from. I know this conflicts with some other definitions of “upstream”. But for this chapter, in the context of forks, let’s assume it means this.</p>
+<p>A <strong><em>pull request</em></strong> (or “PR” for short) is a way for you to offer changes you’ve made to your fork to the owner of the original repo.</p>
+<blockquote>
+<p><strong>Forks and Pull Requests are a GitHub thing, not a Git thing.</strong> It’s some additional functionality that GitHub has implemented on their website that you can use.</p>
+</blockquote>
+<p>Let’s say, for example, you found an open source project you liked and there was a bug in it. You don’t have permission to write to the project’s GitHub repo, so how can you change it?</p>
+<p></p>
+<p>The process for someone making a pull request is:</p>
+<ol type="1">
+<li>On GitHub, fork the repo. Now you have your own clone of it.</li>
+<li>Clone your repo to your local machine. Now you have two clones of it: your fork on GitHub and its clone on your local machine. (And you own them both.)</li>
+<li>Make the fix on your local machine and test it.</li>
+<li>Push your fix to your GitHub fork.</li>
+<li>On GitHub, create a pull request. This informs the upstream owner that you have changes you’d like them to merge.</li>
+<li>On GitHub, the upstream owner reviews your PR and decides if they want to merge it. If so, they merge it. Otherwise they comment and ask for changes, or delete it.</li>
+<li>At this point, if you’re done, you can optionally delete your fork.</li>
+</ol>
+<p>Let’s give it a try! Feel free to issue PRs on my sample repo, used below. I’m just going to delete them (they won’t be merged); don’t take it personally—I just don’t have time to review them all.</p>
+<h2 data-number="17.1" id="making-a-fork"><span class="header-section-number">17.1</span> Making a Fork</h2>
+<p></p>
+<p>Head on over to <a href="https://github.com/beejjorgensen/git-example-repo">my test repo</a><a href="quick-reference.html#fn26" class="footnote-ref" id="fnref26" role="doc-noteref"><sup>26</sup></a> and let’s do this:</p>
+<ul>
+<li>In the upper right there should be a button labeled “Fork”. Click it.</li>
+<li>Under “Owner”, choose your user name.</li>
+<li>Under “Repository name”, chose the default or make a new name.</li>
+<li>Optionally, if the repo has multiple branches and you wish to have those in your fork, uncheck the “Copy the main branch only” checkbox. You can always get the branches by hand later if you don’t do this.</li>
+<li>Click the “Create fork” button.</li>
+</ul>
+<blockquote>
+<p><strong>This can be done with impunity.</strong> That is, you’ve made your own fork but the original owner is unaware that you did. You can delete it with no damage to the original repo. Remember that a fork is a clone on GitHub that you have ownership of, independent of the original repo.</p>
+</blockquote>
+<p>At this point, you should land on the project page for your fork, and the fine print on the page reads: “forked from beejjorgensen/git-example-repo”.</p>
+<p>And now we have our own version of that repo on GitHub to do with as we please.</p>
+<p>We can clone it as normal, pull, push, delete the repo, etc. The owner of the original repo will not know about it—our changes affect our repo alone. Later we’ll see how to issue a pull request to try to get our changes merged into the original upstream repo.</p>
+<p></p>
+<h2 data-number="17.2" id="making-your-changes"><span class="header-section-number">17.2</span> Making Your Changes</h2>
+<p>Let’s make some changes. First, we have to clone <em>our</em> repo (that is, clone the fork we made) onto our local machine.</p>
+<p>So pull down the “Code” button as usual and select the SSH link to clone (or use the GitHub CLI variant if you’re using that).</p>
+<div class="sourceCode" id="cb215"><pre class="sourceCode default"><code class="sourceCode default"><span id="cb215-1"><a href="github-forking-and-pull-requests.html#cb215-1" aria-hidden="true" tabindex="-1"></a>$ git clone git@github.com:user/git-example-repo.git</span>
+<span id="cb215-2"><a href="github-forking-and-pull-requests.html#cb215-2" aria-hidden="true" tabindex="-1"></a>  Cloning into &#39;git-example-repo&#39;...</span>
+<span id="cb215-3"><a href="github-forking-and-pull-requests.html#cb215-3" aria-hidden="true" tabindex="-1"></a>  remote: Enumerating objects: 4, done.</span>
+<span id="cb215-4"><a href="github-forking-and-pull-requests.html#cb215-4" aria-hidden="true" tabindex="-1"></a>  remote: Counting objects: 100% (4/4), done.</span>
+<span id="cb215-5"><a href="github-forking-and-pull-requests.html#cb215-5" aria-hidden="true" tabindex="-1"></a>  remote: Compressing objects: 100% (3/3), done.</span>
+<span id="cb215-6"><a href="github-forking-and-pull-requests.html#cb215-6" aria-hidden="true" tabindex="-1"></a>  remote: Total 4 (delta 0), reused 4 (delta 0), pack-reused 0</span>
+<span id="cb215-7"><a href="github-forking-and-pull-requests.html#cb215-7" aria-hidden="true" tabindex="-1"></a>  Receiving objects: 100% (4/4), done.</span></code></pre></div>
+<p>And then you can <code>cd</code> into that directory and see the files there.</p>
+<div class="sourceCode" id="cb216"><pre class="sourceCode default"><code class="sourceCode default"><span id="cb216-1"><a href="github-forking-and-pull-requests.html#cb216-1" aria-hidden="true" tabindex="-1"></a>$ cd git-example-repo</span>
+<span id="cb216-2"><a href="github-forking-and-pull-requests.html#cb216-2" aria-hidden="true" tabindex="-1"></a>$ ls</span>
+<span id="cb216-3"><a href="github-forking-and-pull-requests.html#cb216-3" aria-hidden="true" tabindex="-1"></a>  hello.py    README.md</span></code></pre></div>
+<p>Let’s modify <code>hello.py</code> to this:</p>
+<div class="sourceCode" id="cb217"><pre class="sourceCode numberSource py numberLines"><code class="sourceCode python"><span id="cb217-1"><a href="github-forking-and-pull-requests.html#cb217-1"></a><span class="co">#!/usr/bin/env python</span></span>
+<span id="cb217-2"><a href="github-forking-and-pull-requests.html#cb217-2"></a></span>
+<span id="cb217-3"><a href="github-forking-and-pull-requests.html#cb217-3"></a><span class="bu">print</span>(<span class="st">&quot;Hello, world!&quot;</span>)</span>
+<span id="cb217-4"><a href="github-forking-and-pull-requests.html#cb217-4"></a><span class="bu">print</span>(<span class="st">&quot;This is my program!&quot;</span>)</span>
+<span id="cb217-5"><a href="github-forking-and-pull-requests.html#cb217-5"></a><span class="bu">print</span>(<span class="st">&quot;This is my modification&quot;</span>)</span></code></pre></div>
+<p>And let’s add it, make a commit, and push.</p>
+<div class="sourceCode" id="cb218"><pre class="sourceCode default"><code class="sourceCode default"><span id="cb218-1"><a href="github-forking-and-pull-requests.html#cb218-1" aria-hidden="true" tabindex="-1"></a>$ git add hello.py</span>
+<span id="cb218-2"><a href="github-forking-and-pull-requests.html#cb218-2" aria-hidden="true" tabindex="-1"></a>$ git commit -m &quot;modified&quot;</span>
+<span id="cb218-3"><a href="github-forking-and-pull-requests.html#cb218-3" aria-hidden="true" tabindex="-1"></a>  [main 5d3fe49] modified</span>
+<span id="cb218-4"><a href="github-forking-and-pull-requests.html#cb218-4" aria-hidden="true" tabindex="-1"></a>   1 file changed, 1 insertion(+)</span>
+<span id="cb218-5"><a href="github-forking-and-pull-requests.html#cb218-5" aria-hidden="true" tabindex="-1"></a>$ git push</span>
+<span id="cb218-6"><a href="github-forking-and-pull-requests.html#cb218-6" aria-hidden="true" tabindex="-1"></a>  Enumerating objects: 5, done.</span>
+<span id="cb218-7"><a href="github-forking-and-pull-requests.html#cb218-7" aria-hidden="true" tabindex="-1"></a>  Counting objects: 100% (5/5), done.</span>
+<span id="cb218-8"><a href="github-forking-and-pull-requests.html#cb218-8" aria-hidden="true" tabindex="-1"></a>  Delta compression using up to 8 threads</span>
+<span id="cb218-9"><a href="github-forking-and-pull-requests.html#cb218-9" aria-hidden="true" tabindex="-1"></a>  Compressing objects: 100% (3/3), done.</span>
+<span id="cb218-10"><a href="github-forking-and-pull-requests.html#cb218-10" aria-hidden="true" tabindex="-1"></a>  Writing objects: 100% (3/3), 1.02 KiB | 1.02 MiB/s, done.</span>
+<span id="cb218-11"><a href="github-forking-and-pull-requests.html#cb218-11" aria-hidden="true" tabindex="-1"></a>  Total 3 (delta 0), reused 0 (delta 0), pack-reused 0 (from 0)</span>
+<span id="cb218-12"><a href="github-forking-and-pull-requests.html#cb218-12" aria-hidden="true" tabindex="-1"></a>  To github.com:user/git-example-repo.git</span>
+<span id="cb218-13"><a href="github-forking-and-pull-requests.html#cb218-13" aria-hidden="true" tabindex="-1"></a>     4332527..5d3fe49  main -&gt; main</span></code></pre></div>
+<p>Again, this just pushed to our fork, not the upstream. You can look at your fork’s page on GitHub and see the change there.</p>
+<h2 data-number="17.3" id="syncing-the-upstream-with-your-fork"><span class="header-section-number">17.3</span> Syncing the Upstream with Your Fork</h2>
+<p></p>
+<p>Are you ready to make a PR? Hold up just a moment!</p>
+<p>What if the upstream owner has made changes to their repo in the meantime? Don’t you want to make sure your code works with the latest version of their code?</p>
+<p>Of course you do.</p>
+<p>On your fork’s page, you might have noticed that it has a “Sync fork” button that you can pull down.</p>
+<p>If you pull it down and it says “This branch is not behind the upstream”, then congratulations! You’re already up to date! Go ahead and make a PR, as outlined in the next section.</p>
+<p>If you pull it down and it says “This branch is out-of-date” and offers you an “Update branch” button, then congratulations! You’re out of date, but you can be brought up to date without a conflict. Click “Update branch” and then go ahead and make a PR, as outlined in the next section. (It might also offer you a “Discard” button, but don’t press that unless you want to discard your changes!)</p>
+<p>If it instead says “This branch has conflicts that must be resolved”, bad news. You have some changes in your repo that conflict with someone else’s changes in the upstream. You have some options:</p>
+<ul>
+<li>The UI says you can open a pull request, which will give you a chance to resolve the conflict in-browser as outlined in the next section.</li>
+<li>It also says you can just throw away your changes and replace them with the upstream. Bummer.</li>
+<li>Aside from that, you can actually merge your branch from the upstream on the command line and take care of the conflict there without opening a PR first. See <a href="github-forking-and-pull-requests.html#sync-cl">Syncing on the Command Line</a>, below.</li>
+</ul>
+<p>In general, it’s a good idea to keep in sync with the upstream repo. This way you can be sure your changes aren’t conflicting with any upstream changes as you go. It’s way better than waiting to resolve them all at the end when you’re ready to issue a pull request.</p>
+<p></p>
+<h2 data-number="17.4" id="making-a-pull-request"><span class="header-section-number">17.4</span> Making a Pull Request</h2>
+<p></p>
+<p>Now that we’ve modified our fork to our satisfaction, we can ask the upstream maintainer if they’re willing to accept it into the official repo.</p>
+<blockquote>
+<p><strong>Maybe they aren’t ready!</strong> Don’t take it personally if they don’t answer or answer with ways they need your patch improved. Work with the owners to get the job done to both of your satisfactions.</p>
+</blockquote>
+<p>Let’s go!</p>
+<ul>
+<li>Click the “Contribute” button and then “Open pull request”.</li>
+<li>Look for the text “This branch has conflicts that must be resolved”. If you find that text, it means the upstream can’t automatically apply your PR and they’ll have to do manual work to make it happen. They’re far more likely to just reject it. To avoid this, you have some options:
+<ul>
+<li>Don’t open the PR, go back and sync with the upstream, fix the conflict, and try again.</li>
+<li>Or click the “Resolve conflicts” button right there in the UI and use the in-browser editor to manually resolve.</li>
+</ul></li>
+<li>Add a nice title.</li>
+<li>Add a good description. You’re asking someone to incorporate your code into their project, so you’ll want to describe what the code does here to make their lives easier when they review it. (Since this example goes to my repo, you can just pretend you wrote something nice—I’m just going to close the PR.)</li>
+<li>Click “Create pull request”!</li>
+</ul>
+<p>This lands us on the PR page. You can add more comments or close the request (if you changed your mind about it).</p>
+<p>The owner of the upstream will see the PR has been issued, and now you have to wait for a response.</p>
+<p>Maybe they respond with a comment asking for improvements or other questions. Maybe they reject the PR and close it, unmerged. Or maybe they accept! Happy days!</p>
+<p></p>
+<h2 data-number="17.5" id="flipside-merging-a-pull-request"><span class="header-section-number">17.5</span> Flipside: Merging a Pull Request</h2>
+<p></p>
+<p>As the upstream owner, if someone issues a PR you’ll be notified (unless you’ve turned those notifications off) with an email and in the notifications in GitHub in the upper right.</p>
+<p>When you do, you can visit your project page on GitHub and decide what to do with the PR.</p>
+<p>At the top of the project page, you’ll see a “Pull requests” button with a number next to it indicating how many PRs are currently outstanding.</p>
+<ul>
+<li>Click the button to see the list.</li>
+<li>Click on a PR title to get to the PR.</li>
+</ul>
+<p>Now we’re looking at the PR. Read the description to see what it does, and then, <strong>very importantly</strong> review the code!</p>
+<blockquote>
+<p><strong>You’re about to accept code from someone you probably don’t know.</strong> On this planet, most people are friendly, but that doesn’t mean there aren’t some bad actors (the industry term is <em>a--holes</em>) out there looking to take advantage of you by introducing some malicious code. Even if you’ve known the contributor for a year, they might be playing a long game, and if that seems unlikely to you, <a href="https://en.wikipedia.org/wiki/XZ_Utils_backdoor">read about the XZ utils hack that took place in 2024</a><a href="quick-reference.html#fn27" class="footnote-ref" id="fnref27" role="doc-noteref"><sup>27</sup></a>.</p>
+</blockquote>
+<p>To review the code, look right below the description to the contributor’s avatar and the commit message. Click on the commit message and you’ll see a diff, as described in the <a href="diff.html#diff"><em>Comparing Files with Diff</em> chapter</a>. Lines marked with a <code>+</code> are added, and lines marked with <code>-</code> are removed.</p>
+<p>If you just want a straight up view of the file as it was edited by the contributor, you can hit the “…” on the right and then “View file”.</p>
+<p>If it’s almost right but you need to make a modification, you can also hit “Edit file” and add commits directly to the PR.</p>
+<p>If everything looks good, scroll down and hopefully you’ll see some text that reads “This branch has no conflicts with the base branch” and “Merging can be performed automatically”. This is good news.</p>
+<p>If it says that, you can just click “Merge pull request”, and that will add the changes to your repo and close the PR. It’s nice to also add a comment thanking the contributor—they just gave you work for free, after all!</p>
+<blockquote>
+<p><strong>Closing a PR doesn’t delete the PR.</strong> You can still reopen it.</p>
+</blockquote>
+<p>But let’s say the PR does conflict and can’t be automatically merged. GitHub complains that “This branch has conflicts that must be resolved” and gives you some options.</p>
+<p>As the upstream owner, you can click the “Resolve conflicts” button and fix the issue if possible.</p>
+<p>Or you can just reject the PR and ask the person who opened it to resolve the conflict so that your life might be made easier with an automatic merge.</p>
+<p></p>
+<h2 data-number="17.6" id="making-many-pull-requests-with-branches"><span class="header-section-number">17.6</span> Making Many Pull Requests with Branches</h2>
+<p></p>
+<p>Here’s the thing about pull requests: when you make one, it takes all the changes you have on your branch and bundles them together in one. Doesn’t matter if the changes are doing radically different things; they all get rolled into the same PR.</p>
+<p>This is sometimes not so great from an administrative perspective. Maybe I want a PR for issue #1 and a different PR for issue #2!</p>
+<p>The way to make this happen is to make a local branch on the clone of your fork for each individual PR, and push those branches to your fork. Then when you create the PR, you choose the branch to use. Even if your branch is named something like <code>feature1</code>, you can still merge it into the <code>main</code> branch on the upstream.</p>
+<p>So make a new branch for the feature:</p>
+<div class="sourceCode" id="cb219"><pre class="sourceCode default"><code class="sourceCode default"><span id="cb219-1"><a href="github-forking-and-pull-requests.html#cb219-1" aria-hidden="true" tabindex="-1"></a>$ git switch -c feature1</span>
+<span id="cb219-2"><a href="github-forking-and-pull-requests.html#cb219-2" aria-hidden="true" tabindex="-1"></a>  Switched to a new branch &#39;feature1&#39;</span></code></pre></div>
+<p>Then make your changes, add, and commit.</p>
+<div class="sourceCode" id="cb220"><pre class="sourceCode default"><code class="sourceCode default"><span id="cb220-1"><a href="github-forking-and-pull-requests.html#cb220-1" aria-hidden="true" tabindex="-1"></a>$ vim readme.txt</span>
+<span id="cb220-2"><a href="github-forking-and-pull-requests.html#cb220-2" aria-hidden="true" tabindex="-1"></a>$ git add readme.txt</span>
+<span id="cb220-3"><a href="github-forking-and-pull-requests.html#cb220-3" aria-hidden="true" tabindex="-1"></a>$ git commit -m &quot;feature 1&quot;</span>
+<span id="cb220-4"><a href="github-forking-and-pull-requests.html#cb220-4" aria-hidden="true" tabindex="-1"></a>  [feature1 1ad9e92] feature 1</span>
+<span id="cb220-5"><a href="github-forking-and-pull-requests.html#cb220-5" aria-hidden="true" tabindex="-1"></a>   1 file changed, 1 insertion(+)</span></code></pre></div>
+<p>Then push them to your repo, setting up a remote-tracking branch:</p>
+<div class="sourceCode" id="cb221"><pre class="sourceCode default"><code class="sourceCode default"><span id="cb221-1"><a href="github-forking-and-pull-requests.html#cb221-1" aria-hidden="true" tabindex="-1"></a>$ git push -u origin feature1</span>
+<span id="cb221-2"><a href="github-forking-and-pull-requests.html#cb221-2" aria-hidden="true" tabindex="-1"></a>  Enumerating objects: 5, done.</span>
+<span id="cb221-3"><a href="github-forking-and-pull-requests.html#cb221-3" aria-hidden="true" tabindex="-1"></a>  Counting objects: 100% (5/5), done.</span>
+<span id="cb221-4"><a href="github-forking-and-pull-requests.html#cb221-4" aria-hidden="true" tabindex="-1"></a>  Delta compression using up to 8 threads</span>
+<span id="cb221-5"><a href="github-forking-and-pull-requests.html#cb221-5" aria-hidden="true" tabindex="-1"></a>  Compressing objects: 100% (2/2), done.</span>
+<span id="cb221-6"><a href="github-forking-and-pull-requests.html#cb221-6" aria-hidden="true" tabindex="-1"></a>  Writing objects: 100% (3/3), 979 bytes | 979.00 KiB/s, done.</span>
+<span id="cb221-7"><a href="github-forking-and-pull-requests.html#cb221-7" aria-hidden="true" tabindex="-1"></a>  Total 3 (delta 1), reused 0 (delta 0), pack-reused 0 (from 0)</span>
+<span id="cb221-8"><a href="github-forking-and-pull-requests.html#cb221-8" aria-hidden="true" tabindex="-1"></a>  remote: Resolving deltas: 100% (1/1), completed with 1 local</span>
+<span id="cb221-9"><a href="github-forking-and-pull-requests.html#cb221-9" aria-hidden="true" tabindex="-1"></a>  remote: object.</span>
+<span id="cb221-10"><a href="github-forking-and-pull-requests.html#cb221-10" aria-hidden="true" tabindex="-1"></a>  remote:</span>
+<span id="cb221-11"><a href="github-forking-and-pull-requests.html#cb221-11" aria-hidden="true" tabindex="-1"></a>  remote: Create a pull request for &#39;feature1&#39; on GitHub by</span>
+<span id="cb221-12"><a href="github-forking-and-pull-requests.html#cb221-12" aria-hidden="true" tabindex="-1"></a>  remote: visiting:</span>
+<span id="cb221-13"><a href="github-forking-and-pull-requests.html#cb221-13" aria-hidden="true" tabindex="-1"></a>  remote:      https://github.com/user/fork/pull/new/feature1</span>
+<span id="cb221-14"><a href="github-forking-and-pull-requests.html#cb221-14" aria-hidden="true" tabindex="-1"></a>  remote:</span>
+<span id="cb221-15"><a href="github-forking-and-pull-requests.html#cb221-15" aria-hidden="true" tabindex="-1"></a>  To github.com:user/fork.git</span>
+<span id="cb221-16"><a href="github-forking-and-pull-requests.html#cb221-16" aria-hidden="true" tabindex="-1"></a>   * [new branch]      feature1 -&gt; feature1</span>
+<span id="cb221-17"><a href="github-forking-and-pull-requests.html#cb221-17" aria-hidden="true" tabindex="-1"></a>  branch &#39;feature1&#39; set up to track &#39;origin/feature1&#39;.</span></code></pre></div>
+<p>Now you can jump back to GitHub and issue a PR. (And look at the response from the remote helpfully telling you the GitHub URL to visit to issue the PR!)</p>
+<p>In the GitHub UI, there might be a handy little popup there saying “feature1 had recent pushes 4 minutes ago” and a button “Compare and pull request” you can click to make the PR.</p>
+<p>But if it’s been too long and the popup is gone, not to worry. See the branch selector button on the upper left that probably says “main” right now? Pull it down and select the branch “feature1” that you want to create the PR for. Then click “Contribute” and open the PR.</p>
+<p>There’s a line at the top of the PR that indicates the repo and branch that will be merged into, and, on the right, your repo and branch name that you’ll be merging from.</p>
+<p>The rest of the PR proceeds as normal.</p>
+<p><strong>Don’t delete your branch until after the merge!</strong> Once it has been safely merged, GitHub will pop up a “Delete branch” button for you on the PR page. This will delete the branch on GitHub, but you’ll still have to delete <code>feature1</code> and <code>origin/feature1</code> on the command line.</p>
+<p></p>
+<h2 data-number="17.7" id="deleting-a-pull-request"><span class="header-section-number">17.7</span> Deleting a Pull Request</h2>
+<p></p>
+<p>Short answer: you can’t.</p>
+<p>Long answer: you can.</p>
+<p>The irony is that the short answer is longer. I don’t make the rules.</p>
+<p>Proper long answer: you can if you are the upstream owner and the PR contains sensitive information.</p>
+<p>There’s no way in the UI to delete PRs, whether you’re the forker or forkee. And this can be a bummer especially if you’ve accidentally included some sensitive information like <a href="https://en.wikipedia.org/wiki/Social_Security_number#SSNs_used_in_advertising">social security number 078-05-1120</a><a href="quick-reference.html#fn28" class="footnote-ref" id="fnref28" role="doc-noteref"><sup>28</sup></a>.</p>
+<p>But hope is not all lost! The upstream owner can visit the virtual assistant at GitHub and <a href="https://support.github.com/request?q=pull+request+removals">ask for a pull request removal</a><a href="quick-reference.html#fn29" class="footnote-ref" id="fnref29" role="doc-noteref"><sup>29</sup></a> which apparently works. I haven’t tried it.</p>
+<p>If there’s a way as the forker to delete the PR they created, I haven’t seen it. You’ll have to plead your case with the upstream owner and get them to do it.</p>
+<p>In any case, you most definitely should change your leaked credentials right now and let that be a lesson to you.</p>
+<p></p>
+<h2 data-number="17.8" id="sync-cl"><span class="header-section-number">17.8</span> Syncing on the Command Line</h2>
+<p></p>
+<p>GitHub has that nice Sync button to bring the upstream changes into your fork, and this was a welcome addition. It used to be you had to do it the hard way.</p>
+<p>But the hard way has an additional benefit: if the upstream conflicts with your changes, you can merge them locally before creating the PR. The GitHub UI requires you create a PR to resolve the conflict.</p>
+<p>Additionally, if you just like the command line and want to quickly sync the upstream to your branch, this can do it.</p>
+<p>The plan is this:</p>
+<ol type="1">
+<li>Add an <code>upstream</code> remote that points to the upstream repo.</li>
+<li>Fetch the data from <code>upstream</code>.</li>
+<li>Merge the upstream branch into your branch.</li>
+<li>Resolve conflicts.</li>
+<li>Push your branch.</li>
+<li>Go issue a now-hopefully-non-conflicting PR.</li>
+</ol>
+<p>Let’s try. I’ll be on my <code>main</code> branch, and try to sync it with the upstream’s <code>main</code> branch. I’ll show what it’s like when there’s a conflict. (If there were no conflict, the merge would succeed automatically.)</p>
+<p>First things first: if you haven’t already, set up the <code>upstream</code> remote to point to the original owner’s repo. This is the repo that you forked from. Since you won’t be pushing to it, you can use the SSH or HTTP methods to access it. (And this remote can be named anything, but <code>upstream</code> is a common convention.)</p>
+<div class="sourceCode" id="cb222"><pre class="sourceCode default"><code class="sourceCode default"><span id="cb222-1"><a href="github-forking-and-pull-requests.html#cb222-1" aria-hidden="true" tabindex="-1"></a>$ git remote add upstream https://github.com/other/orig-repo.git</span></code></pre></div>
+<p>And then we need to get the new commits from the upstream repo and merge them into our stuff.</p>
+<p></p>
+<div class="sourceCode" id="cb223"><pre class="sourceCode default"><code class="sourceCode default"><span id="cb223-1"><a href="github-forking-and-pull-requests.html#cb223-1" aria-hidden="true" tabindex="-1"></a>$ git fetch upstream</span>
+<span id="cb223-2"><a href="github-forking-and-pull-requests.html#cb223-2" aria-hidden="true" tabindex="-1"></a>  remote: Enumerating objects: 5, done.</span>
+<span id="cb223-3"><a href="github-forking-and-pull-requests.html#cb223-3" aria-hidden="true" tabindex="-1"></a>  remote: Counting objects: 100% (5/5), done.</span>
+<span id="cb223-4"><a href="github-forking-and-pull-requests.html#cb223-4" aria-hidden="true" tabindex="-1"></a>  remote: Compressing objects: 100% (1/1), done.</span>
+<span id="cb223-5"><a href="github-forking-and-pull-requests.html#cb223-5" aria-hidden="true" tabindex="-1"></a>  remote: Total 3 (delta 1), reused 3 (delta 1), pack-reused 0</span>
+<span id="cb223-6"><a href="github-forking-and-pull-requests.html#cb223-6" aria-hidden="true" tabindex="-1"></a>  Unpacking objects: 100% (3/3), 950 bytes | 950.00 KiB/s, done.</span>
+<span id="cb223-7"><a href="github-forking-and-pull-requests.html#cb223-7" aria-hidden="true" tabindex="-1"></a>  From https://github.com/other/upstream</span>
+<span id="cb223-8"><a href="github-forking-and-pull-requests.html#cb223-8" aria-hidden="true" tabindex="-1"></a>   * [new branch]      main       -&gt; upstream/main</span>
+<span id="cb223-9"><a href="github-forking-and-pull-requests.html#cb223-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb223-10"><a href="github-forking-and-pull-requests.html#cb223-10" aria-hidden="true" tabindex="-1"></a>$ git switch main   # Make sure we&#39;re on the main branch</span>
+<span id="cb223-11"><a href="github-forking-and-pull-requests.html#cb223-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb223-12"><a href="github-forking-and-pull-requests.html#cb223-12" aria-hidden="true" tabindex="-1"></a>$ git merge upstream/main</span>
+<span id="cb223-13"><a href="github-forking-and-pull-requests.html#cb223-13" aria-hidden="true" tabindex="-1"></a>  Auto-merging readme.txt</span>
+<span id="cb223-14"><a href="github-forking-and-pull-requests.html#cb223-14" aria-hidden="true" tabindex="-1"></a>  CONFLICT (content): Merge conflict in readme.txt</span>
+<span id="cb223-15"><a href="github-forking-and-pull-requests.html#cb223-15" aria-hidden="true" tabindex="-1"></a>  Automatic merge failed; fix conflicts and then commit the result.</span></code></pre></div>
+<p>(You could also rebase if you wanted.)</p>
+<p>At this point, we should edit the file and resolve the conflict, and complete the resolution as per usual.</p>
+<p>And then we push back to our fork on GitHub!</p>
+<div class="sourceCode" id="cb224"><pre class="sourceCode default"><code class="sourceCode default"><span id="cb224-1"><a href="github-forking-and-pull-requests.html#cb224-1" aria-hidden="true" tabindex="-1"></a>$ git push</span>
+<span id="cb224-2"><a href="github-forking-and-pull-requests.html#cb224-2" aria-hidden="true" tabindex="-1"></a>  Enumerating objects: 7, done.</span>
+<span id="cb224-3"><a href="github-forking-and-pull-requests.html#cb224-3" aria-hidden="true" tabindex="-1"></a>  Counting objects: 100% (7/7), done.</span>
+<span id="cb224-4"><a href="github-forking-and-pull-requests.html#cb224-4" aria-hidden="true" tabindex="-1"></a>  Delta compression using up to 8 threads</span>
+<span id="cb224-5"><a href="github-forking-and-pull-requests.html#cb224-5" aria-hidden="true" tabindex="-1"></a>  Compressing objects: 100% (2/2), done.</span>
+<span id="cb224-6"><a href="github-forking-and-pull-requests.html#cb224-6" aria-hidden="true" tabindex="-1"></a>  Writing objects: 100% (3/3), 999 bytes | 999.00 KiB/s, done.</span>
+<span id="cb224-7"><a href="github-forking-and-pull-requests.html#cb224-7" aria-hidden="true" tabindex="-1"></a>  Total 3 (delta 1), reused 0 (delta 0), pack-reused 0 (from 0)</span>
+<span id="cb224-8"><a href="github-forking-and-pull-requests.html#cb224-8" aria-hidden="true" tabindex="-1"></a>  remote: Resolving deltas: 100% (1/1), completed with 1 local</span>
+<span id="cb224-9"><a href="github-forking-and-pull-requests.html#cb224-9" aria-hidden="true" tabindex="-1"></a>  remote: object.</span>
+<span id="cb224-10"><a href="github-forking-and-pull-requests.html#cb224-10" aria-hidden="true" tabindex="-1"></a>  To github.com:user/fork.git</span>
+<span id="cb224-11"><a href="github-forking-and-pull-requests.html#cb224-11" aria-hidden="true" tabindex="-1"></a>   8b2476c..c8a7e0a  main -&gt; main</span></code></pre></div>
+<p>If we jump back to the GitHub UI at this point and open a PR, it should tell us “These branches can be automatically merged” which is music to everyone’s ears.</p>
+<p>Once you have the <code>upstream</code> remote set up, all you have to do to sync in the future is do the <code>git fetch upstream</code> and then merge or rebase your stuff with it.</p>
+<p></p>
+<p> </p>
+<!-- BG_NEW_CHAPTER -->
+<hr><div style="text-align:center"><span><a href="stash.html" rel="prev">Prev</a> | </span><a href="index.html">Contents</a><span> | <a href="revert.html" rel="next">Next</a></span></div></body>
+</html>

@@ -1,0 +1,803 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <title>Beej's Guide to Git</title>
+  <style>
+    html {
+      color: #1a1a1a;
+      background-color: #fdfdfd;
+    }
+    body {
+      margin: 0 auto;
+      max-width: 36em;
+      padding-left: 50px;
+      padding-right: 50px;
+      padding-top: 50px;
+      padding-bottom: 50px;
+      hyphens: auto;
+      overflow-wrap: break-word;
+      text-rendering: optimizeLegibility;
+      font-kerning: normal;
+    }
+    @media (max-width: 600px) {
+      body {
+        font-size: 0.9em;
+        padding: 12px;
+      }
+      h1 {
+        font-size: 1.8em;
+      }
+    }
+    @media print {
+      html {
+        background-color: white;
+      }
+      body {
+        background-color: transparent;
+        color: black;
+        font-size: 12pt;
+      }
+      p, h2, h3 {
+        orphans: 3;
+        widows: 3;
+      }
+      h2, h3, h4 {
+        page-break-after: avoid;
+      }
+    }
+    p {
+      margin: 1em 0;
+    }
+    a {
+      color: #1a1a1a;
+    }
+    a:visited {
+      color: #1a1a1a;
+    }
+    img {
+      max-width: 100%;
+    }
+    svg {
+      height: auto;
+      max-width: 100%;
+    }
+    h1, h2, h3, h4, h5, h6 {
+      margin-top: 1.4em;
+    }
+    h5, h6 {
+      font-size: 1em;
+      font-style: italic;
+    }
+    h6 {
+      font-weight: normal;
+    }
+    ol, ul {
+      padding-left: 1.7em;
+      margin-top: 1em;
+    }
+    li > ol, li > ul {
+      margin-top: 0;
+    }
+    blockquote {
+      margin: 1em 0 1em 1.7em;
+      padding-left: 1em;
+      border-left: 2px solid #e6e6e6;
+      color: #606060;
+    }
+    code {
+      font-family: Menlo, Monaco, Consolas, 'Lucida Console', monospace;
+      font-size: 85%;
+      margin: 0;
+      hyphens: manual;
+    }
+    pre {
+      margin: 1em 0;
+      overflow: auto;
+    }
+    pre code {
+      padding: 0;
+      overflow: visible;
+      overflow-wrap: normal;
+    }
+    .sourceCode {
+     background-color: transparent;
+     overflow: visible;
+    }
+    hr {
+      background-color: #1a1a1a;
+      border: none;
+      height: 1px;
+      margin: 1em 0;
+    }
+    table {
+      margin: 1em 0;
+      border-collapse: collapse;
+      width: 100%;
+      overflow-x: auto;
+      display: block;
+      font-variant-numeric: lining-nums tabular-nums;
+    }
+    table caption {
+      margin-bottom: 0.75em;
+    }
+    tbody {
+      margin-top: 0.5em;
+      border-top: 1px solid #1a1a1a;
+      border-bottom: 1px solid #1a1a1a;
+    }
+    th {
+      border-top: 1px solid #1a1a1a;
+      padding: 0.25em 0.5em 0.25em 0.5em;
+    }
+    td {
+      padding: 0.125em 0.5em 0.25em 0.5em;
+    }
+    header {
+      margin-bottom: 4em;
+      text-align: center;
+    }
+    #TOC li {
+      list-style: none;
+    }
+    #TOC ul {
+      padding-left: 1.3em;
+    }
+    #TOC > ul {
+      padding-left: 0;
+    }
+    #TOC a:not(:hover) {
+      text-decoration: none;
+    }
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+    /* CSS for syntax highlighting */
+    html { -webkit-text-size-adjust: 100%; }
+    pre > code.sourceCode { white-space: pre; position: relative; }
+    pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+    pre > code.sourceCode > span:empty { height: 1.2em; }
+    .sourceCode { overflow: visible; }
+    code.sourceCode > span { color: inherit; text-decoration: inherit; }
+    div.sourceCode { margin: 1em 0; }
+    pre.sourceCode { margin: 0; }
+    @media screen {
+    div.sourceCode { overflow: auto; }
+    }
+    @media print {
+    pre > code.sourceCode { white-space: pre-wrap; }
+    pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+    }
+    pre.numberSource code
+      { counter-reset: source-line 0; }
+    pre.numberSource code > span
+      { position: relative; left: -4em; counter-increment: source-line; }
+    pre.numberSource code > span > a:first-child::before
+      { content: counter(source-line);
+        position: relative; left: -1em; text-align: right; vertical-align: baseline;
+        border: none; display: inline-block;
+        -webkit-touch-callout: none; -webkit-user-select: none;
+        -khtml-user-select: none; -moz-user-select: none;
+        -ms-user-select: none; user-select: none;
+        padding: 0 4px; width: 4em;
+        color: #aaaaaa;
+      }
+    pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+    div.sourceCode
+      {   }
+    @media screen {
+    pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+    }
+    code span.al { color: #ff0000; font-weight: bold; } /* Alert */
+    code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+    code span.at { color: #7d9029; } /* Attribute */
+    code span.bn { color: #40a070; } /* BaseN */
+    code span.bu { color: #008000; } /* BuiltIn */
+    code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+    code span.ch { color: #4070a0; } /* Char */
+    code span.cn { color: #880000; } /* Constant */
+    code span.co { color: #60a0b0; font-style: italic; } /* Comment */
+    code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+    code span.do { color: #ba2121; font-style: italic; } /* Documentation */
+    code span.dt { color: #902000; } /* DataType */
+    code span.dv { color: #40a070; } /* DecVal */
+    code span.er { color: #ff0000; font-weight: bold; } /* Error */
+    code span.ex { } /* Extension */
+    code span.fl { color: #40a070; } /* Float */
+    code span.fu { color: #06287e; } /* Function */
+    code span.im { color: #008000; font-weight: bold; } /* Import */
+    code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+    code span.kw { color: #007020; font-weight: bold; } /* Keyword */
+    code span.op { color: #666666; } /* Operator */
+    code span.ot { color: #007020; } /* Other */
+    code span.pp { color: #bc7a00; } /* Preprocessor */
+    code span.sc { color: #4070a0; } /* SpecialChar */
+    code span.ss { color: #bb6688; } /* SpecialString */
+    code span.st { color: #4070a0; } /* String */
+    code span.va { color: #19177c; } /* Variable */
+    code span.vs { color: #4070a0; } /* VerbatimString */
+    code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+  </style>
+  <!-- BG custom styling -->
+  <style type="text/css">
+  /* Fix for line numbers not visible */
+  pre.numberSource code > span {
+      left: -1em;
+  }
+  pre.numberSource {
+      margin-left: initial;
+  }
+
+  /* Put some space after the section numbers */
+  span.toc-section-number::after {
+      content: "\a0\a0\a0";  /* non-breaking whitespace */
+  }
+
+  /* Hide underlines on code number links */
+  pre > code.sourceCode > span > a:first-child::before {
+      text-decoration: none;
+  }
+
+  /* Color the source blocks */
+  div.sourceCode {
+      background-color: #f0f0f0;
+  }
+
+  /* Fix iOS big text rendering issue */
+  pre > code.sourceCode > span {
+      display: initial;
+  }
+
+
+  /* Color the inline code */
+  code:not(.sourceCode) {
+      background: #f0f0f0;
+      padding-left: 0.2em;
+      padding-right: 0.2em;
+      border-radius: 0.2em;
+  }
+
+  pre.sourceCode {
+      border: 1px solid #ccc;
+      padding: 0.5em;
+      border-radius: 0.2em;
+  }
+
+  /* Keep code tags from wrapping in tables */
+  tbody code {
+      white-space: nowrap;
+  }
+
+  /* Prevent hyphenation and hyphen breaks in code*/
+  code {
+      word-break: keep-all;
+  }
+
+  td {
+      vertical-align: top;
+  }
+
+  body {
+      font-size: 12pt;
+      max-width: 43em;
+      font-family: sans-serif;
+  }
+
+  html {
+      background: #f9f9f9;
+  }
+
+  figure > embed {
+      max-width: 100%;
+  }
+
+  figure {
+      text-align: center;
+      margin-top: 2em;
+      margin-bottom: 2em;
+  }
+
+  figcaption {
+      font-size: 0.9em;
+      font-style: italic;
+      margin-top: 0.6em;
+  }
+
+  body {
+      counter-reset: figure-counter-major;
+      counter-reset: figure-counter-minor;
+  }
+
+  figure {
+      counter-increment: figure-counter-minor;
+  }
+
+  figcaption::before {
+      content: "Figure " counter(figure-counter-major) "." counter(figure-counter-minor) ": ";
+  }
+
+  blockquote {
+      border-left: 2px solid #bbb;
+      color: #444;
+  }
+
+  /* Contents */
+
+  nav[role="doc-toc"] > ul > li {
+    font-weight: bold;
+    margin-top: 1.2em;
+  }
+
+  nav[role="doc-toc"] > ul > li:first {
+    font-weight: bold;
+    margin-top: initial;
+  }
+
+  nav[role="doc-toc"] > ul > li > ul {
+    font-weight: normal;
+    margin-top: 0.3em;
+  }
+
+  /*
+  In multipage, we need to reset the figure counter to the chapter
+  number. Luckily, this is in the <h1 data-number> attribute. Unluckily,
+  there is no way to get this in a general way.
+
+  This doesn't work:
+
+    h1[data-number] {
+      counter-set: figure-counter-major attr(data-number);
+    }
+
+  Nor this:
+
+    h1[data-number] {
+      --figure-counter-major-value: attr(data-number);
+      counter-set: figure-counter-major var(--figure-counter-major-value);
+    }
+
+  So, dumbly, we have a bunch of rules for all these sections, up to the
+  maximum possible section.
+
+  Here's a program to generate them:
+
+    for (let i = 1; i < 100; i++)
+        console.log(`h1[data-number="${i}"]{counter-set:figure-counter-major ${i};counter-reset:figure-counter-minor;}`);
+
+  Note to self: never write a book with more than 99 frickin' chapters.
+  */
+
+  h1[data-number="1"]{counter-set:figure-counter-major 1;counter-reset:figure-counter-minor;}
+  h1[data-number="2"]{counter-set:figure-counter-major 2;counter-reset:figure-counter-minor;}
+  h1[data-number="3"]{counter-set:figure-counter-major 3;counter-reset:figure-counter-minor;}
+  h1[data-number="4"]{counter-set:figure-counter-major 4;counter-reset:figure-counter-minor;}
+  h1[data-number="5"]{counter-set:figure-counter-major 5;counter-reset:figure-counter-minor;}
+  h1[data-number="6"]{counter-set:figure-counter-major 6;counter-reset:figure-counter-minor;}
+  h1[data-number="7"]{counter-set:figure-counter-major 7;counter-reset:figure-counter-minor;}
+  h1[data-number="8"]{counter-set:figure-counter-major 8;counter-reset:figure-counter-minor;}
+  h1[data-number="9"]{counter-set:figure-counter-major 9;counter-reset:figure-counter-minor;}
+  h1[data-number="10"]{counter-set:figure-counter-major 10;counter-reset:figure-counter-minor;}
+  h1[data-number="11"]{counter-set:figure-counter-major 11;counter-reset:figure-counter-minor;}
+  h1[data-number="12"]{counter-set:figure-counter-major 12;counter-reset:figure-counter-minor;}
+  h1[data-number="13"]{counter-set:figure-counter-major 13;counter-reset:figure-counter-minor;}
+  h1[data-number="14"]{counter-set:figure-counter-major 14;counter-reset:figure-counter-minor;}
+  h1[data-number="15"]{counter-set:figure-counter-major 15;counter-reset:figure-counter-minor;}
+  h1[data-number="16"]{counter-set:figure-counter-major 16;counter-reset:figure-counter-minor;}
+  h1[data-number="17"]{counter-set:figure-counter-major 17;counter-reset:figure-counter-minor;}
+  h1[data-number="18"]{counter-set:figure-counter-major 18;counter-reset:figure-counter-minor;}
+  h1[data-number="19"]{counter-set:figure-counter-major 19;counter-reset:figure-counter-minor;}
+  h1[data-number="20"]{counter-set:figure-counter-major 20;counter-reset:figure-counter-minor;}
+  h1[data-number="21"]{counter-set:figure-counter-major 21;counter-reset:figure-counter-minor;}
+  h1[data-number="22"]{counter-set:figure-counter-major 22;counter-reset:figure-counter-minor;}
+  h1[data-number="23"]{counter-set:figure-counter-major 23;counter-reset:figure-counter-minor;}
+  h1[data-number="24"]{counter-set:figure-counter-major 24;counter-reset:figure-counter-minor;}
+  h1[data-number="25"]{counter-set:figure-counter-major 25;counter-reset:figure-counter-minor;}
+  h1[data-number="26"]{counter-set:figure-counter-major 26;counter-reset:figure-counter-minor;}
+  h1[data-number="27"]{counter-set:figure-counter-major 27;counter-reset:figure-counter-minor;}
+  h1[data-number="28"]{counter-set:figure-counter-major 28;counter-reset:figure-counter-minor;}
+  h1[data-number="29"]{counter-set:figure-counter-major 29;counter-reset:figure-counter-minor;}
+  h1[data-number="30"]{counter-set:figure-counter-major 30;counter-reset:figure-counter-minor;}
+  h1[data-number="31"]{counter-set:figure-counter-major 31;counter-reset:figure-counter-minor;}
+  h1[data-number="32"]{counter-set:figure-counter-major 32;counter-reset:figure-counter-minor;}
+  h1[data-number="33"]{counter-set:figure-counter-major 33;counter-reset:figure-counter-minor;}
+  h1[data-number="34"]{counter-set:figure-counter-major 34;counter-reset:figure-counter-minor;}
+  h1[data-number="35"]{counter-set:figure-counter-major 35;counter-reset:figure-counter-minor;}
+  h1[data-number="36"]{counter-set:figure-counter-major 36;counter-reset:figure-counter-minor;}
+  h1[data-number="37"]{counter-set:figure-counter-major 37;counter-reset:figure-counter-minor;}
+  h1[data-number="38"]{counter-set:figure-counter-major 38;counter-reset:figure-counter-minor;}
+  h1[data-number="39"]{counter-set:figure-counter-major 39;counter-reset:figure-counter-minor;}
+  h1[data-number="40"]{counter-set:figure-counter-major 40;counter-reset:figure-counter-minor;}
+  h1[data-number="41"]{counter-set:figure-counter-major 41;counter-reset:figure-counter-minor;}
+  h1[data-number="42"]{counter-set:figure-counter-major 42;counter-reset:figure-counter-minor;}
+  h1[data-number="43"]{counter-set:figure-counter-major 43;counter-reset:figure-counter-minor;}
+  h1[data-number="44"]{counter-set:figure-counter-major 44;counter-reset:figure-counter-minor;}
+  h1[data-number="45"]{counter-set:figure-counter-major 45;counter-reset:figure-counter-minor;}
+  h1[data-number="46"]{counter-set:figure-counter-major 46;counter-reset:figure-counter-minor;}
+  h1[data-number="47"]{counter-set:figure-counter-major 47;counter-reset:figure-counter-minor;}
+  h1[data-number="48"]{counter-set:figure-counter-major 48;counter-reset:figure-counter-minor;}
+  h1[data-number="49"]{counter-set:figure-counter-major 49;counter-reset:figure-counter-minor;}
+  h1[data-number="50"]{counter-set:figure-counter-major 50;counter-reset:figure-counter-minor;}
+  h1[data-number="51"]{counter-set:figure-counter-major 51;counter-reset:figure-counter-minor;}
+  h1[data-number="52"]{counter-set:figure-counter-major 52;counter-reset:figure-counter-minor;}
+  h1[data-number="53"]{counter-set:figure-counter-major 53;counter-reset:figure-counter-minor;}
+  h1[data-number="54"]{counter-set:figure-counter-major 54;counter-reset:figure-counter-minor;}
+  h1[data-number="55"]{counter-set:figure-counter-major 55;counter-reset:figure-counter-minor;}
+  h1[data-number="56"]{counter-set:figure-counter-major 56;counter-reset:figure-counter-minor;}
+  h1[data-number="57"]{counter-set:figure-counter-major 57;counter-reset:figure-counter-minor;}
+  h1[data-number="58"]{counter-set:figure-counter-major 58;counter-reset:figure-counter-minor;}
+  h1[data-number="59"]{counter-set:figure-counter-major 59;counter-reset:figure-counter-minor;}
+  h1[data-number="60"]{counter-set:figure-counter-major 60;counter-reset:figure-counter-minor;}
+  h1[data-number="61"]{counter-set:figure-counter-major 61;counter-reset:figure-counter-minor;}
+  h1[data-number="62"]{counter-set:figure-counter-major 62;counter-reset:figure-counter-minor;}
+  h1[data-number="63"]{counter-set:figure-counter-major 63;counter-reset:figure-counter-minor;}
+  h1[data-number="64"]{counter-set:figure-counter-major 64;counter-reset:figure-counter-minor;}
+  h1[data-number="65"]{counter-set:figure-counter-major 65;counter-reset:figure-counter-minor;}
+  h1[data-number="66"]{counter-set:figure-counter-major 66;counter-reset:figure-counter-minor;}
+  h1[data-number="67"]{counter-set:figure-counter-major 67;counter-reset:figure-counter-minor;}
+  h1[data-number="68"]{counter-set:figure-counter-major 68;counter-reset:figure-counter-minor;}
+  h1[data-number="69"]{counter-set:figure-counter-major 69;counter-reset:figure-counter-minor;}
+  h1[data-number="70"]{counter-set:figure-counter-major 70;counter-reset:figure-counter-minor;}
+  h1[data-number="71"]{counter-set:figure-counter-major 71;counter-reset:figure-counter-minor;}
+  h1[data-number="72"]{counter-set:figure-counter-major 72;counter-reset:figure-counter-minor;}
+  h1[data-number="73"]{counter-set:figure-counter-major 73;counter-reset:figure-counter-minor;}
+  h1[data-number="74"]{counter-set:figure-counter-major 74;counter-reset:figure-counter-minor;}
+  h1[data-number="75"]{counter-set:figure-counter-major 75;counter-reset:figure-counter-minor;}
+  h1[data-number="76"]{counter-set:figure-counter-major 76;counter-reset:figure-counter-minor;}
+  h1[data-number="77"]{counter-set:figure-counter-major 77;counter-reset:figure-counter-minor;}
+  h1[data-number="78"]{counter-set:figure-counter-major 78;counter-reset:figure-counter-minor;}
+  h1[data-number="79"]{counter-set:figure-counter-major 79;counter-reset:figure-counter-minor;}
+  h1[data-number="80"]{counter-set:figure-counter-major 80;counter-reset:figure-counter-minor;}
+  h1[data-number="81"]{counter-set:figure-counter-major 81;counter-reset:figure-counter-minor;}
+  h1[data-number="82"]{counter-set:figure-counter-major 82;counter-reset:figure-counter-minor;}
+  h1[data-number="83"]{counter-set:figure-counter-major 83;counter-reset:figure-counter-minor;}
+  h1[data-number="84"]{counter-set:figure-counter-major 84;counter-reset:figure-counter-minor;}
+  h1[data-number="85"]{counter-set:figure-counter-major 85;counter-reset:figure-counter-minor;}
+  h1[data-number="86"]{counter-set:figure-counter-major 86;counter-reset:figure-counter-minor;}
+  h1[data-number="87"]{counter-set:figure-counter-major 87;counter-reset:figure-counter-minor;}
+  h1[data-number="88"]{counter-set:figure-counter-major 88;counter-reset:figure-counter-minor;}
+  h1[data-number="89"]{counter-set:figure-counter-major 89;counter-reset:figure-counter-minor;}
+  h1[data-number="90"]{counter-set:figure-counter-major 90;counter-reset:figure-counter-minor;}
+  h1[data-number="91"]{counter-set:figure-counter-major 91;counter-reset:figure-counter-minor;}
+  h1[data-number="92"]{counter-set:figure-counter-major 92;counter-reset:figure-counter-minor;}
+  h1[data-number="93"]{counter-set:figure-counter-major 93;counter-reset:figure-counter-minor;}
+  h1[data-number="94"]{counter-set:figure-counter-major 94;counter-reset:figure-counter-minor;}
+  h1[data-number="95"]{counter-set:figure-counter-major 95;counter-reset:figure-counter-minor;}
+  h1[data-number="96"]{counter-set:figure-counter-major 96;counter-reset:figure-counter-minor;}
+  h1[data-number="97"]{counter-set:figure-counter-major 97;counter-reset:figure-counter-minor;}
+  h1[data-number="98"]{counter-set:figure-counter-major 98;counter-reset:figure-counter-minor;}
+  h1[data-number="99"]{counter-set:figure-counter-major 99;counter-reset:figure-counter-minor;}
+
+
+  </style>
+  <!-- BG custom styling for the wide body variant -->
+  <!-- Gets appended after bg-css.html -->
+
+  <style type="text/css">
+  body {
+      max-width: inherit;
+  }
+  </style>
+</head>
+<body>
+<div style="text-align:center"><span><a href="mergetool.html" rel="prev">Prev</a> | </span><a href="index.html">Contents</a><span> | <a href="tags.html" rel="next">Next</a></span></div><hr>
+<h1 data-number="30" id="submodules"><span class="header-section-number">30</span> Submodules</h1>
+<p></p>
+<p>You can’t really have a Git repo <em>inside</em> a Git repo. I mean, yes, you can make one, but when you try to add it to the outer repo, Git will have a lot to say about it.</p>
+<div class="sourceCode" id="cb345"><pre class="sourceCode default"><code class="sourceCode default"><span id="cb345-1"><a href="submodules.html#cb345-1" aria-hidden="true" tabindex="-1"></a>warning: adding embedded git repository: inner</span>
+<span id="cb345-2"><a href="submodules.html#cb345-2" aria-hidden="true" tabindex="-1"></a>hint: You&#39;ve added another git repository inside your current</span>
+<span id="cb345-3"><a href="submodules.html#cb345-3" aria-hidden="true" tabindex="-1"></a>hint: repository. Clones of the outer repository will not contain</span>
+<span id="cb345-4"><a href="submodules.html#cb345-4" aria-hidden="true" tabindex="-1"></a>hint: the contents of the embedded repository and will not know how</span>
+<span id="cb345-5"><a href="submodules.html#cb345-5" aria-hidden="true" tabindex="-1"></a>hint: to obtain it. If you meant to add a submodule, use:</span>
+<span id="cb345-6"><a href="submodules.html#cb345-6" aria-hidden="true" tabindex="-1"></a>hint:</span>
+<span id="cb345-7"><a href="submodules.html#cb345-7" aria-hidden="true" tabindex="-1"></a>hint:     git submodule add &lt;url&gt; inner</span>
+<span id="cb345-8"><a href="submodules.html#cb345-8" aria-hidden="true" tabindex="-1"></a>hint:</span>
+<span id="cb345-9"><a href="submodules.html#cb345-9" aria-hidden="true" tabindex="-1"></a>hint: If you added this path by mistake, you can remove it from the</span>
+<span id="cb345-10"><a href="submodules.html#cb345-10" aria-hidden="true" tabindex="-1"></a>hint: index with:</span>
+<span id="cb345-11"><a href="submodules.html#cb345-11" aria-hidden="true" tabindex="-1"></a>hint:</span>
+<span id="cb345-12"><a href="submodules.html#cb345-12" aria-hidden="true" tabindex="-1"></a>hint:     git rm --cached inner</span>
+<span id="cb345-13"><a href="submodules.html#cb345-13" aria-hidden="true" tabindex="-1"></a>hint:</span>
+<span id="cb345-14"><a href="submodules.html#cb345-14" aria-hidden="true" tabindex="-1"></a>hint: See &quot;git help submodule&quot; for more information.</span>
+<span id="cb345-15"><a href="submodules.html#cb345-15" aria-hidden="true" tabindex="-1"></a>hint: Disable this message with &quot;git config advice.addEmbeddedRepo</span>
+<span id="cb345-16"><a href="submodules.html#cb345-16" aria-hidden="true" tabindex="-1"></a>hint: false&quot;</span></code></pre></div>
+<p>So it’s probably not what you want, but Git offers a hint: maybe you wanted something to do with submodules, instead!</p>
+<p>Submodules give you a way to make a completely separate repo appear inside the working tree of your current repo. Not only that, it allows the current working tree to have a specific commit of the submodule represented in that submodule’s tree.</p>
+<p>The canonical use case for this is when your project depends on a library that you also have the source for. You can include the library’s repo as a submodule of your repo, and effectively pin it to a particular version (specifically to a particular commit).</p>
+<p>For example, maybe your code works with FooLib version 3.4.90. So you include FooLib as a submodule and make sure it’s pinned to that version. Then even though another team might be updating FooLib, you’ll always have version 3.4.90 available to build against.</p>
+<p>Then later when you’re ready, you can update the submodule to the latest version, say 4.0.1, and pin that one in place.</p>
+<p>It’s important to note that a submodule is just another regular Git repo. Nothing special about it. The only thing that’s notable is that we’ve decided to effectively clone it inside another repo, and logically tie it to that repo.</p>
+<h2 data-number="30.1" id="using-a-repo-with-submodules"><span class="header-section-number">30.1</span> Using a Repo with Submodules</h2>
+<p>Let’s start by talking about what happens when you clone a repo that already uses submodules. In this case, someone else has done the work of putting the repo together with its submodules, but you have to do a little bit of extra effort after cloning it so you get all the submodules, as well.</p>
+<p>Later we’ll talk about how to add submodules to a project.</p>
+<p>Luckily, for demonstration purposes, I have a repo you can clone that already has a submodule defined within it. (Fork the repo before you clone it if you want to be able to push back.)</p>
+<p>Let’s say you already know that the repo you’re about to clone has submodules. (Because someone told you it did.) You can then clone with a flag saying you want to get all the submodule repos, too, please. You do this with the <code>--recurse-submodules</code> switch:</p>
+<div class="sourceCode" id="cb346"><pre class="sourceCode default"><code class="sourceCode default"><span id="cb346-1"><a href="submodules.html#cb346-1" aria-hidden="true" tabindex="-1"></a>$ git clone --recurse-submodules \</span>
+<span id="cb346-2"><a href="submodules.html#cb346-2" aria-hidden="true" tabindex="-1"></a>        git@github.com:beejjorgensen/git-example-submodule-repo.git</span></code></pre></div>
+<p>(Above command split into two lines to fit in the margins.)</p>
+<p>And that will clone the repo in question, and it will also clone all repos listed as submodules of that repo. Go ahead and run it—it’s a real repo you can clone.</p>
+<p>After you run it and go into the repo directory, you’ll see a <code>git-example-repo</code> directory in there. That’s a completely separate repo inside this one as a submodule. You can <code>cd</code> into it and look at the files!</p>
+<blockquote>
+<p><strong>Any Git commands you run in the submodule directory tree apply only to the submodule!</strong> Be extra careful making commits in the submodule directory tree—<code>HEAD</code> commonly gets detached with submodules. More on that later.</p>
+</blockquote>
+<p>But let’s say you forget to specify <code>--recurse-submodules</code>, or you just plain didn’t realize there were submodules here. Not to worry! You can get them after the fact. The above command is the same as these two (or three) commands:</p>
+<div class="sourceCode" id="cb347"><pre class="sourceCode default"><code class="sourceCode default"><span id="cb347-1"><a href="submodules.html#cb347-1" aria-hidden="true" tabindex="-1"></a>$ git clone \</span>
+<span id="cb347-2"><a href="submodules.html#cb347-2" aria-hidden="true" tabindex="-1"></a>        git@github.com:beejjorgensen/git-example-submodule-repo.git</span>
+<span id="cb347-3"><a href="submodules.html#cb347-3" aria-hidden="true" tabindex="-1"></a>$ cd git-example-submodule-repo</span>
+<span id="cb347-4"><a href="submodules.html#cb347-4" aria-hidden="true" tabindex="-1"></a>$ git submodule update --recursive --init</span></code></pre></div>
+<p>That will also get the submodules cloned. (<code>--recursive</code> is in case the submodules have submodules (!!) and the <code>--init</code> does some necessary bookkeeping work in your local repo. How’s that for a handwavy statement?)</p>
+<p>And for now, that might be enough for you to get to work! All you really needed to build the existing project was the repo and its submodules, and you might not be in charge of the submodules and just need them to exist for the build. So now you can get to work.</p>
+<p>But in case you need to do more, read on!</p>
+<h2 data-number="30.2" id="creating-a-submodule"><span class="header-section-number">30.2</span> Creating a Submodule</h2>
+<p></p>
+<p>Let’s say you have a repo already, but you’ve decided you want to include another repo as a submodule.</p>
+<p>Again, a use case for this might be if your main repo project depends on another one for the build, e.g. like a library. And you don’t want to use the binary form of the library (or maybe it doesn’t exist), so you need to build it.</p>
+<p>If you didn’t use submodules, anyone who wanted to build your repo would need to also clone the library repo and juggle all that. Wouldn’t it be nicer if they could just add that <code>--recurse-submodules</code> flag to their <code>clone</code> command and have it all set up an ready to build?</p>
+<p>So let’s go through the steps of adding a submodule to an existing repo and see how that all works.</p>
+<p>Feel free to use my sample repo as your submodule, use one of your own, or anyone else’s. No one knows when you make a submodule out of their repo.</p>
+<p>First, let’s create a new repo for testing and put a commit in there for fun:</p>
+<div class="sourceCode" id="cb348"><pre class="sourceCode default"><code class="sourceCode default"><span id="cb348-1"><a href="submodules.html#cb348-1" aria-hidden="true" tabindex="-1"></a>$ git init test_repo</span>
+<span id="cb348-2"><a href="submodules.html#cb348-2" aria-hidden="true" tabindex="-1"></a>  Initialized empty Git repository in /frotz/test_repo/.git/</span>
+<span id="cb348-3"><a href="submodules.html#cb348-3" aria-hidden="true" tabindex="-1"></a>$ cd test_repo</span>
+<span id="cb348-4"><a href="submodules.html#cb348-4" aria-hidden="true" tabindex="-1"></a>$ echo Hello, world &gt; foo.txt</span>
+<span id="cb348-5"><a href="submodules.html#cb348-5" aria-hidden="true" tabindex="-1"></a>$ git add foo.txt</span>
+<span id="cb348-6"><a href="submodules.html#cb348-6" aria-hidden="true" tabindex="-1"></a>$ git commit -m added</span></code></pre></div>
+<p>And let’s add a submodule!</p>
+<div class="sourceCode" id="cb349"><pre class="sourceCode default"><code class="sourceCode default"><span id="cb349-1"><a href="submodules.html#cb349-1" aria-hidden="true" tabindex="-1"></a>$ git submodule add \</span>
+<span id="cb349-2"><a href="submodules.html#cb349-2" aria-hidden="true" tabindex="-1"></a>                  git@github.com:beejjorgensen/git-example-repo.git</span>
+<span id="cb349-3"><a href="submodules.html#cb349-3" aria-hidden="true" tabindex="-1"></a>  Cloning into &#39;/home/beej/tmp/test_repo/git-example-repo&#39;...</span>
+<span id="cb349-4"><a href="submodules.html#cb349-4" aria-hidden="true" tabindex="-1"></a>  remote: Enumerating objects: 4, done.</span>
+<span id="cb349-5"><a href="submodules.html#cb349-5" aria-hidden="true" tabindex="-1"></a>  remote: Counting objects: 100% (4/4), done.</span>
+<span id="cb349-6"><a href="submodules.html#cb349-6" aria-hidden="true" tabindex="-1"></a>  remote: Compressing objects: 100% (3/3), done.</span>
+<span id="cb349-7"><a href="submodules.html#cb349-7" aria-hidden="true" tabindex="-1"></a>  remote: Total 4 (delta 0), reused 4 (delta 0), pack-reused 0</span>
+<span id="cb349-8"><a href="submodules.html#cb349-8" aria-hidden="true" tabindex="-1"></a>  remote: (from 0)</span>
+<span id="cb349-9"><a href="submodules.html#cb349-9" aria-hidden="true" tabindex="-1"></a>  Receiving objects: 100% (4/4), done.</span></code></pre></div>
+<p>There you go! Well, almost, anyway. Let’s check our status:</p>
+<div class="sourceCode" id="cb350"><pre class="sourceCode default"><code class="sourceCode default"><span id="cb350-1"><a href="submodules.html#cb350-1" aria-hidden="true" tabindex="-1"></a>$ git status</span>
+<span id="cb350-2"><a href="submodules.html#cb350-2" aria-hidden="true" tabindex="-1"></a>  On branch main</span>
+<span id="cb350-3"><a href="submodules.html#cb350-3" aria-hidden="true" tabindex="-1"></a>  Changes to be committed:</span>
+<span id="cb350-4"><a href="submodules.html#cb350-4" aria-hidden="true" tabindex="-1"></a>    (use &quot;git restore --staged &lt;file&gt;...&quot; to unstage)</span>
+<span id="cb350-5"><a href="submodules.html#cb350-5" aria-hidden="true" tabindex="-1"></a>      new file:   .gitmodules</span>
+<span id="cb350-6"><a href="submodules.html#cb350-6" aria-hidden="true" tabindex="-1"></a>      new file:   git-example-repo</span></code></pre></div>
+<p>What are those things on the stage? Well, <code>git-example-repo</code> is the submodule. It’s a little strange because Git is calling it a “file” when it’s a directory, but that’s just part of the special treatment submodules get.</p>
+<p>And there’s another file in there called <code>.gitmodules</code> that holds information about all the submodules you’ve added.</p>
+<p>Both of these files (treating <code>git-example-repo</code> like a file) should be committed to your repo so that other people who clone it get the submodule information.</p>
+<div class="sourceCode" id="cb351"><pre class="sourceCode default"><code class="sourceCode default"><span id="cb351-1"><a href="submodules.html#cb351-1" aria-hidden="true" tabindex="-1"></a>$ git commit -m &quot;added submodule&quot;</span>
+<span id="cb351-2"><a href="submodules.html#cb351-2" aria-hidden="true" tabindex="-1"></a>  [main cedea64] added submodule</span>
+<span id="cb351-3"><a href="submodules.html#cb351-3" aria-hidden="true" tabindex="-1"></a>   2 files changed, 4 insertions(+)</span>
+<span id="cb351-4"><a href="submodules.html#cb351-4" aria-hidden="true" tabindex="-1"></a>   create mode 100644 .gitmodules</span>
+<span id="cb351-5"><a href="submodules.html#cb351-5" aria-hidden="true" tabindex="-1"></a>   create mode 160000 git-example-repo</span></code></pre></div>
+<p>Now you’re set! Anyone who clones the repo gets that submodule information.</p>
+<p>You can even do it with your test repo. Change directory to the parent of the test repo and clone it:</p>
+<div class="sourceCode" id="cb352"><pre class="sourceCode default"><code class="sourceCode default"><span id="cb352-1"><a href="submodules.html#cb352-1" aria-hidden="true" tabindex="-1"></a>$ git clone --recurse-submodules test_repo test_repo2</span></code></pre></div>
+<p>After that you can <code>cd</code> into <code>test_repo2</code> and see the submodule there.</p>
+<blockquote>
+<p><strong>Can I Make a Local Repo a Submodule?</strong> No! Git prohibits that because there’s some security risk there that, to be honest, I haven’t really read about. There’s supposed to be a way to override that with a config setting, which I thought would be quite useful for messing around to see how submodules worked, but apparently that config setting doesn’t work as of late 2024. So you’ll have to use network-remote repos for submodules.</p>
+</blockquote>
+<p></p>
+<h2 data-number="30.3" id="set-submodule-commit"><span class="header-section-number">30.3</span> Setting the Commit for the Submodule</h2>
+<p></p>
+<p>What does this section even mean?</p>
+<p>Here’s the deal: the containing repo refers to a specific commit within the submodule. That is, the submodule is always checked out to a particular commit as defined in the containing repo. (The submodule <code>HEAD</code> might be attached to a branch, but it also very well might not be.)</p>
+<p>The upshot of this is that when we make a repo with a submodule, we get to dictate which exact commit of that submodule our repo is using. And then, importantly, when someone clones our repo, they’ll be looking at the submodule at the exact same commit as we are.</p>
+<p>This lets us do things like choose a very particular version of a library as a submodule, and then everyone who clones our repo will get that same version <em>regardless of whether or not the submodule repo was changed elsewhere</em>. Someone else could move <code>main</code> wherever they want, but we’ll still use the one commit we’re pinned to, even if we fetch the new <code>main</code> commit into our submodule.</p>
+<p>We effectively pin our submodule to a particular commit. And we probably want to do that so that someone else developing the submodule on the side doesn’t introduce some change that breaks our containing repo’s build.</p>
+<p>How do we do that? It’s pretty easy:</p>
+<ol type="1">
+<li>Go to the submodule directory.</li>
+<li>Switch to the commit that you want to use. You can refer to this commit by branch name, commit hash, tag, or any other thing that <code>git    switch</code> takes. Use <code>--detach</code> if you’re detaching the <code>HEAD</code>.</li>
+<li>Go back to the containing module directory.</li>
+<li>Add the submodule directory.</li>
+<li>Commit.</li>
+</ol>
+<p>If you want to mess around with this using my test repos on GitHub, be sure to fork them first so you have write access.</p>
+<p>Let’s do the same thing we did in the last section and create the <code>test_repo</code> repo.</p>
+<p>And then do the <code>clone</code> into <code>test_repo2</code> just so we have two to mess with. (Don’t forget the <code>--recurse-submodules</code> flag!)</p>
+<blockquote>
+<p><strong>We’re cloning a non-bare repo, which is weird.</strong> It’s OK to clone it—the Git Police aren’t going to show up. You just won’t be able to push to it. And that’s perfectly good enough for this demo. But it’s something that you wouldn’t normally do.</p>
+</blockquote>
+<blockquote>
+<p><strong>Also notice the detached <code>HEAD</code> in the cloned submodule repo!</strong> If you look in <code>test_repo2/git-example-repo</code> and do a <code>git log</code>, you’ll see this on the first line:</p>
+<div class="sourceCode" id="cb353"><pre class="sourceCode default"><code class="sourceCode default"><span id="cb353-1"><a href="submodules.html#cb353-1" aria-hidden="true" tabindex="-1"></a>(HEAD, origin/main, origin/HEAD, main)</span></code></pre></div>
+<!-- ` -->
+<p>See how <code>HEAD</code> is detached from <code>main</code>?</p>
+<p>Now, I’d be lying if I said I knew the exact rules for when the <code>HEAD</code> in a submodule gets detached, but it’s not uncommon. In fact, you should just generally assume it’s detached and attach it to a branch if you have to. More on this later.</p>
+</blockquote>
+<p>Now in <code>test_repo</code>, let’s go into the submodule directory and check out an earlier version of the submodule repo. In this case, we’ll just check out the previous commit from <code>main</code>.</p>
+<div class="sourceCode" id="cb354"><pre class="sourceCode default"><code class="sourceCode default"><span id="cb354-1"><a href="submodules.html#cb354-1" aria-hidden="true" tabindex="-1"></a>$ cd test_repo/git-example-repo</span>
+<span id="cb354-2"><a href="submodules.html#cb354-2" aria-hidden="true" tabindex="-1"></a>$ git log</span>
+<span id="cb354-3"><a href="submodules.html#cb354-3" aria-hidden="true" tabindex="-1"></a>  commit cd1bf77d2ef08115b18d7f15a9c172dace1b2222</span>
+<span id="cb354-4"><a href="submodules.html#cb354-4" aria-hidden="true" tabindex="-1"></a>                           (HEAD -&gt; main, origin/main, origin/HEAD)</span>
+<span id="cb354-5"><a href="submodules.html#cb354-5" aria-hidden="true" tabindex="-1"></a>  Author: Brian &quot;Beej Jorgensen&quot; Hall &lt;beej@beej.us&gt;</span>
+<span id="cb354-6"><a href="submodules.html#cb354-6" aria-hidden="true" tabindex="-1"></a>  Date:   Fri Dec 6 15:07:43 2024 -0800</span>
+<span id="cb354-7"><a href="submodules.html#cb354-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb354-8"><a href="submodules.html#cb354-8" aria-hidden="true" tabindex="-1"></a>      very important clarification</span>
+<span id="cb354-9"><a href="submodules.html#cb354-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb354-10"><a href="submodules.html#cb354-10" aria-hidden="true" tabindex="-1"></a>  commit d8481e125e6ef49e2fa8041b16b9dd3b8136b550</span>
+<span id="cb354-11"><a href="submodules.html#cb354-11" aria-hidden="true" tabindex="-1"></a>  Author: Brian &quot;Beej Jorgensen&quot; Hall &lt;beej@beej.us&gt;</span>
+<span id="cb354-12"><a href="submodules.html#cb354-12" aria-hidden="true" tabindex="-1"></a>  Date:   Fri Dec 6 15:07:13 2024 -0800</span>
+<span id="cb354-13"><a href="submodules.html#cb354-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb354-14"><a href="submodules.html#cb354-14" aria-hidden="true" tabindex="-1"></a>      improve functionality</span>
+<span id="cb354-15"><a href="submodules.html#cb354-15" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb354-16"><a href="submodules.html#cb354-16" aria-hidden="true" tabindex="-1"></a>  commit 433252748b7f9bf85e556a6a0196cdf38198fc43</span>
+<span id="cb354-17"><a href="submodules.html#cb354-17" aria-hidden="true" tabindex="-1"></a>  Author: Brian &quot;Beej Jorgensen&quot; Hall &lt;beej@beej.us&gt;</span>
+<span id="cb354-18"><a href="submodules.html#cb354-18" aria-hidden="true" tabindex="-1"></a>  Date:   Fri Jan 26 13:30:08 2024 -0800</span>
+<span id="cb354-19"><a href="submodules.html#cb354-19" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb354-20"><a href="submodules.html#cb354-20" aria-hidden="true" tabindex="-1"></a>      Added</span></code></pre></div>
+<p>Let’s move this to the earlier commit.</p>
+<div class="sourceCode" id="cb355"><pre class="sourceCode default"><code class="sourceCode default"><span id="cb355-1"><a href="submodules.html#cb355-1" aria-hidden="true" tabindex="-1"></a>$ git switch --detach d8481e</span>
+<span id="cb355-2"><a href="submodules.html#cb355-2" aria-hidden="true" tabindex="-1"></a>  HEAD is now at d8481e1 improve functionality</span></code></pre></div>
+<p>So far so good. Now let’s <code>cd</code> back to the containing repo and have a look at where we stand.</p>
+<div class="sourceCode" id="cb356"><pre class="sourceCode default"><code class="sourceCode default"><span id="cb356-1"><a href="submodules.html#cb356-1" aria-hidden="true" tabindex="-1"></a>$ cd ..</span>
+<span id="cb356-2"><a href="submodules.html#cb356-2" aria-hidden="true" tabindex="-1"></a>$ git status</span>
+<span id="cb356-3"><a href="submodules.html#cb356-3" aria-hidden="true" tabindex="-1"></a>  On branch main</span>
+<span id="cb356-4"><a href="submodules.html#cb356-4" aria-hidden="true" tabindex="-1"></a>  Changes not staged for commit:</span>
+<span id="cb356-5"><a href="submodules.html#cb356-5" aria-hidden="true" tabindex="-1"></a>    (use &quot;git add &lt;file&gt;...&quot; to update what will be committed)</span>
+<span id="cb356-6"><a href="submodules.html#cb356-6" aria-hidden="true" tabindex="-1"></a>    (use &quot;git restore &lt;file&gt;...&quot; to discard changes in working</span>
+<span id="cb356-7"><a href="submodules.html#cb356-7" aria-hidden="true" tabindex="-1"></a>    directory)</span>
+<span id="cb356-8"><a href="submodules.html#cb356-8" aria-hidden="true" tabindex="-1"></a>      modified:   git-example-repo (new commits)</span>
+<span id="cb356-9"><a href="submodules.html#cb356-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb356-10"><a href="submodules.html#cb356-10" aria-hidden="true" tabindex="-1"></a>  no changes added to commit (use &quot;git add&quot; and/or &quot;git commit -a&quot;)</span></code></pre></div>
+<p>Look at that! The submodule directory is listed as modified. It says “new commits”, but that’s just telling us that “things have changed in the submodule from the commit that I was pinned onto before”.</p>
+<p>So let’s add that and commit it.</p>
+<div class="sourceCode" id="cb357"><pre class="sourceCode default"><code class="sourceCode default"><span id="cb357-1"><a href="submodules.html#cb357-1" aria-hidden="true" tabindex="-1"></a>$ git add git-example-repo</span>
+<span id="cb357-2"><a href="submodules.html#cb357-2" aria-hidden="true" tabindex="-1"></a>$ git commit -m &quot;update submodule commit&quot;</span>
+<span id="cb357-3"><a href="submodules.html#cb357-3" aria-hidden="true" tabindex="-1"></a>  [main dd69bb8] update submodule commit</span>
+<span id="cb357-4"><a href="submodules.html#cb357-4" aria-hidden="true" tabindex="-1"></a>   1 file changed, 1 insertion(+), 1 deletion(-)</span></code></pre></div>
+<p>And now let’s pull those changes in our clone, <code>test_repo2</code>—note the <code>--recurse-submodule</code> option on the pull!</p>
+<div class="sourceCode" id="cb358"><pre class="sourceCode default"><code class="sourceCode default"><span id="cb358-1"><a href="submodules.html#cb358-1" aria-hidden="true" tabindex="-1"></a>$ cd ../test_repo2</span>
+<span id="cb358-2"><a href="submodules.html#cb358-2" aria-hidden="true" tabindex="-1"></a>$ git pull --recurse-submodules</span>
+<span id="cb358-3"><a href="submodules.html#cb358-3" aria-hidden="true" tabindex="-1"></a>  Fetching submodule git-example-repo</span>
+<span id="cb358-4"><a href="submodules.html#cb358-4" aria-hidden="true" tabindex="-1"></a>  Already up to date.</span>
+<span id="cb358-5"><a href="submodules.html#cb358-5" aria-hidden="true" tabindex="-1"></a>  Submodule path &#39;git-example-repo&#39;: checked out&#39;</span>
+<span id="cb358-6"><a href="submodules.html#cb358-6" aria-hidden="true" tabindex="-1"></a>                         &#39;d8481e125e6ef49e2fa8041b16b9dd3b8136b550&#39;</span></code></pre></div>
+<p>And now on <code>test_repo2</code> if we jump into the <code>git-example-repo</code> submodule, we can check the log:</p>
+<div class="sourceCode" id="cb359"><pre class="sourceCode default"><code class="sourceCode default"><span id="cb359-1"><a href="submodules.html#cb359-1" aria-hidden="true" tabindex="-1"></a>$ git log</span>
+<span id="cb359-2"><a href="submodules.html#cb359-2" aria-hidden="true" tabindex="-1"></a>  commit d8481e125e6ef49e2fa8041b16b9dd3b8136b550 (HEAD)</span>
+<span id="cb359-3"><a href="submodules.html#cb359-3" aria-hidden="true" tabindex="-1"></a>  Author: Brian &quot;Beej Jorgensen&quot; Hall &lt;beej@beej.us&gt;</span>
+<span id="cb359-4"><a href="submodules.html#cb359-4" aria-hidden="true" tabindex="-1"></a>  Date:   Fri Dec 6 15:07:13 2024 -0800</span>
+<span id="cb359-5"><a href="submodules.html#cb359-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb359-6"><a href="submodules.html#cb359-6" aria-hidden="true" tabindex="-1"></a>      improve functionality</span>
+<span id="cb359-7"><a href="submodules.html#cb359-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb359-8"><a href="submodules.html#cb359-8" aria-hidden="true" tabindex="-1"></a>  commit 433252748b7f9bf85e556a6a0196cdf38198fc43</span>
+<span id="cb359-9"><a href="submodules.html#cb359-9" aria-hidden="true" tabindex="-1"></a>  Author: Brian &quot;Beej Jorgensen&quot; Hall &lt;beej@beej.us&gt;</span>
+<span id="cb359-10"><a href="submodules.html#cb359-10" aria-hidden="true" tabindex="-1"></a>  Date:   Fri Jan 26 13:30:08 2024 -0800</span>
+<span id="cb359-11"><a href="submodules.html#cb359-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb359-12"><a href="submodules.html#cb359-12" aria-hidden="true" tabindex="-1"></a>      Added</span></code></pre></div>
+<p>And we see <code>HEAD</code> is on commit <code>d8481e</code>, just like we set it to in <code>test_repo</code>. (And we also do not see <code>main</code>. It’s the child commit from where <code>HEAD</code> is now, so it’s not appearing in the log. We could still switch to it if we wanted, of course.)</p>
+<p>What have we done? We’ve changed the commit the submodule is pinned at in one repo, and then we’ve pulled that change into another repo!</p>
+<p></p>
+<h2 data-number="30.4" id="getting-submodule-latest"><span class="header-section-number">30.4</span> Getting Submodule Latest</h2>
+<p></p>
+<p>Let’s say someone else has updated the commit that the submodule is pinned at in your repo. And you want to get up to speed.</p>
+<p>Two steps to make that happen:</p>
+<ol type="1">
+<li><p>In the containing repo, <code>git pull</code>. This will get you the latest version of the containing repo that has the new pinned commit numbers for the submodule.</p></li>
+<li><p>In the containing repo (again), run:</p>
+<div class="sourceCode" id="cb360"><pre class="sourceCode default"><code class="sourceCode default"><span id="cb360-1"><a href="submodules.html#cb360-1" aria-hidden="true" tabindex="-1"></a>git submodule update --init --recursive</span></code></pre></div>
+<p>This will fetch the submodule data and set you up to point at the correct commit.</p></li>
+</ol>
+<p></p>
+<h2 data-number="30.5" id="updating-the-actual-submodule-itself"><span class="header-section-number">30.5</span> Updating the Actual Submodule Itself</h2>
+<p></p>
+<p>What do I mean by this? Let’s say the submodule holds some library, and you need to make a bug fix in the library. And you need people who use this repo as a submodule (or otherwise) to get the changes.</p>
+<p>So how to make this happen?</p>
+<p>Either do it from a standalone repo, or you can also do it <em>in situ</em> in submodule directory.</p>
+<h3 data-number="30.5.1" id="modify-the-submodule-repo-elsewhere"><span class="header-section-number">30.5.1</span> Modify the Submodule Repo Elsewhere</h3>
+<p>The way that’s easiest for my tiny human brain is to clone the submodule independently of any other repos. That is, clone it like it’s not a submodule at all.</p>
+<p>Then you can push, pull, modify, etc. all you want.</p>
+<p> And then when you have it all fixed, you can go to the submodule directory and do a <code>git fetch</code> to pull down the new commits.</p>
+<p>At that point, it might be convenient to run this:</p>
+<div class="sourceCode" id="cb361"><pre class="sourceCode default"><code class="sourceCode default"><span id="cb361-1"><a href="submodules.html#cb361-1" aria-hidden="true" tabindex="-1"></a>$ git log HEAD^..origin/main</span></code></pre></div>
+<p>This will show you all the commits between <code>HEAD</code> and <code>origin/main</code>, inclusive so you can see what’s been done. (Assuming they’re related, that is. If they’re on divergent branches you’ll have to get more creative.)</p>
+<p>Then you choose the commit you want to pin <code>HEAD</code> to, switch to that, and run an <code>add</code>/<code>commit</code> from the containing repo, as outlined in <a href="submodules.html#set-submodule-commit">Setting the Commit for the Submodule</a>, above.</p>
+<h3 data-number="30.5.2" id="modify-the-submodule-repo-in-the-submodule-directory"><span class="header-section-number">30.5.2</span> Modify the Submodule Repo in the Submodule Directory</h3>
+<p>But wait! If the submodule is a full-blown repo itself, can’t you just edit in the submodule directory?</p>
+<p>Yes! You totally can.</p>
+<p>The only weird part is that you might have a detached <code>HEAD</code> in your submodule, so be sure to check out a branch that you can push if you want to go this route.</p>
+<p>For example:</p>
+<div class="sourceCode" id="cb362"><pre class="sourceCode default"><code class="sourceCode default"><span id="cb362-1"><a href="submodules.html#cb362-1" aria-hidden="true" tabindex="-1"></a>$ git switch main</span></code></pre></div>
+<p>Then make your changes and push them (from the submodule directory).</p>
+<p>At this point, the containing repo is still pinned to the old commit. So you’ll want to run an <code>add</code>/<code>commit</code> from the containing repo, as outlined in <a href="submodules.html#set-submodule-commit">Setting the Commit for the Submodule</a>, above.</p>
+<p></p>
+<h2 data-number="30.6" id="getting-the-submodule-status"><span class="header-section-number">30.6</span> Getting the Submodule Status</h2>
+<p></p>
+<p>When it comes to which commit the submodule is pinned to, there are some commands that are quite helpful.</p>
+<p>The first is <code>git submodule status</code>. This will tell you where the submodule <code>HEAD</code> is currently.</p>
+<p>For example, running from the containing repo:</p>
+<div class="sourceCode" id="cb363"><pre class="sourceCode default"><code class="sourceCode default"><span id="cb363-1"><a href="submodules.html#cb363-1" aria-hidden="true" tabindex="-1"></a>$ git submodule status</span>
+<span id="cb363-2"><a href="submodules.html#cb363-2" aria-hidden="true" tabindex="-1"></a>898650e74c18cf4b30bdd07297d638de4a6fc7dd mysubmod (heads/main)</span></code></pre></div>
+<p>This tells me that <code>HEAD</code> in the <code>mysubmod</code> directory is at commit <code>89865</code>.</p>
+<p>But what if you see this with a <code>+</code> sign in front:</p>
+<div class="sourceCode" id="cb364"><pre class="sourceCode default"><code class="sourceCode default"><span id="cb364-1"><a href="submodules.html#cb364-1" aria-hidden="true" tabindex="-1"></a>$ git submodule status</span>
+<span id="cb364-2"><a href="submodules.html#cb364-2" aria-hidden="true" tabindex="-1"></a>+1c10d608190194b7f9fbb9a442abd5c63c74cdfa mysubmod (heads/main)</span></code></pre></div>
+<p>That <code>+</code> means that, although <code>HEAD</code> in the submodule is at commit <code>1c10d</code>, the containing repo has the submodule pinned to a different commit! You might see this happen after you pull a submodule (thus moving <code>HEAD</code>), but haven’t updated the containing repo to match.</p>
+<p>If you see the <code>+</code>, <code>git status</code> will also tell you more:</p>
+<div class="sourceCode" id="cb365"><pre class="sourceCode default"><code class="sourceCode default"><span id="cb365-1"><a href="submodules.html#cb365-1" aria-hidden="true" tabindex="-1"></a>$ git status</span>
+<span id="cb365-2"><a href="submodules.html#cb365-2" aria-hidden="true" tabindex="-1"></a>  On branch main</span>
+<span id="cb365-3"><a href="submodules.html#cb365-3" aria-hidden="true" tabindex="-1"></a>  Changes not staged for commit:</span>
+<span id="cb365-4"><a href="submodules.html#cb365-4" aria-hidden="true" tabindex="-1"></a>    (use &quot;git add &lt;file&gt;...&quot; to update what will be committed)</span>
+<span id="cb365-5"><a href="submodules.html#cb365-5" aria-hidden="true" tabindex="-1"></a>    (use &quot;git restore &lt;file&gt;...&quot; to discard changes in working</span>
+<span id="cb365-6"><a href="submodules.html#cb365-6" aria-hidden="true" tabindex="-1"></a>    directory)</span>
+<span id="cb365-7"><a href="submodules.html#cb365-7" aria-hidden="true" tabindex="-1"></a>      modified:   mysubmod (new commits)</span>
+<span id="cb365-8"><a href="submodules.html#cb365-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb365-9"><a href="submodules.html#cb365-9" aria-hidden="true" tabindex="-1"></a>  no changes added to commit (use &quot;git add&quot; and/or &quot;git commit -a&quot;)</span></code></pre></div>
+<p>Sure enough—we have changed <code>HEAD</code> in the submodule so its directory shows as <code>modified</code>.</p>
+<p>You can get rid of the plus by either pinning the repo to a new commit as outlined in <a href="submodules.html#set-submodule-commit">Setting the Commit for the Submodule</a>, above, or by moving the submodule <code>HEAD</code> back to where the containing module expects it.</p>
+<blockquote>
+<p><strong>There can also be a <code>-</code> in front of the commit hash.</strong> This means the submodule hasn’t been initialized or downloaded. Try a <code>git submodule update --recursive --init</code>.</p>
+</blockquote>
+<p>How do we figure out where the containing module expects the submodule <code>HEAD</code> to be? With this handy command:</p>
+<div class="sourceCode" id="cb366"><pre class="sourceCode default"><code class="sourceCode default"><span id="cb366-1"><a href="submodules.html#cb366-1" aria-hidden="true" tabindex="-1"></a>$ git ls-tree HEAD mysubmod</span>
+<span id="cb366-2"><a href="submodules.html#cb366-2" aria-hidden="true" tabindex="-1"></a>  160000 commit 898650e74c18cf4b30bdd07297d638de4a6fc7dd   mysubmod</span></code></pre></div>
+<p></p>
+<h2 data-number="30.7" id="some-behind-the-scenes"><span class="header-section-number">30.7</span> Some Behind the Scenes</h2>
+<p>Not really behind the scenes, actually, but I wanted to point out the historic steps to initialize the submodule that we’ve shortcutted by using some command line switches.</p>
+<p>For example, when we cloned the repo with the submodule initially, we used this:</p>
+<div class="sourceCode" id="cb367"><pre class="sourceCode default"><code class="sourceCode default"><span id="cb367-1"><a href="submodules.html#cb367-1" aria-hidden="true" tabindex="-1"></a>$ git clone --recurse-submodules \</span>
+<span id="cb367-2"><a href="submodules.html#cb367-2" aria-hidden="true" tabindex="-1"></a>        git@github.com:beejjorgensen/git-example-submodule-repo.git</span></code></pre></div>
+<p>That <code>--recurse-submodules</code> did a lot of work for us, cloning the submodule and setting everything up so it was ready to use.</p>
+<p>We also noted that if we forgot that switch, we could still pull it off:</p>
+<div class="sourceCode" id="cb368"><pre class="sourceCode default"><code class="sourceCode default"><span id="cb368-1"><a href="submodules.html#cb368-1" aria-hidden="true" tabindex="-1"></a>$ git clone \</span>
+<span id="cb368-2"><a href="submodules.html#cb368-2" aria-hidden="true" tabindex="-1"></a>        git@github.com:beejjorgensen/git-example-submodule-repo.git</span>
+<span id="cb368-3"><a href="submodules.html#cb368-3" aria-hidden="true" tabindex="-1"></a>$ cd git-example-submodule-repo</span>
+<span id="cb368-4"><a href="submodules.html#cb368-4" aria-hidden="true" tabindex="-1"></a>$ git submodule update --recursive --init</span></code></pre></div>
+<p>So <code>--recurse-submodules</code> was going that work for us.</p>
+<p>But the rabbit hole goes farther! That <code>--init</code> does a bunch for us, too. Let’s break it down into a full by-hand process. Don’t worry—it’s just a couple steps:</p>
+<div class="sourceCode" id="cb369"><pre class="sourceCode default"><code class="sourceCode default"><span id="cb369-1"><a href="submodules.html#cb369-1" aria-hidden="true" tabindex="-1"></a>$ git clone \</span>
+<span id="cb369-2"><a href="submodules.html#cb369-2" aria-hidden="true" tabindex="-1"></a>        git@github.com:beejjorgensen/git-example-submodule-repo.git</span>
+<span id="cb369-3"><a href="submodules.html#cb369-3" aria-hidden="true" tabindex="-1"></a>$ cd git-example-submodule-repo</span>
+<span id="cb369-4"><a href="submodules.html#cb369-4" aria-hidden="true" tabindex="-1"></a>$ git submodule init</span>
+<span id="cb369-5"><a href="submodules.html#cb369-5" aria-hidden="true" tabindex="-1"></a>$ git submodule update --recursive</span></code></pre></div>
+<p>So that <code>--recurse-submodules</code> switch to <code>git clone</code> was actually running a bunch of commands for us behind the scenes.</p>
+<p>A little breakdown:</p>
+<p>When you first clone the containing repo, there’s a <code>.gitmodules</code> file in there indicating the directory name and the URL of the submodule remote. But that’s not enough info. You have to do a <code>git submodule init</code> to cause Git to parse that file and set up some internal bookkeeping.</p>
+<p>After that, you can run <code>git submodule update</code> to bring in the submodule data to use.</p>
+<h2 data-number="30.8" id="deleting-a-submodule"><span class="header-section-number">30.8</span> Deleting a Submodule</h2>
+<p></p>
+<p>This is a bit clunky, but not too bad if you follow the steps.</p>
+<p>All this action takes place from the containing repo. Let’s say for this example we want to delete the module <code>mysubmod</code>—substitute the name of your module in the following commands.</p>
+<ol type="1">
+<li><p>De-initialize the submodule. If the submodule <code>HEAD</code> is not where the containing module expects, you can add <code>-f</code> to force this.</p>
+<div class="sourceCode" id="cb370"><pre class="sourceCode default"><code class="sourceCode default"><span id="cb370-1"><a href="submodules.html#cb370-1" aria-hidden="true" tabindex="-1"></a>$ git submodule deinit mysubmod</span></code></pre></div>
+<p>This is partially undoing <code>git submodule init</code>.</p></li>
+<li><p>Remove the bookkeeping information from the Git internals for the containing repo.</p>
+<div class="sourceCode" id="cb371"><pre class="sourceCode default"><code class="sourceCode default"><span id="cb371-1"><a href="submodules.html#cb371-1" aria-hidden="true" tabindex="-1"></a>$ rm -rf .git/modules/mysubmod</span></code></pre></div>
+<p>This is the rest of undoing <code>git submodule init</code>.</p></li>
+<li><p>Fix up <code>.gitmodules</code> by removing the section about the submodule. You can either do this by hand in an editor, or you can ask Git to do it like so:</p>
+<div class="sourceCode" id="cb372"><pre class="sourceCode default"><code class="sourceCode default"><span id="cb372-1"><a href="submodules.html#cb372-1" aria-hidden="true" tabindex="-1"></a>$ git config -f .gitmodules --remove-section submodule.mysubmod</span></code></pre></div>
+<p>This is undoing <code>git submodule add</code>.</p></li>
+<li><p>Add the <code>.gitmodules</code> file to the stage.</p>
+<div class="sourceCode" id="cb373"><pre class="sourceCode default"><code class="sourceCode default"><span id="cb373-1"><a href="submodules.html#cb373-1" aria-hidden="true" tabindex="-1"></a>$ git add .gitmodules</span></code></pre></div></li>
+<li><p>Delete the submodule tree from Git. This will also add the deletion to the stage.</p>
+<div class="sourceCode" id="cb374"><pre class="sourceCode default"><code class="sourceCode default"><span id="cb374-1"><a href="submodules.html#cb374-1" aria-hidden="true" tabindex="-1"></a>git rm --cached mysubmod</span></code></pre></div>
+<p>This is sort of like undoing <code>git submodule update</code>.</p></li>
+<li><p>Do a <code>git status</code> to make sure we’re set.</p>
+<div class="sourceCode" id="cb375"><pre class="sourceCode default"><code class="sourceCode default"><span id="cb375-1"><a href="submodules.html#cb375-1" aria-hidden="true" tabindex="-1"></a>$ git status</span>
+<span id="cb375-2"><a href="submodules.html#cb375-2" aria-hidden="true" tabindex="-1"></a>  On branch main</span>
+<span id="cb375-3"><a href="submodules.html#cb375-3" aria-hidden="true" tabindex="-1"></a>  Changes to be committed:</span>
+<span id="cb375-4"><a href="submodules.html#cb375-4" aria-hidden="true" tabindex="-1"></a>    (use &quot;git restore --staged &lt;file&gt;...&quot; to unstage)</span>
+<span id="cb375-5"><a href="submodules.html#cb375-5" aria-hidden="true" tabindex="-1"></a>          modified:   .gitmodules</span>
+<span id="cb375-6"><a href="submodules.html#cb375-6" aria-hidden="true" tabindex="-1"></a>          deleted:    mysubmod</span></code></pre></div>
+<p>Looks good.</p></li>
+<li><p>Commit and push (if appropriate).</p>
+<div class="sourceCode" id="cb376"><pre class="sourceCode default"><code class="sourceCode default"><span id="cb376-1"><a href="submodules.html#cb376-1" aria-hidden="true" tabindex="-1"></a>$ git commit -m &quot;remove mysubmod submodule&quot;</span>
+<span id="cb376-2"><a href="submodules.html#cb376-2" aria-hidden="true" tabindex="-1"></a>$ git push</span></code></pre></div></li>
+</ol>
+<p>And that’s the end of the submodule.</p>
+<p></p>
+<p></p>
+<!-- BG_NEW_CHAPTER -->
+<hr><div style="text-align:center"><span><a href="mergetool.html" rel="prev">Prev</a> | </span><a href="index.html">Contents</a><span> | <a href="tags.html" rel="next">Next</a></span></div></body>
+</html>

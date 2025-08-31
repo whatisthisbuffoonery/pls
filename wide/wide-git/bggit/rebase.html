@@ -1,0 +1,809 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <title>Beej's Guide to Git</title>
+  <style>
+    html {
+      color: #1a1a1a;
+      background-color: #fdfdfd;
+    }
+    body {
+      margin: 0 auto;
+      max-width: 36em;
+      padding-left: 50px;
+      padding-right: 50px;
+      padding-top: 50px;
+      padding-bottom: 50px;
+      hyphens: auto;
+      overflow-wrap: break-word;
+      text-rendering: optimizeLegibility;
+      font-kerning: normal;
+    }
+    @media (max-width: 600px) {
+      body {
+        font-size: 0.9em;
+        padding: 12px;
+      }
+      h1 {
+        font-size: 1.8em;
+      }
+    }
+    @media print {
+      html {
+        background-color: white;
+      }
+      body {
+        background-color: transparent;
+        color: black;
+        font-size: 12pt;
+      }
+      p, h2, h3 {
+        orphans: 3;
+        widows: 3;
+      }
+      h2, h3, h4 {
+        page-break-after: avoid;
+      }
+    }
+    p {
+      margin: 1em 0;
+    }
+    a {
+      color: #1a1a1a;
+    }
+    a:visited {
+      color: #1a1a1a;
+    }
+    img {
+      max-width: 100%;
+    }
+    svg {
+      height: auto;
+      max-width: 100%;
+    }
+    h1, h2, h3, h4, h5, h6 {
+      margin-top: 1.4em;
+    }
+    h5, h6 {
+      font-size: 1em;
+      font-style: italic;
+    }
+    h6 {
+      font-weight: normal;
+    }
+    ol, ul {
+      padding-left: 1.7em;
+      margin-top: 1em;
+    }
+    li > ol, li > ul {
+      margin-top: 0;
+    }
+    blockquote {
+      margin: 1em 0 1em 1.7em;
+      padding-left: 1em;
+      border-left: 2px solid #e6e6e6;
+      color: #606060;
+    }
+    code {
+      font-family: Menlo, Monaco, Consolas, 'Lucida Console', monospace;
+      font-size: 85%;
+      margin: 0;
+      hyphens: manual;
+    }
+    pre {
+      margin: 1em 0;
+      overflow: auto;
+    }
+    pre code {
+      padding: 0;
+      overflow: visible;
+      overflow-wrap: normal;
+    }
+    .sourceCode {
+     background-color: transparent;
+     overflow: visible;
+    }
+    hr {
+      background-color: #1a1a1a;
+      border: none;
+      height: 1px;
+      margin: 1em 0;
+    }
+    table {
+      margin: 1em 0;
+      border-collapse: collapse;
+      width: 100%;
+      overflow-x: auto;
+      display: block;
+      font-variant-numeric: lining-nums tabular-nums;
+    }
+    table caption {
+      margin-bottom: 0.75em;
+    }
+    tbody {
+      margin-top: 0.5em;
+      border-top: 1px solid #1a1a1a;
+      border-bottom: 1px solid #1a1a1a;
+    }
+    th {
+      border-top: 1px solid #1a1a1a;
+      padding: 0.25em 0.5em 0.25em 0.5em;
+    }
+    td {
+      padding: 0.125em 0.5em 0.25em 0.5em;
+    }
+    header {
+      margin-bottom: 4em;
+      text-align: center;
+    }
+    #TOC li {
+      list-style: none;
+    }
+    #TOC ul {
+      padding-left: 1.3em;
+    }
+    #TOC > ul {
+      padding-left: 0;
+    }
+    #TOC a:not(:hover) {
+      text-decoration: none;
+    }
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+    /* CSS for syntax highlighting */
+    html { -webkit-text-size-adjust: 100%; }
+    pre > code.sourceCode { white-space: pre; position: relative; }
+    pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+    pre > code.sourceCode > span:empty { height: 1.2em; }
+    .sourceCode { overflow: visible; }
+    code.sourceCode > span { color: inherit; text-decoration: inherit; }
+    div.sourceCode { margin: 1em 0; }
+    pre.sourceCode { margin: 0; }
+    @media screen {
+    div.sourceCode { overflow: auto; }
+    }
+    @media print {
+    pre > code.sourceCode { white-space: pre-wrap; }
+    pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+    }
+    pre.numberSource code
+      { counter-reset: source-line 0; }
+    pre.numberSource code > span
+      { position: relative; left: -4em; counter-increment: source-line; }
+    pre.numberSource code > span > a:first-child::before
+      { content: counter(source-line);
+        position: relative; left: -1em; text-align: right; vertical-align: baseline;
+        border: none; display: inline-block;
+        -webkit-touch-callout: none; -webkit-user-select: none;
+        -khtml-user-select: none; -moz-user-select: none;
+        -ms-user-select: none; user-select: none;
+        padding: 0 4px; width: 4em;
+        color: #aaaaaa;
+      }
+    pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+    div.sourceCode
+      {   }
+    @media screen {
+    pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+    }
+    code span.al { color: #ff0000; font-weight: bold; } /* Alert */
+    code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+    code span.at { color: #7d9029; } /* Attribute */
+    code span.bn { color: #40a070; } /* BaseN */
+    code span.bu { color: #008000; } /* BuiltIn */
+    code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+    code span.ch { color: #4070a0; } /* Char */
+    code span.cn { color: #880000; } /* Constant */
+    code span.co { color: #60a0b0; font-style: italic; } /* Comment */
+    code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+    code span.do { color: #ba2121; font-style: italic; } /* Documentation */
+    code span.dt { color: #902000; } /* DataType */
+    code span.dv { color: #40a070; } /* DecVal */
+    code span.er { color: #ff0000; font-weight: bold; } /* Error */
+    code span.ex { } /* Extension */
+    code span.fl { color: #40a070; } /* Float */
+    code span.fu { color: #06287e; } /* Function */
+    code span.im { color: #008000; font-weight: bold; } /* Import */
+    code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+    code span.kw { color: #007020; font-weight: bold; } /* Keyword */
+    code span.op { color: #666666; } /* Operator */
+    code span.ot { color: #007020; } /* Other */
+    code span.pp { color: #bc7a00; } /* Preprocessor */
+    code span.sc { color: #4070a0; } /* SpecialChar */
+    code span.ss { color: #bb6688; } /* SpecialString */
+    code span.st { color: #4070a0; } /* String */
+    code span.va { color: #19177c; } /* Variable */
+    code span.vs { color: #4070a0; } /* VerbatimString */
+    code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+  </style>
+  <!-- BG custom styling -->
+  <style type="text/css">
+  /* Fix for line numbers not visible */
+  pre.numberSource code > span {
+      left: -1em;
+  }
+  pre.numberSource {
+      margin-left: initial;
+  }
+
+  /* Put some space after the section numbers */
+  span.toc-section-number::after {
+      content: "\a0\a0\a0";  /* non-breaking whitespace */
+  }
+
+  /* Hide underlines on code number links */
+  pre > code.sourceCode > span > a:first-child::before {
+      text-decoration: none;
+  }
+
+  /* Color the source blocks */
+  div.sourceCode {
+      background-color: #f0f0f0;
+  }
+
+  /* Fix iOS big text rendering issue */
+  pre > code.sourceCode > span {
+      display: initial;
+  }
+
+
+  /* Color the inline code */
+  code:not(.sourceCode) {
+      background: #f0f0f0;
+      padding-left: 0.2em;
+      padding-right: 0.2em;
+      border-radius: 0.2em;
+  }
+
+  pre.sourceCode {
+      border: 1px solid #ccc;
+      padding: 0.5em;
+      border-radius: 0.2em;
+  }
+
+  /* Keep code tags from wrapping in tables */
+  tbody code {
+      white-space: nowrap;
+  }
+
+  /* Prevent hyphenation and hyphen breaks in code*/
+  code {
+      word-break: keep-all;
+  }
+
+  td {
+      vertical-align: top;
+  }
+
+  body {
+      font-size: 12pt;
+      max-width: 43em;
+      font-family: sans-serif;
+  }
+
+  html {
+      background: #f9f9f9;
+  }
+
+  figure > embed {
+      max-width: 100%;
+  }
+
+  figure {
+      text-align: center;
+      margin-top: 2em;
+      margin-bottom: 2em;
+  }
+
+  figcaption {
+      font-size: 0.9em;
+      font-style: italic;
+      margin-top: 0.6em;
+  }
+
+  body {
+      counter-reset: figure-counter-major;
+      counter-reset: figure-counter-minor;
+  }
+
+  figure {
+      counter-increment: figure-counter-minor;
+  }
+
+  figcaption::before {
+      content: "Figure " counter(figure-counter-major) "." counter(figure-counter-minor) ": ";
+  }
+
+  blockquote {
+      border-left: 2px solid #bbb;
+      color: #444;
+  }
+
+  /* Contents */
+
+  nav[role="doc-toc"] > ul > li {
+    font-weight: bold;
+    margin-top: 1.2em;
+  }
+
+  nav[role="doc-toc"] > ul > li:first {
+    font-weight: bold;
+    margin-top: initial;
+  }
+
+  nav[role="doc-toc"] > ul > li > ul {
+    font-weight: normal;
+    margin-top: 0.3em;
+  }
+
+  /*
+  In multipage, we need to reset the figure counter to the chapter
+  number. Luckily, this is in the <h1 data-number> attribute. Unluckily,
+  there is no way to get this in a general way.
+
+  This doesn't work:
+
+    h1[data-number] {
+      counter-set: figure-counter-major attr(data-number);
+    }
+
+  Nor this:
+
+    h1[data-number] {
+      --figure-counter-major-value: attr(data-number);
+      counter-set: figure-counter-major var(--figure-counter-major-value);
+    }
+
+  So, dumbly, we have a bunch of rules for all these sections, up to the
+  maximum possible section.
+
+  Here's a program to generate them:
+
+    for (let i = 1; i < 100; i++)
+        console.log(`h1[data-number="${i}"]{counter-set:figure-counter-major ${i};counter-reset:figure-counter-minor;}`);
+
+  Note to self: never write a book with more than 99 frickin' chapters.
+  */
+
+  h1[data-number="1"]{counter-set:figure-counter-major 1;counter-reset:figure-counter-minor;}
+  h1[data-number="2"]{counter-set:figure-counter-major 2;counter-reset:figure-counter-minor;}
+  h1[data-number="3"]{counter-set:figure-counter-major 3;counter-reset:figure-counter-minor;}
+  h1[data-number="4"]{counter-set:figure-counter-major 4;counter-reset:figure-counter-minor;}
+  h1[data-number="5"]{counter-set:figure-counter-major 5;counter-reset:figure-counter-minor;}
+  h1[data-number="6"]{counter-set:figure-counter-major 6;counter-reset:figure-counter-minor;}
+  h1[data-number="7"]{counter-set:figure-counter-major 7;counter-reset:figure-counter-minor;}
+  h1[data-number="8"]{counter-set:figure-counter-major 8;counter-reset:figure-counter-minor;}
+  h1[data-number="9"]{counter-set:figure-counter-major 9;counter-reset:figure-counter-minor;}
+  h1[data-number="10"]{counter-set:figure-counter-major 10;counter-reset:figure-counter-minor;}
+  h1[data-number="11"]{counter-set:figure-counter-major 11;counter-reset:figure-counter-minor;}
+  h1[data-number="12"]{counter-set:figure-counter-major 12;counter-reset:figure-counter-minor;}
+  h1[data-number="13"]{counter-set:figure-counter-major 13;counter-reset:figure-counter-minor;}
+  h1[data-number="14"]{counter-set:figure-counter-major 14;counter-reset:figure-counter-minor;}
+  h1[data-number="15"]{counter-set:figure-counter-major 15;counter-reset:figure-counter-minor;}
+  h1[data-number="16"]{counter-set:figure-counter-major 16;counter-reset:figure-counter-minor;}
+  h1[data-number="17"]{counter-set:figure-counter-major 17;counter-reset:figure-counter-minor;}
+  h1[data-number="18"]{counter-set:figure-counter-major 18;counter-reset:figure-counter-minor;}
+  h1[data-number="19"]{counter-set:figure-counter-major 19;counter-reset:figure-counter-minor;}
+  h1[data-number="20"]{counter-set:figure-counter-major 20;counter-reset:figure-counter-minor;}
+  h1[data-number="21"]{counter-set:figure-counter-major 21;counter-reset:figure-counter-minor;}
+  h1[data-number="22"]{counter-set:figure-counter-major 22;counter-reset:figure-counter-minor;}
+  h1[data-number="23"]{counter-set:figure-counter-major 23;counter-reset:figure-counter-minor;}
+  h1[data-number="24"]{counter-set:figure-counter-major 24;counter-reset:figure-counter-minor;}
+  h1[data-number="25"]{counter-set:figure-counter-major 25;counter-reset:figure-counter-minor;}
+  h1[data-number="26"]{counter-set:figure-counter-major 26;counter-reset:figure-counter-minor;}
+  h1[data-number="27"]{counter-set:figure-counter-major 27;counter-reset:figure-counter-minor;}
+  h1[data-number="28"]{counter-set:figure-counter-major 28;counter-reset:figure-counter-minor;}
+  h1[data-number="29"]{counter-set:figure-counter-major 29;counter-reset:figure-counter-minor;}
+  h1[data-number="30"]{counter-set:figure-counter-major 30;counter-reset:figure-counter-minor;}
+  h1[data-number="31"]{counter-set:figure-counter-major 31;counter-reset:figure-counter-minor;}
+  h1[data-number="32"]{counter-set:figure-counter-major 32;counter-reset:figure-counter-minor;}
+  h1[data-number="33"]{counter-set:figure-counter-major 33;counter-reset:figure-counter-minor;}
+  h1[data-number="34"]{counter-set:figure-counter-major 34;counter-reset:figure-counter-minor;}
+  h1[data-number="35"]{counter-set:figure-counter-major 35;counter-reset:figure-counter-minor;}
+  h1[data-number="36"]{counter-set:figure-counter-major 36;counter-reset:figure-counter-minor;}
+  h1[data-number="37"]{counter-set:figure-counter-major 37;counter-reset:figure-counter-minor;}
+  h1[data-number="38"]{counter-set:figure-counter-major 38;counter-reset:figure-counter-minor;}
+  h1[data-number="39"]{counter-set:figure-counter-major 39;counter-reset:figure-counter-minor;}
+  h1[data-number="40"]{counter-set:figure-counter-major 40;counter-reset:figure-counter-minor;}
+  h1[data-number="41"]{counter-set:figure-counter-major 41;counter-reset:figure-counter-minor;}
+  h1[data-number="42"]{counter-set:figure-counter-major 42;counter-reset:figure-counter-minor;}
+  h1[data-number="43"]{counter-set:figure-counter-major 43;counter-reset:figure-counter-minor;}
+  h1[data-number="44"]{counter-set:figure-counter-major 44;counter-reset:figure-counter-minor;}
+  h1[data-number="45"]{counter-set:figure-counter-major 45;counter-reset:figure-counter-minor;}
+  h1[data-number="46"]{counter-set:figure-counter-major 46;counter-reset:figure-counter-minor;}
+  h1[data-number="47"]{counter-set:figure-counter-major 47;counter-reset:figure-counter-minor;}
+  h1[data-number="48"]{counter-set:figure-counter-major 48;counter-reset:figure-counter-minor;}
+  h1[data-number="49"]{counter-set:figure-counter-major 49;counter-reset:figure-counter-minor;}
+  h1[data-number="50"]{counter-set:figure-counter-major 50;counter-reset:figure-counter-minor;}
+  h1[data-number="51"]{counter-set:figure-counter-major 51;counter-reset:figure-counter-minor;}
+  h1[data-number="52"]{counter-set:figure-counter-major 52;counter-reset:figure-counter-minor;}
+  h1[data-number="53"]{counter-set:figure-counter-major 53;counter-reset:figure-counter-minor;}
+  h1[data-number="54"]{counter-set:figure-counter-major 54;counter-reset:figure-counter-minor;}
+  h1[data-number="55"]{counter-set:figure-counter-major 55;counter-reset:figure-counter-minor;}
+  h1[data-number="56"]{counter-set:figure-counter-major 56;counter-reset:figure-counter-minor;}
+  h1[data-number="57"]{counter-set:figure-counter-major 57;counter-reset:figure-counter-minor;}
+  h1[data-number="58"]{counter-set:figure-counter-major 58;counter-reset:figure-counter-minor;}
+  h1[data-number="59"]{counter-set:figure-counter-major 59;counter-reset:figure-counter-minor;}
+  h1[data-number="60"]{counter-set:figure-counter-major 60;counter-reset:figure-counter-minor;}
+  h1[data-number="61"]{counter-set:figure-counter-major 61;counter-reset:figure-counter-minor;}
+  h1[data-number="62"]{counter-set:figure-counter-major 62;counter-reset:figure-counter-minor;}
+  h1[data-number="63"]{counter-set:figure-counter-major 63;counter-reset:figure-counter-minor;}
+  h1[data-number="64"]{counter-set:figure-counter-major 64;counter-reset:figure-counter-minor;}
+  h1[data-number="65"]{counter-set:figure-counter-major 65;counter-reset:figure-counter-minor;}
+  h1[data-number="66"]{counter-set:figure-counter-major 66;counter-reset:figure-counter-minor;}
+  h1[data-number="67"]{counter-set:figure-counter-major 67;counter-reset:figure-counter-minor;}
+  h1[data-number="68"]{counter-set:figure-counter-major 68;counter-reset:figure-counter-minor;}
+  h1[data-number="69"]{counter-set:figure-counter-major 69;counter-reset:figure-counter-minor;}
+  h1[data-number="70"]{counter-set:figure-counter-major 70;counter-reset:figure-counter-minor;}
+  h1[data-number="71"]{counter-set:figure-counter-major 71;counter-reset:figure-counter-minor;}
+  h1[data-number="72"]{counter-set:figure-counter-major 72;counter-reset:figure-counter-minor;}
+  h1[data-number="73"]{counter-set:figure-counter-major 73;counter-reset:figure-counter-minor;}
+  h1[data-number="74"]{counter-set:figure-counter-major 74;counter-reset:figure-counter-minor;}
+  h1[data-number="75"]{counter-set:figure-counter-major 75;counter-reset:figure-counter-minor;}
+  h1[data-number="76"]{counter-set:figure-counter-major 76;counter-reset:figure-counter-minor;}
+  h1[data-number="77"]{counter-set:figure-counter-major 77;counter-reset:figure-counter-minor;}
+  h1[data-number="78"]{counter-set:figure-counter-major 78;counter-reset:figure-counter-minor;}
+  h1[data-number="79"]{counter-set:figure-counter-major 79;counter-reset:figure-counter-minor;}
+  h1[data-number="80"]{counter-set:figure-counter-major 80;counter-reset:figure-counter-minor;}
+  h1[data-number="81"]{counter-set:figure-counter-major 81;counter-reset:figure-counter-minor;}
+  h1[data-number="82"]{counter-set:figure-counter-major 82;counter-reset:figure-counter-minor;}
+  h1[data-number="83"]{counter-set:figure-counter-major 83;counter-reset:figure-counter-minor;}
+  h1[data-number="84"]{counter-set:figure-counter-major 84;counter-reset:figure-counter-minor;}
+  h1[data-number="85"]{counter-set:figure-counter-major 85;counter-reset:figure-counter-minor;}
+  h1[data-number="86"]{counter-set:figure-counter-major 86;counter-reset:figure-counter-minor;}
+  h1[data-number="87"]{counter-set:figure-counter-major 87;counter-reset:figure-counter-minor;}
+  h1[data-number="88"]{counter-set:figure-counter-major 88;counter-reset:figure-counter-minor;}
+  h1[data-number="89"]{counter-set:figure-counter-major 89;counter-reset:figure-counter-minor;}
+  h1[data-number="90"]{counter-set:figure-counter-major 90;counter-reset:figure-counter-minor;}
+  h1[data-number="91"]{counter-set:figure-counter-major 91;counter-reset:figure-counter-minor;}
+  h1[data-number="92"]{counter-set:figure-counter-major 92;counter-reset:figure-counter-minor;}
+  h1[data-number="93"]{counter-set:figure-counter-major 93;counter-reset:figure-counter-minor;}
+  h1[data-number="94"]{counter-set:figure-counter-major 94;counter-reset:figure-counter-minor;}
+  h1[data-number="95"]{counter-set:figure-counter-major 95;counter-reset:figure-counter-minor;}
+  h1[data-number="96"]{counter-set:figure-counter-major 96;counter-reset:figure-counter-minor;}
+  h1[data-number="97"]{counter-set:figure-counter-major 97;counter-reset:figure-counter-minor;}
+  h1[data-number="98"]{counter-set:figure-counter-major 98;counter-reset:figure-counter-minor;}
+  h1[data-number="99"]{counter-set:figure-counter-major 99;counter-reset:figure-counter-minor;}
+
+
+  </style>
+  <!-- BG custom styling for the wide body variant -->
+  <!-- Gets appended after bg-css.html -->
+
+  <style type="text/css">
+  body {
+      max-width: inherit;
+  }
+  </style>
+</head>
+<body>
+<div style="text-align:center"><span><a href="collaboration-across-branches.html" rel="prev">Prev</a> | </span><a href="index.html">Contents</a><span> | <a href="stash.html" rel="next">Next</a></span></div><hr>
+<h1 data-number="15" id="rebase"><span class="header-section-number">15</span> Rebasing: Moving Commits</h1>
+<p></p>
+<p>I’m going to start with the Number One Rule of Rebasing: <strong><em>never rebase anything that you have pushed</em></strong>. That is, only rebase local changes that no one else has seen. You can push them after the rebase.</p>
+<p>This is more of a guideline than a rule in that you can rebase things you’ve pushed <em>if you understand the consequences</em>. It’s typically not a great situation, though, so you’ll want to generally avoid it.</p>
+<p>The reason is that rebasing <em>rewrites history</em>. And that makes your history get out of sync with the history of other devs who have cloned the repo with the old history, and it makes syncing up quite challenging.</p>
+<p>There are other commands in Git that also rewrite history. And the general rule is <em>never rewrite history on anything that’s already been pushed</em>. Unless you really know what you’re doing.</p>
+<h2 data-number="15.1" id="contrasted-to-merging"><span class="header-section-number">15.1</span> Contrasted to Merging</h2>
+<p> </p>
+<p>But before we go run off in high spirits talking about rebasing, let’s do a quick merge refresher. Here’s a variation of an earlier example where we have two divergent branches, Figure 15.1. Let’s say you’re working on the <code>topic</code> branch.</p>
+<figure>
+<embed src="img_110_010.svg" title="Two divergent branches." />
+<figcaption aria-hidden="true">Two divergent branches.</figcaption>
+</figure>
+<p>Then you hear that someone has made a change to <code>main</code> and you want to roll those changes into your <code>topic</code> branch, but not necessarily get your changes in <code>main</code> yet.</p>
+<p>At this point, if we wanted to get the changes in <code>main</code> into <code>topic</code>, our merge option was to make another commit, the <em>merge commit</em>. The merge commit contains the changes from two parent commits (in this case the commit labeled <code>(2)</code> and the one labeled <code>(4)</code> are the parents) and makes them into a new commit, marked <code>(5)</code> in Figure 15.2.</p>
+<figure>
+<embed src="img_110_020.svg" title="Two divergent branches, merged." />
+<figcaption aria-hidden="true">Two divergent branches, merged.</figcaption>
+</figure>
+<p>If we look at our log at that point, we can see the changes from all the other commits in the graph from the <code>topic</code> branch.</p>
+<p>And we’re good at this point. That worked, and it did what we wanted. Merging is a completely acceptable solution to this problem.</p>
+<p>But there are a couple drawbacks to doing the merge. See, we really just wanted to get the latest stuff from <code>main</code> into our branch so we could use it, but we didn’t really want to commit anything. But here we’ve made a new commit for everyone to see.</p>
+<p>Not only that, but now the commit graph forms a loop, so the history is a little more convoluted than perhaps we’d like it.</p>
+<p>What really would have been nice is if I could just have taken commits <code>(3)</code> and <code>(4)</code> from <code>topic</code> and just somehow applied those changes to <code>(2)</code> on <code>main</code>. That is, could we pretend that instead of branching off <code>(1)</code> like <code>topic</code> did, that we instead branched off <code>(2)</code>?</p>
+<p>After all, if we branched off <code>(2)</code>, then we’d have those changes from <code>main</code> that we wanted.</p>
+<p>What we need is a way to somehow rewind our commits back to the branch point at <code>(1)</code>, and then reapply them on commit <code>(2)</code>. That is, the base of our <code>topic</code> branch, which was commit <code>(1)</code>, needs to be changed to another base at commit <code>(2)</code>. We want to <strong><em>rebase</em></strong> it to commit <code>(2)</code>!</p>
+<p> </p>
+<h2 data-number="15.2" id="how-it-works"><span class="header-section-number">15.2</span> How it Works</h2>
+<p>So let’s do exactly that. Let’s take the changes we made in commit <code>(3)</code> and apply them to <code>main</code> at commit <code>(2)</code>. This will make a brand new commit that includes changes from both commit <code>(2)</code> and commit <code>(3)</code>. (Importantly, this commit didn’t exist before; there was no commit that contained changes from <code>(2)</code> and <code>(3)</code>.) We’ll call this new commit <code>(3')</code> (“three prime”), since it has the changes that we made in <code>(3)</code>.</p>
+<p>After that, we’ll do the same thing with commit <code>(4)</code>. We’ll apply the changes from old commit <code>(4)</code> to <code>(3')</code>, making a new commit <code>(4')</code>.</p>
+<p>And if we do that, we end up with Figure 15.3.</p>
+<figure>
+<embed src="img_110_030.svg" title="topic branch rebased on main" />
+<figcaption aria-hidden="true"><code>topic</code> branch rebased on <code>main</code>.</figcaption>
+</figure>
+<p>And there you see <code>(3')</code> and <code>(4')</code> now rebased onto <code>main</code>! And now the <code>topic</code> branch includes commit <code>(2)</code> from the <code>main</code> branch!</p>
+<p>Again, these two commits have the same changes that you originally had in commits <code>(3)</code> and <code>(4)</code>, but now they’ve been applied to <code>main</code> at commit <code>(2)</code>. So the code is necessarily different since it now contains the changes from <code>main</code>. This means your old commits <code>(3)</code> and <code>(4)</code> are effectively gone, and the rebase has replaced them with two new commits that contain the same changes, just on a different base point.</p>
+<blockquote>
+<p><strong>We just changed history.</strong> When we mentioned rewriting history at the top of this chapter, this is what we were talking about. Imagine some other dev had your old commits <code>(3)</code> and <code>(4)</code> and was working off those making their own new commits. And then you rebased effectively destroying commits <code>(3)</code> and <code>(4)</code>. Now your commit history is different than the other dev’s and all kinds of <em>Fun</em>™ will be had trying to sort if out.</p>
+<p>If you only rebase commits that you haven’t pushed, you’ll never get into trouble. But if some other dev has a copy of your commits (because you’ve already pushed them and they pulled them), don’t rebase those commits!</p>
+</blockquote>
+<h2 data-number="15.3" id="when-should-i-do-this"><span class="header-section-number">15.3</span> When Should I Do This?</h2>
+<p> There’s no fixed rule about this. Sometimes a shop will have one, saying that everyone should rebase all the time so that the commit history has a cleaner look (no merge commits, no loops).</p>
+<p>Other shops will say to merge all the time so that the complete history is preserved.</p>
+<h2 data-number="15.4" id="pulling-and-rebasing"><span class="header-section-number">15.4</span> Pulling and Rebasing</h2>
+<p></p>
+<p>If you might recall from way back when, doing a pull is actually a couple operations: <em>fetch</em> and <em>merge</em>.</p>
+<p>The fetch downloads all the new data from the remote, but doesn’t actually merge anything into your branches or working tree. So you won’t see any local changes after a fetch.</p>
+<p>But the pull follows it up with a standard merge so that you see the remote tracking branch’s changes in your local branch.</p>
+<p>So, assuming you have everything set up and you’re on your <code>main</code> branch, when you do this:</p>
+<div class="sourceCode" id="cb173"><pre class="sourceCode default"><code class="sourceCode default"><span id="cb173-1"><a href="rebase.html#cb173-1" aria-hidden="true" tabindex="-1"></a>$ git pull</span></code></pre></div>
+<p>Git actually does something like this:</p>
+<p></p>
+<div class="sourceCode" id="cb174"><pre class="sourceCode default"><code class="sourceCode default"><span id="cb174-1"><a href="rebase.html#cb174-1" aria-hidden="true" tabindex="-1"></a>git fetch                # Get all the information from origin</span>
+<span id="cb174-2"><a href="rebase.html#cb174-2" aria-hidden="true" tabindex="-1"></a>git merge origin/main    # Merge origin/main into main</span></code></pre></div>
+<p>(Recall that <code>origin/main</code> is your remote-tracking branch—it’s the version of <code>main</code> that’s on <code>origin</code>, not the <code>main</code> on your local machine.)</p>
+<p>But merging isn’t the only thing you can do there. Given that this is the chapter on rebasing, you might correctly suspect that we can make it do a rebase instead.</p>
+<p>And here’s how:</p>
+<div class="sourceCode" id="cb175"><pre class="sourceCode default"><code class="sourceCode default"><span id="cb175-1"><a href="rebase.html#cb175-1" aria-hidden="true" tabindex="-1"></a>$ git pull --rebase</span></code></pre></div>
+<p>That causes these two things to happen:</p>
+<p></p>
+<div class="sourceCode" id="cb176"><pre class="sourceCode default"><code class="sourceCode default"><span id="cb176-1"><a href="rebase.html#cb176-1" aria-hidden="true" tabindex="-1"></a>git fetch                # Get all the information from origin</span>
+<span id="cb176-2"><a href="rebase.html#cb176-2" aria-hidden="true" tabindex="-1"></a>git rebase origin/main   # Rebase main into origin/main</span></code></pre></div>
+<p>If you want that to be the default behavior for the current repo, you can run this one-time command:</p>
+<div class="sourceCode" id="cb177"><pre class="sourceCode default"><code class="sourceCode default"><span id="cb177-1"><a href="rebase.html#cb177-1" aria-hidden="true" tabindex="-1"></a>$ git config pull.rebase true</span></code></pre></div>
+<p>If you want it to be the default behavior for all repos, you can:</p>
+<div class="sourceCode" id="cb178"><pre class="sourceCode default"><code class="sourceCode default"><span id="cb178-1"><a href="rebase.html#cb178-1" aria-hidden="true" tabindex="-1"></a>$ git config --global pull.rebase true</span></code></pre></div>
+<p>If you’ve configured your repo to always rebase on a pull, you can override that to force a merge (if you want) with:</p>
+<div class="sourceCode" id="cb179"><pre class="sourceCode default"><code class="sourceCode default"><span id="cb179-1"><a href="rebase.html#cb179-1" aria-hidden="true" tabindex="-1"></a>$ git pull --no-rebase  # Do a merge instead of a rebase</span></code></pre></div>
+<p></p>
+<h2 data-number="15.5" id="rebasing-conflicts"><span class="header-section-number">15.5</span> Conflicts</h2>
+<p></p>
+<p>When you do a merge, there’s a chance that you might conflict with some of the changes in the other branch, and you have to resolve those, as we’ve seen.</p>
+<p>Can the same thing happen with a rebase?</p>
+<p>Of course! If the commit you’re trying to rebase onto conflicts with your commit, you’ll have the same trouble you’d have with a merge.</p>
+<p>Luckily, Git will let you resolve the conflict in a way similar to the merge.</p>
+<p>Let’s start with a simple example. I’m going to have a text file that contains the following:</p>
+<div class="sourceCode" id="cb180"><pre class="sourceCode default"><code class="sourceCode default"><span id="cb180-1"><a href="rebase.html#cb180-1" aria-hidden="true" tabindex="-1"></a>The magic number is 1.</span></code></pre></div>
+<p>We’ll have that in a commit on the <code>main</code> branch.</p>
+<p>Then we’ll make a new <code>topic</code> branch there.</p>
+<p>Then on the <code>main</code> branch we’ll change the number to <code>2</code> and commit.</p>
+<p>And on the <code>topic</code> branch we’ll change the number to <code>3</code> and commit.</p>
+<p>So we’ll have the scenario in Figure 15.4.</p>
+<figure>
+<embed src="img_110_040.svg" title="Branches ready for conflict" />
+<figcaption aria-hidden="true">Branches ready for conflict.</figcaption>
+</figure>
+<p>Finally, we’ll try to rebase <code>topic</code> onto <code>main</code>.</p>
+<p>At that point, Git will become confused. It knows the last commit on <code>main</code> has <code>2</code> and that <code>topic</code> is unaware of this (because it branched off before that change). And it knows the last commit on <code>topic</code> has <code>3</code>. So which one is right?</p>
+<p>Let’s try to rebase while we’re on the <code>topic</code> branch and see what happens.</p>
+<div class="sourceCode" id="cb181"><pre class="sourceCode default"><code class="sourceCode default"><span id="cb181-1"><a href="rebase.html#cb181-1" aria-hidden="true" tabindex="-1"></a>$ git rebase main</span>
+<span id="cb181-2"><a href="rebase.html#cb181-2" aria-hidden="true" tabindex="-1"></a>  Auto-merging magic.txt</span>
+<span id="cb181-3"><a href="rebase.html#cb181-3" aria-hidden="true" tabindex="-1"></a>  CONFLICT (content): Merge conflict in magic.txt</span>
+<span id="cb181-4"><a href="rebase.html#cb181-4" aria-hidden="true" tabindex="-1"></a>  error: could not apply 9f19221... Update to 3</span>
+<span id="cb181-5"><a href="rebase.html#cb181-5" aria-hidden="true" tabindex="-1"></a>  hint: Resolve all conflicts manually, mark them as resolved with</span>
+<span id="cb181-6"><a href="rebase.html#cb181-6" aria-hidden="true" tabindex="-1"></a>  hint: &quot;git add/rm &lt;conflicted_files&gt;&quot;, then run &quot;git rebase</span>
+<span id="cb181-7"><a href="rebase.html#cb181-7" aria-hidden="true" tabindex="-1"></a>  hint: --continue&quot;.</span>
+<span id="cb181-8"><a href="rebase.html#cb181-8" aria-hidden="true" tabindex="-1"></a>  hint: You can instead skip this commit: run &quot;git rebase --skip&quot;.</span>
+<span id="cb181-9"><a href="rebase.html#cb181-9" aria-hidden="true" tabindex="-1"></a>  hint: To abort and get back to the state before &quot;git rebase&quot;, run</span>
+<span id="cb181-10"><a href="rebase.html#cb181-10" aria-hidden="true" tabindex="-1"></a>  hint: &quot;git rebase --abort&quot;.</span>
+<span id="cb181-11"><a href="rebase.html#cb181-11" aria-hidden="true" tabindex="-1"></a>  hint: Disable this message with &quot;git config advice.mergeConflict</span>
+<span id="cb181-12"><a href="rebase.html#cb181-12" aria-hidden="true" tabindex="-1"></a>  hint: false&quot;</span>
+<span id="cb181-13"><a href="rebase.html#cb181-13" aria-hidden="true" tabindex="-1"></a>  Could not apply 9f19221... Update to 3</span></code></pre></div>
+<p>Whoa, Nelly. OK, so it can’t do that. It says we need to “Resolve all conflicts manually”, and then add them, and then we’ll run rebase again with the <code>--continue</code> flag to continue the rebase.</p>
+<blockquote>
+<p><strong>If you keep reading the hints</strong>, you’ll see there some more stuff in there. We’ll get to <code>--skip</code> later, but do note that if the conflict is more than you want to take on right now, you can just run:</p>
+<div class="sourceCode" id="cb182"><pre class="sourceCode default"><code class="sourceCode default"><span id="cb182-1"><a href="rebase.html#cb182-1" aria-hidden="true" tabindex="-1"></a>$ git rebase --abort</span></code></pre></div>
+<!-- ` -->
+<p>to pretend you never started it in the first place.</p>
+</blockquote>
+<p>This might sound a little familiar. It’s basically the same process as we went through with the merge conflict.</p>
+<ol type="1">
+<li>Edit the conflicting file and make it <em>Right</em>.</li>
+<li>Add it.</li>
+<li>Continue the rebase.</li>
+</ol>
+<p>Let’s do that. If I pop open that file <code>magic.txt</code> in my editor, I see:</p>
+<div class="sourceCode" id="cb183"><pre class="sourceCode numberSource default numberLines"><code class="sourceCode default"><span id="cb183-1"><a href="rebase.html#cb183-1"></a>&lt;&lt;&lt;&lt;&lt;&lt;&lt; HEAD</span>
+<span id="cb183-2"><a href="rebase.html#cb183-2"></a>The magic number is 2</span>
+<span id="cb183-3"><a href="rebase.html#cb183-3"></a>=======</span>
+<span id="cb183-4"><a href="rebase.html#cb183-4"></a>The magic number is 3</span>
+<span id="cb183-5"><a href="rebase.html#cb183-5"></a>&gt;&gt;&gt;&gt;&gt;&gt;&gt; 9f19221 (Update to 3)</span></code></pre></div>
+<p>That’s just like in a merge conflict—Git is showing us the two choices we have for this line. So we’ll consult with the team and come to an agreement on what should be in the file, and we delete everything that shouldn’t be there and we make it <em>Right</em>.</p>
+<div class="sourceCode" id="cb184"><pre class="sourceCode default"><code class="sourceCode default"><span id="cb184-1"><a href="rebase.html#cb184-1" aria-hidden="true" tabindex="-1"></a>The magic number is 3</span></code></pre></div>
+<p>And I save that.</p>
+<p>Now, what were we supposed to do at this point, again? If you’ve forgotten, it’s fine. Just run <code>git status</code> to see where we’re at.</p>
+<div class="sourceCode" id="cb185"><pre class="sourceCode default"><code class="sourceCode default"><span id="cb185-1"><a href="rebase.html#cb185-1" aria-hidden="true" tabindex="-1"></a>$ git status</span>
+<span id="cb185-2"><a href="rebase.html#cb185-2" aria-hidden="true" tabindex="-1"></a>  interactive rebase in progress; onto 6ceeefb</span>
+<span id="cb185-3"><a href="rebase.html#cb185-3" aria-hidden="true" tabindex="-1"></a>  Last command done (1 command done):</span>
+<span id="cb185-4"><a href="rebase.html#cb185-4" aria-hidden="true" tabindex="-1"></a>     pick 9f19221 Update to 3</span>
+<span id="cb185-5"><a href="rebase.html#cb185-5" aria-hidden="true" tabindex="-1"></a>  No commands remaining.</span>
+<span id="cb185-6"><a href="rebase.html#cb185-6" aria-hidden="true" tabindex="-1"></a>  You are currently rebasing branch &#39;topic&#39; on &#39;6ceeefb&#39;.</span>
+<span id="cb185-7"><a href="rebase.html#cb185-7" aria-hidden="true" tabindex="-1"></a>    (fix conflicts and then run &quot;git rebase --continue&quot;)</span>
+<span id="cb185-8"><a href="rebase.html#cb185-8" aria-hidden="true" tabindex="-1"></a>    (use &quot;git rebase --skip&quot; to skip this patch)</span>
+<span id="cb185-9"><a href="rebase.html#cb185-9" aria-hidden="true" tabindex="-1"></a>    (use &quot;git rebase --abort&quot; to check out the original branch)</span>
+<span id="cb185-10"><a href="rebase.html#cb185-10" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb185-11"><a href="rebase.html#cb185-11" aria-hidden="true" tabindex="-1"></a>  Unmerged paths:</span>
+<span id="cb185-12"><a href="rebase.html#cb185-12" aria-hidden="true" tabindex="-1"></a>    (use &quot;git restore --staged &lt;file&gt;...&quot; to unstage)</span>
+<span id="cb185-13"><a href="rebase.html#cb185-13" aria-hidden="true" tabindex="-1"></a>    (use &quot;git add &lt;file&gt;...&quot; to mark resolution)</span>
+<span id="cb185-14"><a href="rebase.html#cb185-14" aria-hidden="true" tabindex="-1"></a>      both modified:   magic.txt</span>
+<span id="cb185-15"><a href="rebase.html#cb185-15" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb185-16"><a href="rebase.html#cb185-16" aria-hidden="true" tabindex="-1"></a>  no changes added to commit (use &quot;git add&quot; and/or &quot;git commit -a&quot;)</span></code></pre></div>
+<p>Oh yeah! <code>--continue</code>, right?</p>
+<div class="sourceCode" id="cb186"><pre class="sourceCode default"><code class="sourceCode default"><span id="cb186-1"><a href="rebase.html#cb186-1" aria-hidden="true" tabindex="-1"></a>$ git rebase --continue</span>
+<span id="cb186-2"><a href="rebase.html#cb186-2" aria-hidden="true" tabindex="-1"></a>  magic.txt: needs merge</span>
+<span id="cb186-3"><a href="rebase.html#cb186-3" aria-hidden="true" tabindex="-1"></a>  You must edit all merge conflicts and then</span>
+<span id="cb186-4"><a href="rebase.html#cb186-4" aria-hidden="true" tabindex="-1"></a>  mark them as resolved using git add</span></code></pre></div>
+<p>What? Oh, we should have read more of the status message. It says to use <code>git add</code> to mark resolution of the file <code>magic.txt</code>. Let’s do that.</p>
+<div class="sourceCode" id="cb187"><pre class="sourceCode default"><code class="sourceCode default"><span id="cb187-1"><a href="rebase.html#cb187-1" aria-hidden="true" tabindex="-1"></a>$ git add magic.txt</span>
+<span id="cb187-2"><a href="rebase.html#cb187-2" aria-hidden="true" tabindex="-1"></a>$ git status</span>
+<span id="cb187-3"><a href="rebase.html#cb187-3" aria-hidden="true" tabindex="-1"></a>  interactive rebase in progress; onto 6ceeefb</span>
+<span id="cb187-4"><a href="rebase.html#cb187-4" aria-hidden="true" tabindex="-1"></a>  Last command done (1 command done):</span>
+<span id="cb187-5"><a href="rebase.html#cb187-5" aria-hidden="true" tabindex="-1"></a>     pick 9f19221 Update to 3</span>
+<span id="cb187-6"><a href="rebase.html#cb187-6" aria-hidden="true" tabindex="-1"></a>  No commands remaining.</span>
+<span id="cb187-7"><a href="rebase.html#cb187-7" aria-hidden="true" tabindex="-1"></a>  You are currently rebasing branch &#39;topic&#39; on &#39;6ceeefb&#39;.</span>
+<span id="cb187-8"><a href="rebase.html#cb187-8" aria-hidden="true" tabindex="-1"></a>    (all conflicts fixed: run &quot;git rebase --continue&quot;)</span>
+<span id="cb187-9"><a href="rebase.html#cb187-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb187-10"><a href="rebase.html#cb187-10" aria-hidden="true" tabindex="-1"></a>  Changes to be committed:</span>
+<span id="cb187-11"><a href="rebase.html#cb187-11" aria-hidden="true" tabindex="-1"></a>    (use &quot;git restore --staged &lt;file&gt;...&quot; to unstage)</span>
+<span id="cb187-12"><a href="rebase.html#cb187-12" aria-hidden="true" tabindex="-1"></a>      modified:   magic.txt</span></code></pre></div>
+<p>That status looks nicer. (But note that Git’s in a special “rebase” state similar to how it gets into a special “merge” state when merging. We have to either abort or continue before we can use Git normally again.)</p>
+<p>Now <code>--continue</code>.</p>
+<div class="sourceCode" id="cb188"><pre class="sourceCode default"><code class="sourceCode default"><span id="cb188-1"><a href="rebase.html#cb188-1" aria-hidden="true" tabindex="-1"></a>$ git rebase --continue</span></code></pre></div>
+<p>This pops me into my editor to edit the commit message. This is your opportunity to change the commit message if it no longer reflects the commit. (That is, if you changed the commit when resolving the conflict to be something entirely different, you might need to edit the message.) Edit it if necessary and save it.</p>
+<p>And Git says:</p>
+<div class="sourceCode" id="cb189"><pre class="sourceCode default"><code class="sourceCode default"><span id="cb189-1"><a href="rebase.html#cb189-1" aria-hidden="true" tabindex="-1"></a>[detached HEAD 443fa53] Update to 3</span>
+<span id="cb189-2"><a href="rebase.html#cb189-2" aria-hidden="true" tabindex="-1"></a> 1 file changed, 1 insertion(+), 1 deletion(-)</span>
+<span id="cb189-3"><a href="rebase.html#cb189-3" aria-hidden="true" tabindex="-1"></a>Successfully rebased and updated refs/heads/topic.</span></code></pre></div>
+<p>And <code>git status</code> shows we’re all clear.</p>
+<p>After all that, we see our new commit graph in Figure 15.5.</p>
+<figure>
+<embed src="img_110_050.svg" title="After rebase conflict resolution." />
+<figcaption aria-hidden="true">After rebase conflict resolution.</figcaption>
+</figure>
+<p>One last note: if you find yourself resolving the same conflicts with a rebase over and over with every pull, you might check out <a href="https://git-scm.com/book/en/v2/Git-Tools-Rerere"><code>git rerere</code></a><a href="quick-reference.html#fn24" class="footnote-ref" id="fnref24" role="doc-noteref"><sup>24</sup></a> to help automate that process.</p>
+<p></p>
+<h2 data-number="15.6" id="squashing-commits"><span class="header-section-number">15.6</span> Squashing Commits</h2>
+<p></p>
+<p>This concept fits in with the notion of a clean commit history.</p>
+<p>Let’s say you were tasked with implementing a feature, namely adding an alert box saying that the storage limit was exceeded.</p>
+<p>No problem. You add it and commit with message “Added feature #121”. (And you don’t push yet.)</p>
+<div class="sourceCode" id="cb190"><pre class="sourceCode default"><code class="sourceCode default"><span id="cb190-1"><a href="rebase.html#cb190-1" aria-hidden="true" tabindex="-1"></a>alert(&quot;Strrage limit exceeeded&quot;);</span></code></pre></div>
+<p>Then after the commit, you notice a typo. Heck.</p>
+<p>So you fix it and commit with message “Fixed typo”.</p>
+<div class="sourceCode" id="cb191"><pre class="sourceCode default"><code class="sourceCode default"><span id="cb191-1"><a href="rebase.html#cb191-1" aria-hidden="true" tabindex="-1"></a>alert(&quot;Storage limit exceeeded&quot;);</span></code></pre></div>
+<p>Done.</p>
+<p>Wait! There’s another typo! Are you kidding me?</p>
+<p>So you fix it:</p>
+<div class="sourceCode" id="cb192"><pre class="sourceCode default"><code class="sourceCode default"><span id="cb192-1"><a href="rebase.html#cb192-1" aria-hidden="true" tabindex="-1"></a>alert(&quot;Storage limit exceeded&quot;);</span></code></pre></div>
+<p>And add another commit saying “Fixed another typo”.</p>
+<p>Now your local commit history reads:</p>
+<div class="sourceCode" id="cb193"><pre class="sourceCode default"><code class="sourceCode default"><span id="cb193-1"><a href="rebase.html#cb193-1" aria-hidden="true" tabindex="-1"></a>Fixed another typo</span>
+<span id="cb193-2"><a href="rebase.html#cb193-2" aria-hidden="true" tabindex="-1"></a>Fixed a typo</span>
+<span id="cb193-3"><a href="rebase.html#cb193-3" aria-hidden="true" tabindex="-1"></a>Added feature #121</span></code></pre></div>
+<p>That’s not super clean, right? Really this was supposed to be one commit that implemented feature #121.</p>
+<p>But luckily you haven’t pushed yet, which means you’re still free to rewrite that history!</p>
+<p>You can use a feature of rebase called <strong><em>squashing</em></strong> to get this done.</p>
+<p>What you want to do is squash those two typo fixes into the previous commit, the one where you first tried to implement the feature.</p>
+<p>First, let’s look at the log.</p>
+<div class="sourceCode" id="cb194"><pre class="sourceCode default"><code class="sourceCode default"><span id="cb194-1"><a href="rebase.html#cb194-1" aria-hidden="true" tabindex="-1"></a>$ git log</span>
+<span id="cb194-2"><a href="rebase.html#cb194-2" aria-hidden="true" tabindex="-1"></a>commit c1820e6d0da19013208b389d264310162477b099 (HEAD -&gt; main)</span>
+<span id="cb194-3"><a href="rebase.html#cb194-3" aria-hidden="true" tabindex="-1"></a>Author: User &lt;user@example.com&gt;</span>
+<span id="cb194-4"><a href="rebase.html#cb194-4" aria-hidden="true" tabindex="-1"></a>Date:   Wed Jul 17 11:53:10 2024 -0700</span>
+<span id="cb194-5"><a href="rebase.html#cb194-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb194-6"><a href="rebase.html#cb194-6" aria-hidden="true" tabindex="-1"></a>    Fixed another typo</span>
+<span id="cb194-7"><a href="rebase.html#cb194-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb194-8"><a href="rebase.html#cb194-8" aria-hidden="true" tabindex="-1"></a>commit c62c0db7b82e6b415d36bd0f00d568fd503164b7</span>
+<span id="cb194-9"><a href="rebase.html#cb194-9" aria-hidden="true" tabindex="-1"></a>Author: User &lt;user@example.com&gt;</span>
+<span id="cb194-10"><a href="rebase.html#cb194-10" aria-hidden="true" tabindex="-1"></a>Date:   Wed Jul 17 11:53:10 2024 -0700</span>
+<span id="cb194-11"><a href="rebase.html#cb194-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb194-12"><a href="rebase.html#cb194-12" aria-hidden="true" tabindex="-1"></a>    Fixed typo</span>
+<span id="cb194-13"><a href="rebase.html#cb194-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb194-14"><a href="rebase.html#cb194-14" aria-hidden="true" tabindex="-1"></a>commit ab84a428b8baae0078ee0647a67b34a89a6abed8</span>
+<span id="cb194-15"><a href="rebase.html#cb194-15" aria-hidden="true" tabindex="-1"></a>Author: User &lt;user@example.com&gt;</span>
+<span id="cb194-16"><a href="rebase.html#cb194-16" aria-hidden="true" tabindex="-1"></a>Date:   Wed Jul 17 11:53:10 2024 -0700</span>
+<span id="cb194-17"><a href="rebase.html#cb194-17" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb194-18"><a href="rebase.html#cb194-18" aria-hidden="true" tabindex="-1"></a>    Added feature #121</span>
+<span id="cb194-19"><a href="rebase.html#cb194-19" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb194-20"><a href="rebase.html#cb194-20" aria-hidden="true" tabindex="-1"></a>commit a95854659e31d203e2325eee61d892c9cdad767c</span>
+<span id="cb194-21"><a href="rebase.html#cb194-21" aria-hidden="true" tabindex="-1"></a>Author: User &lt;user@example.com&gt;</span>
+<span id="cb194-22"><a href="rebase.html#cb194-22" aria-hidden="true" tabindex="-1"></a>Date:   Wed Jul 17 11:53:10 2024 -0700</span>
+<span id="cb194-23"><a href="rebase.html#cb194-23" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb194-24"><a href="rebase.html#cb194-24" aria-hidden="true" tabindex="-1"></a>    Added</span></code></pre></div>
+<p>Since this is a rebase, we’re going to rebase onto something, namely the commit <em>prior</em> to the added feature commit, the commit ID starting with <code>a9585</code>.</p>
+<p>And we want to do it <em>interactively</em>, which is a special rebase mode that lets us do the squashing, and we get there with the <code>-i</code> flag.</p>
+<div class="sourceCode" id="cb195"><pre class="sourceCode default"><code class="sourceCode default"><span id="cb195-1"><a href="rebase.html#cb195-1" aria-hidden="true" tabindex="-1"></a>$ git rebase -i a9585</span></code></pre></div>
+<p>This brings us into an editor that has this information, and a huge comment block below it full of instructions.</p>
+<div class="sourceCode" id="cb196"><pre class="sourceCode numberSource default numberLines"><code class="sourceCode default"><span id="cb196-1"><a href="rebase.html#cb196-1"></a>pick ab84a42 Added feature #121</span>
+<span id="cb196-2"><a href="rebase.html#cb196-2"></a>pick c62c0db Fixed typo</span>
+<span id="cb196-3"><a href="rebase.html#cb196-3"></a>pick c1820e6 Fixed another typo</span></code></pre></div>
+<p>Notice that they’re listed in forward order instead of the reverse log order we’re used to.</p>
+<p>Look at all those options shown in the comment block (and not shown here in the guide)! Pick, reword, edit, squash, fixup… so many things to choose from. As you might imagine we’re in a pretty powerful history rewriting mode.</p>
+<p>For now, though, let’s just look at “squash” and “fixup”, which are almost the same thing.</p>
+<p>Starting with “squash”, what I want to do is take those typo fix commits and work them into the “Added feature” commit. We can use the squash mode to do this.</p>
+<p>I’ll edit the file to look like this:</p>
+<div class="sourceCode" id="cb197"><pre class="sourceCode numberSource default numberLines"><code class="sourceCode default"><span id="cb197-1"><a href="rebase.html#cb197-1"></a>pick ab84a42 Added feature #121</span>
+<span id="cb197-2"><a href="rebase.html#cb197-2"></a>squash c62c0db Fixed typo</span>
+<span id="cb197-3"><a href="rebase.html#cb197-3"></a>squash c1820e6 Fixed another typo</span></code></pre></div>
+<p>That will squash “Fixed another typo” into “Fixed typo” and then squash that result into “Added feature #121”.</p>
+<p>And <code>pick</code> just means “use this commit as-is”.</p>
+<blockquote>
+<p><strong>There are shorthand versions for all these commands.</strong> I could have used <code>s</code> instead of <code>squash</code>.</p>
+</blockquote>
+<p>After I save the file, I get launched right back into another editor that has this in it:</p>
+<div class="sourceCode" id="cb198"><pre class="sourceCode numberSource default numberLines"><code class="sourceCode default"><span id="cb198-1"><a href="rebase.html#cb198-1"></a># This is a combination of 3 commits.</span>
+<span id="cb198-2"><a href="rebase.html#cb198-2"></a># This is the 1st commit message:</span>
+<span id="cb198-3"><a href="rebase.html#cb198-3"></a></span>
+<span id="cb198-4"><a href="rebase.html#cb198-4"></a>Added feature #121</span>
+<span id="cb198-5"><a href="rebase.html#cb198-5"></a></span>
+<span id="cb198-6"><a href="rebase.html#cb198-6"></a># This is the commit message #2:</span>
+<span id="cb198-7"><a href="rebase.html#cb198-7"></a></span>
+<span id="cb198-8"><a href="rebase.html#cb198-8"></a>Fixed typo</span>
+<span id="cb198-9"><a href="rebase.html#cb198-9"></a></span>
+<span id="cb198-10"><a href="rebase.html#cb198-10"></a># This is the commit message #3:</span>
+<span id="cb198-11"><a href="rebase.html#cb198-11"></a></span>
+<span id="cb198-12"><a href="rebase.html#cb198-12"></a>Fixed another typo</span></code></pre></div>
+<p>We’re making a new rebased commit here with the three commits squashed into one, and so we get to write a new commit message. Helpfully, Git has included all three commit messages. Let’s hack it down to just have the commit message we want.</p>
+<div class="sourceCode" id="cb199"><pre class="sourceCode numberSource default numberLines"><code class="sourceCode default"><span id="cb199-1"><a href="rebase.html#cb199-1"></a>Added feature #121</span></code></pre></div>
+<p>And saving gets us back out with a message.</p>
+<div class="sourceCode" id="cb200"><pre class="sourceCode default"><code class="sourceCode default"><span id="cb200-1"><a href="rebase.html#cb200-1" aria-hidden="true" tabindex="-1"></a>[detached HEAD 4bc6bca] Added feature #121</span>
+<span id="cb200-2"><a href="rebase.html#cb200-2" aria-hidden="true" tabindex="-1"></a> Date: Wed Jul 17 11:53:10 2024 -0700</span>
+<span id="cb200-3"><a href="rebase.html#cb200-3" aria-hidden="true" tabindex="-1"></a> 1 file changed, 1 insertion(+)</span>
+<span id="cb200-4"><a href="rebase.html#cb200-4" aria-hidden="true" tabindex="-1"></a> create mode 100644 foo.js</span>
+<span id="cb200-5"><a href="rebase.html#cb200-5" aria-hidden="true" tabindex="-1"></a>Successfully rebased and updated refs/heads/main.</span></code></pre></div>
+<p>Success is good. I like success.</p>
+<blockquote>
+<p><strong>What’s that about detached HEAD?</strong> Git detaches the <code>HEAD</code> briefly when doing a rebase. Don’t worry—it gets reattached for you.</p>
+</blockquote>
+<p>Now my commit history is all cleaned up.</p>
+<div class="sourceCode" id="cb201"><pre class="sourceCode default"><code class="sourceCode default"><span id="cb201-1"><a href="rebase.html#cb201-1" aria-hidden="true" tabindex="-1"></a>commit 4bc6bca6870d124b3eebc9afd32486a5a23189fc (HEAD -&gt; main)</span>
+<span id="cb201-2"><a href="rebase.html#cb201-2" aria-hidden="true" tabindex="-1"></a>Author: User &lt;user@example.com&gt;</span>
+<span id="cb201-3"><a href="rebase.html#cb201-3" aria-hidden="true" tabindex="-1"></a>Date:   Wed Jul 17 11:53:10 2024 -0700</span>
+<span id="cb201-4"><a href="rebase.html#cb201-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb201-5"><a href="rebase.html#cb201-5" aria-hidden="true" tabindex="-1"></a>    Added feature #121</span>
+<span id="cb201-6"><a href="rebase.html#cb201-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb201-7"><a href="rebase.html#cb201-7" aria-hidden="true" tabindex="-1"></a>commit a95854659e31d203e2325eee61d892c9cdad767c</span>
+<span id="cb201-8"><a href="rebase.html#cb201-8" aria-hidden="true" tabindex="-1"></a>Author: User &lt;user@example.com&gt;</span>
+<span id="cb201-9"><a href="rebase.html#cb201-9" aria-hidden="true" tabindex="-1"></a>Date:   Wed Jul 17 11:53:10 2024 -0700</span>
+<span id="cb201-10"><a href="rebase.html#cb201-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb201-11"><a href="rebase.html#cb201-11" aria-hidden="true" tabindex="-1"></a>    Added</span></code></pre></div>
+<p>And you can see, if you look at the earlier log, that the “Added feature” commit ID has changed. We did a rebase, after all, so those old commits are gone, replaced by the new ones.</p>
+<p>Finally, after all this, <em>now</em> you can push. And always remember that since this is a history rewrite, you shouldn’t do it after you’ve pushed.</p>
+<p></p>
+<h3 data-number="15.6.1" id="squash-versus-fixup"><span class="header-section-number">15.6.1</span> Squash versus Fixup</h3>
+<p></p>
+<p>Now a quick note about <code>fixup</code> instead of <code>squash</code>. It’s the same thing, except only the squashed-into commit message is kept by default. So if I ran this:</p>
+<div class="sourceCode" id="cb202"><pre class="sourceCode numberSource default numberLines"><code class="sourceCode default"><span id="cb202-1"><a href="rebase.html#cb202-1"></a>pick fbc1075 Added feature #121</span>
+<span id="cb202-2"><a href="rebase.html#cb202-2"></a>fixup fd4ca42 Fixed typo</span>
+<span id="cb202-3"><a href="rebase.html#cb202-3"></a>fixup 6a10e97 Fixed another typo</span></code></pre></div>
+<p>Git instantly returns with:</p>
+<div class="sourceCode" id="cb203"><pre class="sourceCode default"><code class="sourceCode default"><span id="cb203-1"><a href="rebase.html#cb203-1" aria-hidden="true" tabindex="-1"></a>Successfully rebased and updated refs/heads/main.</span></code></pre></div>
+<p>And Git log only shows the “Added feature #121” commit. With <code>fixup</code>, Git automatically discards the squashed commit messages.</p>
+<h2 data-number="15.7" id="multiple-conflicts-in-the-rebase"><span class="header-section-number">15.7</span> Multiple Conflicts in the Rebase</h2>
+<p></p>
+<p>When you merge with commit and there are multiple conflicts, you resolve them all in one big merge commit and then you’re done. You use <code>git commit</code> to wrap it all up.</p>
+<p>Rebase is a little different. Since rebase “replays” your commits onto the new base one at a time, each replay is a merge conflict opportunity. This means that <em>as you rebase, you might have to resolve multiple conflicts one after another</em>.</p>
+<p>For example, let’s say on your topic branch you made a commit that modified file <code>foo.txt</code>. And then you made <em>another commit</em> that modified file <code>bar.txt</code>.</p>
+<p>But unbeknownst to you, someone on the <code>main</code> branch has also modified those two files, so they’re bound to conflict when you rebase.</p>
+<p>And so you begin <code>git rebase main</code>, and we’re in trouble right off the bat. It’s telling us that <code>foo.txt</code> conflicts.</p>
+<p>So you fix it up and then run <code>git rebase --continue</code> and edit the commit message, and get on with it.</p>
+<p>But all that does is move on to your <em>next</em> commit to <code>bar.txt</code> and try to rebase that. And it conflicts, too!</p>
+<p>So you fix it up and then run <code>git rebase --continue</code> and edit the commit message, and get on with it. Again.</p>
+<p>And finally you get the success message:</p>
+<div class="sourceCode" id="cb204"><pre class="sourceCode default"><code class="sourceCode default"><span id="cb204-1"><a href="rebase.html#cb204-1" aria-hidden="true" tabindex="-1"></a>[detached HEAD 31c3947] topic change bar</span>
+<span id="cb204-2"><a href="rebase.html#cb204-2" aria-hidden="true" tabindex="-1"></a> 1 file changed, 1 insertion(+)</span>
+<span id="cb204-3"><a href="rebase.html#cb204-3" aria-hidden="true" tabindex="-1"></a>Successfully rebased and updated refs/heads/topic.</span></code></pre></div>
+<p>This is why you can conclude a merge with a simple commit, but you have to conclude a rebase by repeatedly running <code>git rebase --continue</code> until all commits have been rebased cleanly.</p>
+<p>Is this good or bad? It might be better in that you get a chance to merge each commit in isolation so it might be easier to reason about and avoid errors. But at the same time it’s more legwork to get through it.</p>
+<p>As always, use the right tool for the job!</p>
+<p></p>
+<p></p>
+<!-- BG_NEW_CHAPTER -->
+<hr><div style="text-align:center"><span><a href="collaboration-across-branches.html" rel="prev">Prev</a> | </span><a href="index.html">Contents</a><span> | <a href="stash.html" rel="next">Next</a></span></div></body>
+</html>

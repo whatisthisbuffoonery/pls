@@ -1,0 +1,642 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <title>Beej's Guide to Git</title>
+  <style>
+    html {
+      color: #1a1a1a;
+      background-color: #fdfdfd;
+    }
+    body {
+      margin: 0 auto;
+      max-width: 36em;
+      padding-left: 50px;
+      padding-right: 50px;
+      padding-top: 50px;
+      padding-bottom: 50px;
+      hyphens: auto;
+      overflow-wrap: break-word;
+      text-rendering: optimizeLegibility;
+      font-kerning: normal;
+    }
+    @media (max-width: 600px) {
+      body {
+        font-size: 0.9em;
+        padding: 12px;
+      }
+      h1 {
+        font-size: 1.8em;
+      }
+    }
+    @media print {
+      html {
+        background-color: white;
+      }
+      body {
+        background-color: transparent;
+        color: black;
+        font-size: 12pt;
+      }
+      p, h2, h3 {
+        orphans: 3;
+        widows: 3;
+      }
+      h2, h3, h4 {
+        page-break-after: avoid;
+      }
+    }
+    p {
+      margin: 1em 0;
+    }
+    a {
+      color: #1a1a1a;
+    }
+    a:visited {
+      color: #1a1a1a;
+    }
+    img {
+      max-width: 100%;
+    }
+    svg {
+      height: auto;
+      max-width: 100%;
+    }
+    h1, h2, h3, h4, h5, h6 {
+      margin-top: 1.4em;
+    }
+    h5, h6 {
+      font-size: 1em;
+      font-style: italic;
+    }
+    h6 {
+      font-weight: normal;
+    }
+    ol, ul {
+      padding-left: 1.7em;
+      margin-top: 1em;
+    }
+    li > ol, li > ul {
+      margin-top: 0;
+    }
+    blockquote {
+      margin: 1em 0 1em 1.7em;
+      padding-left: 1em;
+      border-left: 2px solid #e6e6e6;
+      color: #606060;
+    }
+    code {
+      font-family: Menlo, Monaco, Consolas, 'Lucida Console', monospace;
+      font-size: 85%;
+      margin: 0;
+      hyphens: manual;
+    }
+    pre {
+      margin: 1em 0;
+      overflow: auto;
+    }
+    pre code {
+      padding: 0;
+      overflow: visible;
+      overflow-wrap: normal;
+    }
+    .sourceCode {
+     background-color: transparent;
+     overflow: visible;
+    }
+    hr {
+      background-color: #1a1a1a;
+      border: none;
+      height: 1px;
+      margin: 1em 0;
+    }
+    table {
+      margin: 1em 0;
+      border-collapse: collapse;
+      width: 100%;
+      overflow-x: auto;
+      display: block;
+      font-variant-numeric: lining-nums tabular-nums;
+    }
+    table caption {
+      margin-bottom: 0.75em;
+    }
+    tbody {
+      margin-top: 0.5em;
+      border-top: 1px solid #1a1a1a;
+      border-bottom: 1px solid #1a1a1a;
+    }
+    th {
+      border-top: 1px solid #1a1a1a;
+      padding: 0.25em 0.5em 0.25em 0.5em;
+    }
+    td {
+      padding: 0.125em 0.5em 0.25em 0.5em;
+    }
+    header {
+      margin-bottom: 4em;
+      text-align: center;
+    }
+    #TOC li {
+      list-style: none;
+    }
+    #TOC ul {
+      padding-left: 1.3em;
+    }
+    #TOC > ul {
+      padding-left: 0;
+    }
+    #TOC a:not(:hover) {
+      text-decoration: none;
+    }
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+    /* CSS for syntax highlighting */
+    html { -webkit-text-size-adjust: 100%; }
+    pre > code.sourceCode { white-space: pre; position: relative; }
+    pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+    pre > code.sourceCode > span:empty { height: 1.2em; }
+    .sourceCode { overflow: visible; }
+    code.sourceCode > span { color: inherit; text-decoration: inherit; }
+    div.sourceCode { margin: 1em 0; }
+    pre.sourceCode { margin: 0; }
+    @media screen {
+    div.sourceCode { overflow: auto; }
+    }
+    @media print {
+    pre > code.sourceCode { white-space: pre-wrap; }
+    pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+    }
+    pre.numberSource code
+      { counter-reset: source-line 0; }
+    pre.numberSource code > span
+      { position: relative; left: -4em; counter-increment: source-line; }
+    pre.numberSource code > span > a:first-child::before
+      { content: counter(source-line);
+        position: relative; left: -1em; text-align: right; vertical-align: baseline;
+        border: none; display: inline-block;
+        -webkit-touch-callout: none; -webkit-user-select: none;
+        -khtml-user-select: none; -moz-user-select: none;
+        -ms-user-select: none; user-select: none;
+        padding: 0 4px; width: 4em;
+        color: #aaaaaa;
+      }
+    pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+    div.sourceCode
+      {   }
+    @media screen {
+    pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+    }
+    code span.al { color: #ff0000; font-weight: bold; } /* Alert */
+    code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+    code span.at { color: #7d9029; } /* Attribute */
+    code span.bn { color: #40a070; } /* BaseN */
+    code span.bu { color: #008000; } /* BuiltIn */
+    code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+    code span.ch { color: #4070a0; } /* Char */
+    code span.cn { color: #880000; } /* Constant */
+    code span.co { color: #60a0b0; font-style: italic; } /* Comment */
+    code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+    code span.do { color: #ba2121; font-style: italic; } /* Documentation */
+    code span.dt { color: #902000; } /* DataType */
+    code span.dv { color: #40a070; } /* DecVal */
+    code span.er { color: #ff0000; font-weight: bold; } /* Error */
+    code span.ex { } /* Extension */
+    code span.fl { color: #40a070; } /* Float */
+    code span.fu { color: #06287e; } /* Function */
+    code span.im { color: #008000; font-weight: bold; } /* Import */
+    code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+    code span.kw { color: #007020; font-weight: bold; } /* Keyword */
+    code span.op { color: #666666; } /* Operator */
+    code span.ot { color: #007020; } /* Other */
+    code span.pp { color: #bc7a00; } /* Preprocessor */
+    code span.sc { color: #4070a0; } /* SpecialChar */
+    code span.ss { color: #bb6688; } /* SpecialString */
+    code span.st { color: #4070a0; } /* String */
+    code span.va { color: #19177c; } /* Variable */
+    code span.vs { color: #4070a0; } /* VerbatimString */
+    code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+  </style>
+  <!-- BG custom styling -->
+  <style type="text/css">
+  /* Fix for line numbers not visible */
+  pre.numberSource code > span {
+      left: -1em;
+  }
+  pre.numberSource {
+      margin-left: initial;
+  }
+
+  /* Put some space after the section numbers */
+  span.toc-section-number::after {
+      content: "\a0\a0\a0";  /* non-breaking whitespace */
+  }
+
+  /* Hide underlines on code number links */
+  pre > code.sourceCode > span > a:first-child::before {
+      text-decoration: none;
+  }
+
+  /* Color the source blocks */
+  div.sourceCode {
+      background-color: #f0f0f0;
+  }
+
+  /* Fix iOS big text rendering issue */
+  pre > code.sourceCode > span {
+      display: initial;
+  }
+
+
+  /* Color the inline code */
+  code:not(.sourceCode) {
+      background: #f0f0f0;
+      padding-left: 0.2em;
+      padding-right: 0.2em;
+      border-radius: 0.2em;
+  }
+
+  pre.sourceCode {
+      border: 1px solid #ccc;
+      padding: 0.5em;
+      border-radius: 0.2em;
+  }
+
+  /* Keep code tags from wrapping in tables */
+  tbody code {
+      white-space: nowrap;
+  }
+
+  /* Prevent hyphenation and hyphen breaks in code*/
+  code {
+      word-break: keep-all;
+  }
+
+  td {
+      vertical-align: top;
+  }
+
+  body {
+      font-size: 12pt;
+      max-width: 43em;
+      font-family: sans-serif;
+  }
+
+  html {
+      background: #f9f9f9;
+  }
+
+  figure > embed {
+      max-width: 100%;
+  }
+
+  figure {
+      text-align: center;
+      margin-top: 2em;
+      margin-bottom: 2em;
+  }
+
+  figcaption {
+      font-size: 0.9em;
+      font-style: italic;
+      margin-top: 0.6em;
+  }
+
+  body {
+      counter-reset: figure-counter-major;
+      counter-reset: figure-counter-minor;
+  }
+
+  figure {
+      counter-increment: figure-counter-minor;
+  }
+
+  figcaption::before {
+      content: "Figure " counter(figure-counter-major) "." counter(figure-counter-minor) ": ";
+  }
+
+  blockquote {
+      border-left: 2px solid #bbb;
+      color: #444;
+  }
+
+  /* Contents */
+
+  nav[role="doc-toc"] > ul > li {
+    font-weight: bold;
+    margin-top: 1.2em;
+  }
+
+  nav[role="doc-toc"] > ul > li:first {
+    font-weight: bold;
+    margin-top: initial;
+  }
+
+  nav[role="doc-toc"] > ul > li > ul {
+    font-weight: normal;
+    margin-top: 0.3em;
+  }
+
+  /*
+  In multipage, we need to reset the figure counter to the chapter
+  number. Luckily, this is in the <h1 data-number> attribute. Unluckily,
+  there is no way to get this in a general way.
+
+  This doesn't work:
+
+    h1[data-number] {
+      counter-set: figure-counter-major attr(data-number);
+    }
+
+  Nor this:
+
+    h1[data-number] {
+      --figure-counter-major-value: attr(data-number);
+      counter-set: figure-counter-major var(--figure-counter-major-value);
+    }
+
+  So, dumbly, we have a bunch of rules for all these sections, up to the
+  maximum possible section.
+
+  Here's a program to generate them:
+
+    for (let i = 1; i < 100; i++)
+        console.log(`h1[data-number="${i}"]{counter-set:figure-counter-major ${i};counter-reset:figure-counter-minor;}`);
+
+  Note to self: never write a book with more than 99 frickin' chapters.
+  */
+
+  h1[data-number="1"]{counter-set:figure-counter-major 1;counter-reset:figure-counter-minor;}
+  h1[data-number="2"]{counter-set:figure-counter-major 2;counter-reset:figure-counter-minor;}
+  h1[data-number="3"]{counter-set:figure-counter-major 3;counter-reset:figure-counter-minor;}
+  h1[data-number="4"]{counter-set:figure-counter-major 4;counter-reset:figure-counter-minor;}
+  h1[data-number="5"]{counter-set:figure-counter-major 5;counter-reset:figure-counter-minor;}
+  h1[data-number="6"]{counter-set:figure-counter-major 6;counter-reset:figure-counter-minor;}
+  h1[data-number="7"]{counter-set:figure-counter-major 7;counter-reset:figure-counter-minor;}
+  h1[data-number="8"]{counter-set:figure-counter-major 8;counter-reset:figure-counter-minor;}
+  h1[data-number="9"]{counter-set:figure-counter-major 9;counter-reset:figure-counter-minor;}
+  h1[data-number="10"]{counter-set:figure-counter-major 10;counter-reset:figure-counter-minor;}
+  h1[data-number="11"]{counter-set:figure-counter-major 11;counter-reset:figure-counter-minor;}
+  h1[data-number="12"]{counter-set:figure-counter-major 12;counter-reset:figure-counter-minor;}
+  h1[data-number="13"]{counter-set:figure-counter-major 13;counter-reset:figure-counter-minor;}
+  h1[data-number="14"]{counter-set:figure-counter-major 14;counter-reset:figure-counter-minor;}
+  h1[data-number="15"]{counter-set:figure-counter-major 15;counter-reset:figure-counter-minor;}
+  h1[data-number="16"]{counter-set:figure-counter-major 16;counter-reset:figure-counter-minor;}
+  h1[data-number="17"]{counter-set:figure-counter-major 17;counter-reset:figure-counter-minor;}
+  h1[data-number="18"]{counter-set:figure-counter-major 18;counter-reset:figure-counter-minor;}
+  h1[data-number="19"]{counter-set:figure-counter-major 19;counter-reset:figure-counter-minor;}
+  h1[data-number="20"]{counter-set:figure-counter-major 20;counter-reset:figure-counter-minor;}
+  h1[data-number="21"]{counter-set:figure-counter-major 21;counter-reset:figure-counter-minor;}
+  h1[data-number="22"]{counter-set:figure-counter-major 22;counter-reset:figure-counter-minor;}
+  h1[data-number="23"]{counter-set:figure-counter-major 23;counter-reset:figure-counter-minor;}
+  h1[data-number="24"]{counter-set:figure-counter-major 24;counter-reset:figure-counter-minor;}
+  h1[data-number="25"]{counter-set:figure-counter-major 25;counter-reset:figure-counter-minor;}
+  h1[data-number="26"]{counter-set:figure-counter-major 26;counter-reset:figure-counter-minor;}
+  h1[data-number="27"]{counter-set:figure-counter-major 27;counter-reset:figure-counter-minor;}
+  h1[data-number="28"]{counter-set:figure-counter-major 28;counter-reset:figure-counter-minor;}
+  h1[data-number="29"]{counter-set:figure-counter-major 29;counter-reset:figure-counter-minor;}
+  h1[data-number="30"]{counter-set:figure-counter-major 30;counter-reset:figure-counter-minor;}
+  h1[data-number="31"]{counter-set:figure-counter-major 31;counter-reset:figure-counter-minor;}
+  h1[data-number="32"]{counter-set:figure-counter-major 32;counter-reset:figure-counter-minor;}
+  h1[data-number="33"]{counter-set:figure-counter-major 33;counter-reset:figure-counter-minor;}
+  h1[data-number="34"]{counter-set:figure-counter-major 34;counter-reset:figure-counter-minor;}
+  h1[data-number="35"]{counter-set:figure-counter-major 35;counter-reset:figure-counter-minor;}
+  h1[data-number="36"]{counter-set:figure-counter-major 36;counter-reset:figure-counter-minor;}
+  h1[data-number="37"]{counter-set:figure-counter-major 37;counter-reset:figure-counter-minor;}
+  h1[data-number="38"]{counter-set:figure-counter-major 38;counter-reset:figure-counter-minor;}
+  h1[data-number="39"]{counter-set:figure-counter-major 39;counter-reset:figure-counter-minor;}
+  h1[data-number="40"]{counter-set:figure-counter-major 40;counter-reset:figure-counter-minor;}
+  h1[data-number="41"]{counter-set:figure-counter-major 41;counter-reset:figure-counter-minor;}
+  h1[data-number="42"]{counter-set:figure-counter-major 42;counter-reset:figure-counter-minor;}
+  h1[data-number="43"]{counter-set:figure-counter-major 43;counter-reset:figure-counter-minor;}
+  h1[data-number="44"]{counter-set:figure-counter-major 44;counter-reset:figure-counter-minor;}
+  h1[data-number="45"]{counter-set:figure-counter-major 45;counter-reset:figure-counter-minor;}
+  h1[data-number="46"]{counter-set:figure-counter-major 46;counter-reset:figure-counter-minor;}
+  h1[data-number="47"]{counter-set:figure-counter-major 47;counter-reset:figure-counter-minor;}
+  h1[data-number="48"]{counter-set:figure-counter-major 48;counter-reset:figure-counter-minor;}
+  h1[data-number="49"]{counter-set:figure-counter-major 49;counter-reset:figure-counter-minor;}
+  h1[data-number="50"]{counter-set:figure-counter-major 50;counter-reset:figure-counter-minor;}
+  h1[data-number="51"]{counter-set:figure-counter-major 51;counter-reset:figure-counter-minor;}
+  h1[data-number="52"]{counter-set:figure-counter-major 52;counter-reset:figure-counter-minor;}
+  h1[data-number="53"]{counter-set:figure-counter-major 53;counter-reset:figure-counter-minor;}
+  h1[data-number="54"]{counter-set:figure-counter-major 54;counter-reset:figure-counter-minor;}
+  h1[data-number="55"]{counter-set:figure-counter-major 55;counter-reset:figure-counter-minor;}
+  h1[data-number="56"]{counter-set:figure-counter-major 56;counter-reset:figure-counter-minor;}
+  h1[data-number="57"]{counter-set:figure-counter-major 57;counter-reset:figure-counter-minor;}
+  h1[data-number="58"]{counter-set:figure-counter-major 58;counter-reset:figure-counter-minor;}
+  h1[data-number="59"]{counter-set:figure-counter-major 59;counter-reset:figure-counter-minor;}
+  h1[data-number="60"]{counter-set:figure-counter-major 60;counter-reset:figure-counter-minor;}
+  h1[data-number="61"]{counter-set:figure-counter-major 61;counter-reset:figure-counter-minor;}
+  h1[data-number="62"]{counter-set:figure-counter-major 62;counter-reset:figure-counter-minor;}
+  h1[data-number="63"]{counter-set:figure-counter-major 63;counter-reset:figure-counter-minor;}
+  h1[data-number="64"]{counter-set:figure-counter-major 64;counter-reset:figure-counter-minor;}
+  h1[data-number="65"]{counter-set:figure-counter-major 65;counter-reset:figure-counter-minor;}
+  h1[data-number="66"]{counter-set:figure-counter-major 66;counter-reset:figure-counter-minor;}
+  h1[data-number="67"]{counter-set:figure-counter-major 67;counter-reset:figure-counter-minor;}
+  h1[data-number="68"]{counter-set:figure-counter-major 68;counter-reset:figure-counter-minor;}
+  h1[data-number="69"]{counter-set:figure-counter-major 69;counter-reset:figure-counter-minor;}
+  h1[data-number="70"]{counter-set:figure-counter-major 70;counter-reset:figure-counter-minor;}
+  h1[data-number="71"]{counter-set:figure-counter-major 71;counter-reset:figure-counter-minor;}
+  h1[data-number="72"]{counter-set:figure-counter-major 72;counter-reset:figure-counter-minor;}
+  h1[data-number="73"]{counter-set:figure-counter-major 73;counter-reset:figure-counter-minor;}
+  h1[data-number="74"]{counter-set:figure-counter-major 74;counter-reset:figure-counter-minor;}
+  h1[data-number="75"]{counter-set:figure-counter-major 75;counter-reset:figure-counter-minor;}
+  h1[data-number="76"]{counter-set:figure-counter-major 76;counter-reset:figure-counter-minor;}
+  h1[data-number="77"]{counter-set:figure-counter-major 77;counter-reset:figure-counter-minor;}
+  h1[data-number="78"]{counter-set:figure-counter-major 78;counter-reset:figure-counter-minor;}
+  h1[data-number="79"]{counter-set:figure-counter-major 79;counter-reset:figure-counter-minor;}
+  h1[data-number="80"]{counter-set:figure-counter-major 80;counter-reset:figure-counter-minor;}
+  h1[data-number="81"]{counter-set:figure-counter-major 81;counter-reset:figure-counter-minor;}
+  h1[data-number="82"]{counter-set:figure-counter-major 82;counter-reset:figure-counter-minor;}
+  h1[data-number="83"]{counter-set:figure-counter-major 83;counter-reset:figure-counter-minor;}
+  h1[data-number="84"]{counter-set:figure-counter-major 84;counter-reset:figure-counter-minor;}
+  h1[data-number="85"]{counter-set:figure-counter-major 85;counter-reset:figure-counter-minor;}
+  h1[data-number="86"]{counter-set:figure-counter-major 86;counter-reset:figure-counter-minor;}
+  h1[data-number="87"]{counter-set:figure-counter-major 87;counter-reset:figure-counter-minor;}
+  h1[data-number="88"]{counter-set:figure-counter-major 88;counter-reset:figure-counter-minor;}
+  h1[data-number="89"]{counter-set:figure-counter-major 89;counter-reset:figure-counter-minor;}
+  h1[data-number="90"]{counter-set:figure-counter-major 90;counter-reset:figure-counter-minor;}
+  h1[data-number="91"]{counter-set:figure-counter-major 91;counter-reset:figure-counter-minor;}
+  h1[data-number="92"]{counter-set:figure-counter-major 92;counter-reset:figure-counter-minor;}
+  h1[data-number="93"]{counter-set:figure-counter-major 93;counter-reset:figure-counter-minor;}
+  h1[data-number="94"]{counter-set:figure-counter-major 94;counter-reset:figure-counter-minor;}
+  h1[data-number="95"]{counter-set:figure-counter-major 95;counter-reset:figure-counter-minor;}
+  h1[data-number="96"]{counter-set:figure-counter-major 96;counter-reset:figure-counter-minor;}
+  h1[data-number="97"]{counter-set:figure-counter-major 97;counter-reset:figure-counter-minor;}
+  h1[data-number="98"]{counter-set:figure-counter-major 98;counter-reset:figure-counter-minor;}
+  h1[data-number="99"]{counter-set:figure-counter-major 99;counter-reset:figure-counter-minor;}
+
+
+  </style>
+  <!-- BG custom styling for the wide body variant -->
+  <!-- Gets appended after bg-css.html -->
+
+  <style type="text/css">
+  body {
+      max-width: inherit;
+  }
+  </style>
+</head>
+<body>
+<div style="text-align:center"><span><a href="reset.html" rel="prev">Prev</a> | </span><a href="index.html">Contents</a><span> | <a href="patch-mode-applying-partial-changes.html" rel="next">Next</a></span></div><hr>
+<h1 data-number="20" id="the-reference-log-reflog"><span class="header-section-number">20</span> The Reference Log, “reflog”</h1>
+<p></p>
+<p>All this time you’ve been committing things, branching, doing whatever. And Git’s been watching you, listening like Big Brother, recording everything you do.</p>
+<p>And you can use this to your benefit.</p>
+<p>Let’s say you’ve done something like a hard reset because you wanted to abandon the branch you were on.</p>
+<p>But then, wait! You actually needed something from one of those commits you just reset past! Is there any way to get back to it? There’s no branch there, and you can’t remember the commit ID. And since it’s not an ancestor to anything, <code>git log</code> won’t help you.</p>
+<p>How can you get it back?</p>
+<p><code>git reflog</code> to the rescue!</p>
+<p>The reflog contains a record of all manner of things you’ve done along with commit IDs, and it keeps them for 90 days<a href="quick-reference.html#fn36" class="footnote-ref" id="fnref36" role="doc-noteref"><sup>36</sup></a>. After that time, orphan commits (that is commits with no branch above them) will be garbage collected.</p>
+<h2 data-number="20.1" id="what-can-we-use-it-for"><span class="header-section-number">20.1</span> What Can We Use It For?</h2>
+<p></p>
+<p>You can use it for all kinds of things.</p>
+<ul>
+<li>Looking at orphan commits</li>
+<li>Recreating deleted branches</li>
+<li>Recovering from a bad reset</li>
+<li>Exploring the order of operations on the repo, even if they’re on other branches</li>
+<li>And more!</li>
+</ul>
+<p>Basically it gives you a way to look back on the linear history of the repo, and tells you the commit hashes along the way.</p>
+<p>This means if you want to, say, hard reset the repo to some earlier state, you could look up that earlier commit in the reflog<a href="quick-reference.html#fn37" class="footnote-ref" id="fnref37" role="doc-noteref"><sup>37</sup></a>.</p>
+<h2 data-number="20.2" id="looking-back-at-an-orphan-commit"><span class="header-section-number">20.2</span> Looking Back at an Orphan Commit</h2>
+<p></p>
+<p>Let’s run an example where we do the following:</p>
+<ol type="1">
+<li>Commit a file, <code>foo.txt</code>, on the <code>main</code> branch.</li>
+<li>Make a new branch, <code>topic1</code>.</li>
+<li>In this new branch, add another file, <code>bar.txt</code>, and commit it.</li>
+<li>Modify <code>bar.txt</code> and commit the modification.</li>
+<li>Decide, at this point, you’re giving up on <code>topic1</code>. Switch back to the <code>main</code> branch and force delete <code>topic1</code>.</li>
+<li>Decide, at this point, that actually you need to look back at that commit in <code>topic1</code> for some reason. But you deleted the branch. Whoops.</li>
+<li>Look in the reflog for the commit on <code>topic1</code> that you want.</li>
+<li>Switch to that commit (detaching the <code>HEAD</code>).</li>
+</ol>
+<p>And here that is in Git, at least the first five steps:</p>
+<div class="sourceCode" id="cb251"><pre class="sourceCode default"><code class="sourceCode default"><span id="cb251-1"><a href="the-reference-log-reflog.html#cb251-1" aria-hidden="true" tabindex="-1"></a>$ echo &#39;Line 1&#39; &gt; foo.txt                  # Create foo.txt</span>
+<span id="cb251-2"><a href="the-reference-log-reflog.html#cb251-2" aria-hidden="true" tabindex="-1"></a>$ git add foo.txt</span>
+<span id="cb251-3"><a href="the-reference-log-reflog.html#cb251-3" aria-hidden="true" tabindex="-1"></a>$ git commit -m &#39;added foo.txt&#39;</span>
+<span id="cb251-4"><a href="the-reference-log-reflog.html#cb251-4" aria-hidden="true" tabindex="-1"></a>  [main (root-commit) 90bd7cc] added foo.txt</span>
+<span id="cb251-5"><a href="the-reference-log-reflog.html#cb251-5" aria-hidden="true" tabindex="-1"></a>   1 file changed, 1 insertion($)</span>
+<span id="cb251-6"><a href="the-reference-log-reflog.html#cb251-6" aria-hidden="true" tabindex="-1"></a>   create mode 100644 foo.txt</span>
+<span id="cb251-7"><a href="the-reference-log-reflog.html#cb251-7" aria-hidden="true" tabindex="-1"></a>$ git switch -c topic1                     # Switch to topic1</span>
+<span id="cb251-8"><a href="the-reference-log-reflog.html#cb251-8" aria-hidden="true" tabindex="-1"></a>  Switched to a new branch &#39;topic1&#39;</span>
+<span id="cb251-9"><a href="the-reference-log-reflog.html#cb251-9" aria-hidden="true" tabindex="-1"></a>$ echo &#39;Line 1&#39; &gt; bar.txt                  # Create bar.txt</span>
+<span id="cb251-10"><a href="the-reference-log-reflog.html#cb251-10" aria-hidden="true" tabindex="-1"></a>$ git add bar.txt</span>
+<span id="cb251-11"><a href="the-reference-log-reflog.html#cb251-11" aria-hidden="true" tabindex="-1"></a>$ git commit -m &#39;added bar.txt&#39;</span>
+<span id="cb251-12"><a href="the-reference-log-reflog.html#cb251-12" aria-hidden="true" tabindex="-1"></a>  [topic1 4219f83] added bar.txt</span>
+<span id="cb251-13"><a href="the-reference-log-reflog.html#cb251-13" aria-hidden="true" tabindex="-1"></a>   1 file changed, 1 insertion($)</span>
+<span id="cb251-14"><a href="the-reference-log-reflog.html#cb251-14" aria-hidden="true" tabindex="-1"></a>   create mode 100644 bar.txt</span>
+<span id="cb251-15"><a href="the-reference-log-reflog.html#cb251-15" aria-hidden="true" tabindex="-1"></a>$ echo &#39;Line 2&#39; &gt;&gt; bar.txt                 # Modify bar.txt</span>
+<span id="cb251-16"><a href="the-reference-log-reflog.html#cb251-16" aria-hidden="true" tabindex="-1"></a>$ git add bar.txt</span>
+<span id="cb251-17"><a href="the-reference-log-reflog.html#cb251-17" aria-hidden="true" tabindex="-1"></a>$ git commit -m &#39;appended to bar.txt&#39;</span>
+<span id="cb251-18"><a href="the-reference-log-reflog.html#cb251-18" aria-hidden="true" tabindex="-1"></a>  [topic1 bf8b8cf] appended to bar.txt</span>
+<span id="cb251-19"><a href="the-reference-log-reflog.html#cb251-19" aria-hidden="true" tabindex="-1"></a>   1 file changed, 1 insertion($)</span>
+<span id="cb251-20"><a href="the-reference-log-reflog.html#cb251-20" aria-hidden="true" tabindex="-1"></a>$ git switch -                             # Switch back to main</span>
+<span id="cb251-21"><a href="the-reference-log-reflog.html#cb251-21" aria-hidden="true" tabindex="-1"></a>  Switched to branch &#39;main&#39;</span>
+<span id="cb251-22"><a href="the-reference-log-reflog.html#cb251-22" aria-hidden="true" tabindex="-1"></a>$ git branch -D topic1                     # Delete topic1</span>
+<span id="cb251-23"><a href="the-reference-log-reflog.html#cb251-23" aria-hidden="true" tabindex="-1"></a>  Deleted branch topic1 (was bf8b8cf).</span></code></pre></div>
+<p>At this point let’s say we want to look back at the commits we made on <code>bar.txt</code>. Good luck with <code>git log</code>!</p>
+<div class="sourceCode" id="cb252"><pre class="sourceCode default"><code class="sourceCode default"><span id="cb252-1"><a href="the-reference-log-reflog.html#cb252-1" aria-hidden="true" tabindex="-1"></a>$ git log</span>
+<span id="cb252-2"><a href="the-reference-log-reflog.html#cb252-2" aria-hidden="true" tabindex="-1"></a>commit 90bd7cc6c3c530798872827ba02cb7db4fd422c2 (HEAD -&gt; main)</span>
+<span id="cb252-3"><a href="the-reference-log-reflog.html#cb252-3" aria-hidden="true" tabindex="-1"></a>Author: User &lt;user@example.com&gt;</span>
+<span id="cb252-4"><a href="the-reference-log-reflog.html#cb252-4" aria-hidden="true" tabindex="-1"></a>Date:   Fri Oct 4 16:24:56 2024 -0700</span>
+<span id="cb252-5"><a href="the-reference-log-reflog.html#cb252-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb252-6"><a href="the-reference-log-reflog.html#cb252-6" aria-hidden="true" tabindex="-1"></a>    added foo.txt</span></code></pre></div>
+<p>That’s it? Where’s all the <code>bar.txt</code> stuff? Well, it was on the <code>topic1</code> commits, which were descendants from this commit <code>90bd7</code>. Because <code>git log</code> only shows ancestors, we’re not seeing any of the <code>bar.txt</code> changes.</p>
+<p>So, finally, we arrive at the entire topic of this chapter: the reflog. Let’s take a peek.</p>
+<div class="sourceCode" id="cb253"><pre class="sourceCode default"><code class="sourceCode default"><span id="cb253-1"><a href="the-reference-log-reflog.html#cb253-1" aria-hidden="true" tabindex="-1"></a>$ git reflog</span>
+<span id="cb253-2"><a href="the-reference-log-reflog.html#cb253-2" aria-hidden="true" tabindex="-1"></a>  90bd7cc (HEAD -&gt; main) HEAD@{0}: checkout: moving from topic1 to</span>
+<span id="cb253-3"><a href="the-reference-log-reflog.html#cb253-3" aria-hidden="true" tabindex="-1"></a>                                             main</span>
+<span id="cb253-4"><a href="the-reference-log-reflog.html#cb253-4" aria-hidden="true" tabindex="-1"></a>  bf8b8cf HEAD@{1}: commit: appended to bar.txt</span>
+<span id="cb253-5"><a href="the-reference-log-reflog.html#cb253-5" aria-hidden="true" tabindex="-1"></a>  4219f83 HEAD@{2}: commit: added bar.txt</span>
+<span id="cb253-6"><a href="the-reference-log-reflog.html#cb253-6" aria-hidden="true" tabindex="-1"></a>  90bd7cc (HEAD -&gt; main) HEAD@{3}: checkout: moving from main to</span>
+<span id="cb253-7"><a href="the-reference-log-reflog.html#cb253-7" aria-hidden="true" tabindex="-1"></a>                                             topic1</span>
+<span id="cb253-8"><a href="the-reference-log-reflog.html#cb253-8" aria-hidden="true" tabindex="-1"></a>  90bd7cc (HEAD -&gt; main) HEAD@{4}: commit (initial): added foo.txt</span></code></pre></div>
+<p>Hey, that’s more like it! I see the changes I made to <code>bar.txt</code> in there! And I see the commit hash on the left! This means I can switch to that commit!</p>
+<div class="sourceCode" id="cb254"><pre class="sourceCode default"><code class="sourceCode default"><span id="cb254-1"><a href="the-reference-log-reflog.html#cb254-1" aria-hidden="true" tabindex="-1"></a>$ git switch --detach bf8b8cf</span>
+<span id="cb254-2"><a href="the-reference-log-reflog.html#cb254-2" aria-hidden="true" tabindex="-1"></a>  HEAD is now at bf8b8cf appended to bar.txt</span>
+<span id="cb254-3"><a href="the-reference-log-reflog.html#cb254-3" aria-hidden="true" tabindex="-1"></a>$ git log</span>
+<span id="cb254-4"><a href="the-reference-log-reflog.html#cb254-4" aria-hidden="true" tabindex="-1"></a>  commit bf8b8cf826bbf667cdd088cfcecbc1086c24de3b (HEAD)</span>
+<span id="cb254-5"><a href="the-reference-log-reflog.html#cb254-5" aria-hidden="true" tabindex="-1"></a>  Author: Brian &quot;Beej Jorgensen&quot; Hall &lt;beej@beej.us&gt;</span>
+<span id="cb254-6"><a href="the-reference-log-reflog.html#cb254-6" aria-hidden="true" tabindex="-1"></a>  Date:   Fri Oct 4 16:24:56 2024 -0700</span>
+<span id="cb254-7"><a href="the-reference-log-reflog.html#cb254-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb254-8"><a href="the-reference-log-reflog.html#cb254-8" aria-hidden="true" tabindex="-1"></a>      appended to bar.txt</span>
+<span id="cb254-9"><a href="the-reference-log-reflog.html#cb254-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb254-10"><a href="the-reference-log-reflog.html#cb254-10" aria-hidden="true" tabindex="-1"></a>  commit 4219f83f22f8a90cb8d57128501facb58b292003</span>
+<span id="cb254-11"><a href="the-reference-log-reflog.html#cb254-11" aria-hidden="true" tabindex="-1"></a>  Author: Brian &quot;Beej Jorgensen&quot; Hall &lt;beej@beej.us&gt;</span>
+<span id="cb254-12"><a href="the-reference-log-reflog.html#cb254-12" aria-hidden="true" tabindex="-1"></a>  Date:   Fri Oct 4 16:24:56 2024 -0700</span>
+<span id="cb254-13"><a href="the-reference-log-reflog.html#cb254-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb254-14"><a href="the-reference-log-reflog.html#cb254-14" aria-hidden="true" tabindex="-1"></a>      added bar.txt</span>
+<span id="cb254-15"><a href="the-reference-log-reflog.html#cb254-15" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb254-16"><a href="the-reference-log-reflog.html#cb254-16" aria-hidden="true" tabindex="-1"></a>  commit 90bd7cc6c3c530798872827ba02cb7db4fd422c2 (main)</span>
+<span id="cb254-17"><a href="the-reference-log-reflog.html#cb254-17" aria-hidden="true" tabindex="-1"></a>  Author: Brian &quot;Beej Jorgensen&quot; Hall &lt;beej@beej.us&gt;</span>
+<span id="cb254-18"><a href="the-reference-log-reflog.html#cb254-18" aria-hidden="true" tabindex="-1"></a>  Date:   Fri Oct 4 16:24:56 2024 -0700</span>
+<span id="cb254-19"><a href="the-reference-log-reflog.html#cb254-19" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb254-20"><a href="the-reference-log-reflog.html#cb254-20" aria-hidden="true" tabindex="-1"></a>      added foo.txt</span></code></pre></div>
+<p>There’s the log… and we have the file contents?</p>
+<div class="sourceCode" id="cb255"><pre class="sourceCode default"><code class="sourceCode default"><span id="cb255-1"><a href="the-reference-log-reflog.html#cb255-1" aria-hidden="true" tabindex="-1"></a>$ cat bar.txt</span>
+<span id="cb255-2"><a href="the-reference-log-reflog.html#cb255-2" aria-hidden="true" tabindex="-1"></a>  Line 1</span>
+<span id="cb255-3"><a href="the-reference-log-reflog.html#cb255-3" aria-hidden="true" tabindex="-1"></a>  Line 2</span></code></pre></div>
+<p>Yup!</p>
+<p>Let’s switch back to <code>main</code> and see what happens.</p>
+<div class="sourceCode" id="cb256"><pre class="sourceCode default"><code class="sourceCode default"><span id="cb256-1"><a href="the-reference-log-reflog.html#cb256-1" aria-hidden="true" tabindex="-1"></a>$ git switch -</span>
+<span id="cb256-2"><a href="the-reference-log-reflog.html#cb256-2" aria-hidden="true" tabindex="-1"></a>  Warning: you are leaving 2 commits behind, not connected to</span>
+<span id="cb256-3"><a href="the-reference-log-reflog.html#cb256-3" aria-hidden="true" tabindex="-1"></a>  any of your branches:</span>
+<span id="cb256-4"><a href="the-reference-log-reflog.html#cb256-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb256-5"><a href="the-reference-log-reflog.html#cb256-5" aria-hidden="true" tabindex="-1"></a>    bf8b8cf appended to bar.txt</span>
+<span id="cb256-6"><a href="the-reference-log-reflog.html#cb256-6" aria-hidden="true" tabindex="-1"></a>    4219f83 added bar.txt</span>
+<span id="cb256-7"><a href="the-reference-log-reflog.html#cb256-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb256-8"><a href="the-reference-log-reflog.html#cb256-8" aria-hidden="true" tabindex="-1"></a>  If you want to keep them by creating a new branch, this may be a</span>
+<span id="cb256-9"><a href="the-reference-log-reflog.html#cb256-9" aria-hidden="true" tabindex="-1"></a>  good time to do so with:</span>
+<span id="cb256-10"><a href="the-reference-log-reflog.html#cb256-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb256-11"><a href="the-reference-log-reflog.html#cb256-11" aria-hidden="true" tabindex="-1"></a>    git branch &lt;new-branch-name&gt; bf8b8cf</span>
+<span id="cb256-12"><a href="the-reference-log-reflog.html#cb256-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb256-13"><a href="the-reference-log-reflog.html#cb256-13" aria-hidden="true" tabindex="-1"></a>  Switched to branch &#39;main&#39;</span></code></pre></div>
+<p>This is Git telling us, “Hey, I’m going to garbage collect these two commits after the 90 days are up. If you want to keep them, attach a branch to them.”</p>
+<p>And it’s helpfully telling us how to do that.</p>
+<p>So even though we force deleted <code>topic1</code> earlier, we could now simply recreate it if we didn’t mean to do that. Let’s do that.</p>
+<div class="sourceCode" id="cb257"><pre class="sourceCode default"><code class="sourceCode default"><span id="cb257-1"><a href="the-reference-log-reflog.html#cb257-1" aria-hidden="true" tabindex="-1"></a>$ git branch topic1 bf8b8cf</span>
+<span id="cb257-2"><a href="the-reference-log-reflog.html#cb257-2" aria-hidden="true" tabindex="-1"></a>$ git switch topic1</span>
+<span id="cb257-3"><a href="the-reference-log-reflog.html#cb257-3" aria-hidden="true" tabindex="-1"></a>  Switched to branch &#39;topic1&#39;</span>
+<span id="cb257-4"><a href="the-reference-log-reflog.html#cb257-4" aria-hidden="true" tabindex="-1"></a>$ cat bar.txt</span>
+<span id="cb257-5"><a href="the-reference-log-reflog.html#cb257-5" aria-hidden="true" tabindex="-1"></a>  Line 1</span>
+<span id="cb257-6"><a href="the-reference-log-reflog.html#cb257-6" aria-hidden="true" tabindex="-1"></a>  Line 2</span></code></pre></div>
+<p>As you can see, the reflog can get you out of all kinds of trouble when you thought you’d lost commits for good.</p>
+<p></p>
+<h2 data-number="20.3" id="reflog-selectors"><span class="header-section-number">20.3</span> Reflog Selectors</h2>
+<p></p>
+<p>Let’s take a look at that example reflog output again:</p>
+<div class="sourceCode" id="cb258"><pre class="sourceCode default"><code class="sourceCode default"><span id="cb258-1"><a href="the-reference-log-reflog.html#cb258-1" aria-hidden="true" tabindex="-1"></a>$ git reflog</span>
+<span id="cb258-2"><a href="the-reference-log-reflog.html#cb258-2" aria-hidden="true" tabindex="-1"></a>  598c84e (HEAD -&gt; main) HEAD@{0}: checkout: moving from topic1 to</span>
+<span id="cb258-3"><a href="the-reference-log-reflog.html#cb258-3" aria-hidden="true" tabindex="-1"></a>                                             main</span>
+<span id="cb258-4"><a href="the-reference-log-reflog.html#cb258-4" aria-hidden="true" tabindex="-1"></a>  dc3d6a3 HEAD@{1}: commit: appended to bar.txt</span>
+<span id="cb258-5"><a href="the-reference-log-reflog.html#cb258-5" aria-hidden="true" tabindex="-1"></a>  0789880 HEAD@{2}: commit: added bar.txt</span>
+<span id="cb258-6"><a href="the-reference-log-reflog.html#cb258-6" aria-hidden="true" tabindex="-1"></a>  598c84e (HEAD -&gt; main) HEAD@{3}: checkout: moving from main to</span>
+<span id="cb258-7"><a href="the-reference-log-reflog.html#cb258-7" aria-hidden="true" tabindex="-1"></a>                                             topic1</span>
+<span id="cb258-8"><a href="the-reference-log-reflog.html#cb258-8" aria-hidden="true" tabindex="-1"></a>  598c84e (HEAD -&gt; main) HEAD@{4}: commit (initial): added foo.txt</span></code></pre></div>
+<p>See that <code>HEAD@{3}</code>-type stuff in there? You can use those to check out specific commits (instead of using the commit hash, for example).</p>
+<p>Now, <code>HEAD@{3}</code> <strong>doesn’t</strong> mean “3 commits before <code>HEAD</code>”. But it is an identifier you can use to switch to a particular commit.</p>
+<div class="sourceCode" id="cb259"><pre class="sourceCode default"><code class="sourceCode default"><span id="cb259-1"><a href="the-reference-log-reflog.html#cb259-1" aria-hidden="true" tabindex="-1"></a>$ git switch --detach HEAD@{1}</span>
+<span id="cb259-2"><a href="the-reference-log-reflog.html#cb259-2" aria-hidden="true" tabindex="-1"></a>  HEAD is now at dc3d6a3 appended to bar.txt</span></code></pre></div>
+<p>Just like that.</p>
+<p></p>
+<p></p>
+<!-- BG_NEW_CHAPTER -->
+<hr><div style="text-align:center"><span><a href="reset.html" rel="prev">Prev</a> | </span><a href="index.html">Contents</a><span> | <a href="patch-mode-applying-partial-changes.html" rel="next">Next</a></span></div></body>
+</html>

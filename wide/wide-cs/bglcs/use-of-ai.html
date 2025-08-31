@@ -1,0 +1,636 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <title>Beej's Guide to Learning Computer Science</title>
+  <style>
+    html {
+      color: #1a1a1a;
+      background-color: #fdfdfd;
+    }
+    body {
+      margin: 0 auto;
+      max-width: 36em;
+      padding-left: 50px;
+      padding-right: 50px;
+      padding-top: 50px;
+      padding-bottom: 50px;
+      hyphens: auto;
+      overflow-wrap: break-word;
+      text-rendering: optimizeLegibility;
+      font-kerning: normal;
+    }
+    @media (max-width: 600px) {
+      body {
+        font-size: 0.9em;
+        padding: 12px;
+      }
+      h1 {
+        font-size: 1.8em;
+      }
+    }
+    @media print {
+      html {
+        background-color: white;
+      }
+      body {
+        background-color: transparent;
+        color: black;
+        font-size: 12pt;
+      }
+      p, h2, h3 {
+        orphans: 3;
+        widows: 3;
+      }
+      h2, h3, h4 {
+        page-break-after: avoid;
+      }
+    }
+    p {
+      margin: 1em 0;
+    }
+    a {
+      color: #1a1a1a;
+    }
+    a:visited {
+      color: #1a1a1a;
+    }
+    img {
+      max-width: 100%;
+    }
+    svg {
+      height: auto;
+      max-width: 100%;
+    }
+    h1, h2, h3, h4, h5, h6 {
+      margin-top: 1.4em;
+    }
+    h5, h6 {
+      font-size: 1em;
+      font-style: italic;
+    }
+    h6 {
+      font-weight: normal;
+    }
+    ol, ul {
+      padding-left: 1.7em;
+      margin-top: 1em;
+    }
+    li > ol, li > ul {
+      margin-top: 0;
+    }
+    blockquote {
+      margin: 1em 0 1em 1.7em;
+      padding-left: 1em;
+      border-left: 2px solid #e6e6e6;
+      color: #606060;
+    }
+    code {
+      font-family: Menlo, Monaco, Consolas, 'Lucida Console', monospace;
+      font-size: 85%;
+      margin: 0;
+      hyphens: manual;
+    }
+    pre {
+      margin: 1em 0;
+      overflow: auto;
+    }
+    pre code {
+      padding: 0;
+      overflow: visible;
+      overflow-wrap: normal;
+    }
+    .sourceCode {
+     background-color: transparent;
+     overflow: visible;
+    }
+    hr {
+      border: none;
+      border-top: 1px solid #1a1a1a;
+      height: 1px;
+      margin: 1em 0;
+    }
+    table {
+      margin: 1em 0;
+      border-collapse: collapse;
+      width: 100%;
+      overflow-x: auto;
+      display: block;
+      font-variant-numeric: lining-nums tabular-nums;
+    }
+    table caption {
+      margin-bottom: 0.75em;
+    }
+    tbody {
+      margin-top: 0.5em;
+      border-top: 1px solid #1a1a1a;
+      border-bottom: 1px solid #1a1a1a;
+    }
+    th {
+      border-top: 1px solid #1a1a1a;
+      padding: 0.25em 0.5em 0.25em 0.5em;
+    }
+    td {
+      padding: 0.125em 0.5em 0.25em 0.5em;
+    }
+    header {
+      margin-bottom: 4em;
+      text-align: center;
+    }
+    #TOC li {
+      list-style: none;
+    }
+    #TOC ul {
+      padding-left: 1.3em;
+    }
+    #TOC > ul {
+      padding-left: 0;
+    }
+    #TOC a:not(:hover) {
+      text-decoration: none;
+    }
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+    /* CSS for syntax highlighting */
+    html { -webkit-text-size-adjust: 100%; }
+    pre > code.sourceCode { white-space: pre; position: relative; }
+    pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+    pre > code.sourceCode > span:empty { height: 1.2em; }
+    .sourceCode { overflow: visible; }
+    code.sourceCode > span { color: inherit; text-decoration: inherit; }
+    div.sourceCode { margin: 1em 0; }
+    pre.sourceCode { margin: 0; }
+    @media screen {
+    div.sourceCode { overflow: auto; }
+    }
+    @media print {
+    pre > code.sourceCode { white-space: pre-wrap; }
+    pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+    }
+    pre.numberSource code
+      { counter-reset: source-line 0; }
+    pre.numberSource code > span
+      { position: relative; left: -4em; counter-increment: source-line; }
+    pre.numberSource code > span > a:first-child::before
+      { content: counter(source-line);
+        position: relative; left: -1em; text-align: right; vertical-align: baseline;
+        border: none; display: inline-block;
+        -webkit-touch-callout: none; -webkit-user-select: none;
+        -khtml-user-select: none; -moz-user-select: none;
+        -ms-user-select: none; user-select: none;
+        padding: 0 4px; width: 4em;
+        color: #aaaaaa;
+      }
+    pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+    div.sourceCode
+      {   }
+    @media screen {
+    pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+    }
+    code span.al { color: #ff0000; font-weight: bold; } /* Alert */
+    code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+    code span.at { color: #7d9029; } /* Attribute */
+    code span.bn { color: #40a070; } /* BaseN */
+    code span.bu { color: #008000; } /* BuiltIn */
+    code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+    code span.ch { color: #4070a0; } /* Char */
+    code span.cn { color: #880000; } /* Constant */
+    code span.co { color: #60a0b0; font-style: italic; } /* Comment */
+    code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+    code span.do { color: #ba2121; font-style: italic; } /* Documentation */
+    code span.dt { color: #902000; } /* DataType */
+    code span.dv { color: #40a070; } /* DecVal */
+    code span.er { color: #ff0000; font-weight: bold; } /* Error */
+    code span.ex { } /* Extension */
+    code span.fl { color: #40a070; } /* Float */
+    code span.fu { color: #06287e; } /* Function */
+    code span.im { color: #008000; font-weight: bold; } /* Import */
+    code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+    code span.kw { color: #007020; font-weight: bold; } /* Keyword */
+    code span.op { color: #666666; } /* Operator */
+    code span.ot { color: #007020; } /* Other */
+    code span.pp { color: #bc7a00; } /* Preprocessor */
+    code span.sc { color: #4070a0; } /* SpecialChar */
+    code span.ss { color: #bb6688; } /* SpecialString */
+    code span.st { color: #4070a0; } /* String */
+    code span.va { color: #19177c; } /* Variable */
+    code span.vs { color: #4070a0; } /* VerbatimString */
+    code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+  </style>
+  <!-- BG custom styling -->
+  <style type="text/css">
+  /* Fix for line numbers not visible */
+  pre.numberSource code > span {
+      left: -1em;
+  }
+  pre.numberSource {
+      margin-left: initial;
+  }
+
+  /* Put some space after the section numbers */
+  span.toc-section-number::after {
+      content: "\a0\a0\a0";  /* non-breaking whitespace */
+  }
+
+  /* Hide underlines on code number links */
+  pre > code.sourceCode > span > a:first-child::before {
+      text-decoration: none;
+  }
+
+  /* Color the source blocks */
+  div.sourceCode {
+      background-color: #f0f0f0;
+  }
+
+  /* Fix iOS big text rendering issue */
+  pre > code.sourceCode > span {
+      display: initial;
+  }
+
+
+  /* Color the inline code */
+  code:not(.sourceCode) {
+      background: #f0f0f0;
+      padding-left: 0.2em;
+      padding-right: 0.2em;
+      border-radius: 0.2em;
+  }
+
+  pre.sourceCode {
+      border: 1px solid #ccc;
+      padding: 0.5em;
+      border-radius: 0.2em;
+  }
+
+  /* Keep code tags from wrapping in tables */
+  tbody code {
+      white-space: nowrap;
+  }
+
+  /* Prevent hyphenation and hyphen breaks in code*/
+  code {
+      word-break: keep-all;
+  }
+
+  td {
+      vertical-align: top;
+  }
+
+  body {
+      font-size: 12pt;
+      max-width: 43em;
+      font-family: sans-serif;
+  }
+
+  html {
+      background: #f9f9f9;
+  }
+
+  figure > embed {
+      max-width: 100%;
+  }
+
+  figure {
+      text-align: center;
+      margin-top: 2em;
+      margin-bottom: 2em;
+  }
+
+  figcaption {
+      font-size: 0.9em;
+      font-style: italic;
+      margin-top: 0.6em;
+  }
+
+  body {
+      counter-reset: figure-counter-major;
+      counter-reset: figure-counter-minor;
+  }
+
+  figure {
+      counter-increment: figure-counter-minor;
+  }
+
+  figcaption::before {
+      content: "Figure " counter(figure-counter-major) "." counter(figure-counter-minor) ": ";
+  }
+
+  blockquote {
+      border-left: 2px solid #bbb;
+      color: #444;
+  }
+
+  /* Contents */
+
+  nav[role="doc-toc"] > ul > li {
+    font-weight: bold;
+    margin-top: 1.2em;
+  }
+
+  nav[role="doc-toc"] > ul > li:first {
+    font-weight: bold;
+    margin-top: initial;
+  }
+
+  nav[role="doc-toc"] > ul > li > ul {
+    font-weight: normal;
+    margin-top: 0.3em;
+  }
+
+  /*
+  In multipage, we need to reset the figure counter to the chapter
+  number. Luckily, this is in the <h1 data-number> attribute. Unluckily,
+  there is no way to get this in a general way.
+
+  This doesn't work:
+
+    h1[data-number] {
+      counter-set: figure-counter-major attr(data-number);
+    }
+
+  Nor this:
+
+    h1[data-number] {
+      --figure-counter-major-value: attr(data-number);
+      counter-set: figure-counter-major var(--figure-counter-major-value);
+    }
+
+  So, dumbly, we have a bunch of rules for all these sections, up to the
+  maximum possible section.
+
+  Here's a program to generate them:
+
+    for (let i = 1; i < 100; i++)
+        console.log(`h1[data-number="${i}"]{counter-set:figure-counter-major ${i};counter-reset:figure-counter-minor;}`);
+
+  Note to self: never write a book with more than 99 frickin' chapters.
+  */
+
+  h1[data-number="1"]{counter-set:figure-counter-major 1;counter-reset:figure-counter-minor;}
+  h1[data-number="2"]{counter-set:figure-counter-major 2;counter-reset:figure-counter-minor;}
+  h1[data-number="3"]{counter-set:figure-counter-major 3;counter-reset:figure-counter-minor;}
+  h1[data-number="4"]{counter-set:figure-counter-major 4;counter-reset:figure-counter-minor;}
+  h1[data-number="5"]{counter-set:figure-counter-major 5;counter-reset:figure-counter-minor;}
+  h1[data-number="6"]{counter-set:figure-counter-major 6;counter-reset:figure-counter-minor;}
+  h1[data-number="7"]{counter-set:figure-counter-major 7;counter-reset:figure-counter-minor;}
+  h1[data-number="8"]{counter-set:figure-counter-major 8;counter-reset:figure-counter-minor;}
+  h1[data-number="9"]{counter-set:figure-counter-major 9;counter-reset:figure-counter-minor;}
+  h1[data-number="10"]{counter-set:figure-counter-major 10;counter-reset:figure-counter-minor;}
+  h1[data-number="11"]{counter-set:figure-counter-major 11;counter-reset:figure-counter-minor;}
+  h1[data-number="12"]{counter-set:figure-counter-major 12;counter-reset:figure-counter-minor;}
+  h1[data-number="13"]{counter-set:figure-counter-major 13;counter-reset:figure-counter-minor;}
+  h1[data-number="14"]{counter-set:figure-counter-major 14;counter-reset:figure-counter-minor;}
+  h1[data-number="15"]{counter-set:figure-counter-major 15;counter-reset:figure-counter-minor;}
+  h1[data-number="16"]{counter-set:figure-counter-major 16;counter-reset:figure-counter-minor;}
+  h1[data-number="17"]{counter-set:figure-counter-major 17;counter-reset:figure-counter-minor;}
+  h1[data-number="18"]{counter-set:figure-counter-major 18;counter-reset:figure-counter-minor;}
+  h1[data-number="19"]{counter-set:figure-counter-major 19;counter-reset:figure-counter-minor;}
+  h1[data-number="20"]{counter-set:figure-counter-major 20;counter-reset:figure-counter-minor;}
+  h1[data-number="21"]{counter-set:figure-counter-major 21;counter-reset:figure-counter-minor;}
+  h1[data-number="22"]{counter-set:figure-counter-major 22;counter-reset:figure-counter-minor;}
+  h1[data-number="23"]{counter-set:figure-counter-major 23;counter-reset:figure-counter-minor;}
+  h1[data-number="24"]{counter-set:figure-counter-major 24;counter-reset:figure-counter-minor;}
+  h1[data-number="25"]{counter-set:figure-counter-major 25;counter-reset:figure-counter-minor;}
+  h1[data-number="26"]{counter-set:figure-counter-major 26;counter-reset:figure-counter-minor;}
+  h1[data-number="27"]{counter-set:figure-counter-major 27;counter-reset:figure-counter-minor;}
+  h1[data-number="28"]{counter-set:figure-counter-major 28;counter-reset:figure-counter-minor;}
+  h1[data-number="29"]{counter-set:figure-counter-major 29;counter-reset:figure-counter-minor;}
+  h1[data-number="30"]{counter-set:figure-counter-major 30;counter-reset:figure-counter-minor;}
+  h1[data-number="31"]{counter-set:figure-counter-major 31;counter-reset:figure-counter-minor;}
+  h1[data-number="32"]{counter-set:figure-counter-major 32;counter-reset:figure-counter-minor;}
+  h1[data-number="33"]{counter-set:figure-counter-major 33;counter-reset:figure-counter-minor;}
+  h1[data-number="34"]{counter-set:figure-counter-major 34;counter-reset:figure-counter-minor;}
+  h1[data-number="35"]{counter-set:figure-counter-major 35;counter-reset:figure-counter-minor;}
+  h1[data-number="36"]{counter-set:figure-counter-major 36;counter-reset:figure-counter-minor;}
+  h1[data-number="37"]{counter-set:figure-counter-major 37;counter-reset:figure-counter-minor;}
+  h1[data-number="38"]{counter-set:figure-counter-major 38;counter-reset:figure-counter-minor;}
+  h1[data-number="39"]{counter-set:figure-counter-major 39;counter-reset:figure-counter-minor;}
+  h1[data-number="40"]{counter-set:figure-counter-major 40;counter-reset:figure-counter-minor;}
+  h1[data-number="41"]{counter-set:figure-counter-major 41;counter-reset:figure-counter-minor;}
+  h1[data-number="42"]{counter-set:figure-counter-major 42;counter-reset:figure-counter-minor;}
+  h1[data-number="43"]{counter-set:figure-counter-major 43;counter-reset:figure-counter-minor;}
+  h1[data-number="44"]{counter-set:figure-counter-major 44;counter-reset:figure-counter-minor;}
+  h1[data-number="45"]{counter-set:figure-counter-major 45;counter-reset:figure-counter-minor;}
+  h1[data-number="46"]{counter-set:figure-counter-major 46;counter-reset:figure-counter-minor;}
+  h1[data-number="47"]{counter-set:figure-counter-major 47;counter-reset:figure-counter-minor;}
+  h1[data-number="48"]{counter-set:figure-counter-major 48;counter-reset:figure-counter-minor;}
+  h1[data-number="49"]{counter-set:figure-counter-major 49;counter-reset:figure-counter-minor;}
+  h1[data-number="50"]{counter-set:figure-counter-major 50;counter-reset:figure-counter-minor;}
+  h1[data-number="51"]{counter-set:figure-counter-major 51;counter-reset:figure-counter-minor;}
+  h1[data-number="52"]{counter-set:figure-counter-major 52;counter-reset:figure-counter-minor;}
+  h1[data-number="53"]{counter-set:figure-counter-major 53;counter-reset:figure-counter-minor;}
+  h1[data-number="54"]{counter-set:figure-counter-major 54;counter-reset:figure-counter-minor;}
+  h1[data-number="55"]{counter-set:figure-counter-major 55;counter-reset:figure-counter-minor;}
+  h1[data-number="56"]{counter-set:figure-counter-major 56;counter-reset:figure-counter-minor;}
+  h1[data-number="57"]{counter-set:figure-counter-major 57;counter-reset:figure-counter-minor;}
+  h1[data-number="58"]{counter-set:figure-counter-major 58;counter-reset:figure-counter-minor;}
+  h1[data-number="59"]{counter-set:figure-counter-major 59;counter-reset:figure-counter-minor;}
+  h1[data-number="60"]{counter-set:figure-counter-major 60;counter-reset:figure-counter-minor;}
+  h1[data-number="61"]{counter-set:figure-counter-major 61;counter-reset:figure-counter-minor;}
+  h1[data-number="62"]{counter-set:figure-counter-major 62;counter-reset:figure-counter-minor;}
+  h1[data-number="63"]{counter-set:figure-counter-major 63;counter-reset:figure-counter-minor;}
+  h1[data-number="64"]{counter-set:figure-counter-major 64;counter-reset:figure-counter-minor;}
+  h1[data-number="65"]{counter-set:figure-counter-major 65;counter-reset:figure-counter-minor;}
+  h1[data-number="66"]{counter-set:figure-counter-major 66;counter-reset:figure-counter-minor;}
+  h1[data-number="67"]{counter-set:figure-counter-major 67;counter-reset:figure-counter-minor;}
+  h1[data-number="68"]{counter-set:figure-counter-major 68;counter-reset:figure-counter-minor;}
+  h1[data-number="69"]{counter-set:figure-counter-major 69;counter-reset:figure-counter-minor;}
+  h1[data-number="70"]{counter-set:figure-counter-major 70;counter-reset:figure-counter-minor;}
+  h1[data-number="71"]{counter-set:figure-counter-major 71;counter-reset:figure-counter-minor;}
+  h1[data-number="72"]{counter-set:figure-counter-major 72;counter-reset:figure-counter-minor;}
+  h1[data-number="73"]{counter-set:figure-counter-major 73;counter-reset:figure-counter-minor;}
+  h1[data-number="74"]{counter-set:figure-counter-major 74;counter-reset:figure-counter-minor;}
+  h1[data-number="75"]{counter-set:figure-counter-major 75;counter-reset:figure-counter-minor;}
+  h1[data-number="76"]{counter-set:figure-counter-major 76;counter-reset:figure-counter-minor;}
+  h1[data-number="77"]{counter-set:figure-counter-major 77;counter-reset:figure-counter-minor;}
+  h1[data-number="78"]{counter-set:figure-counter-major 78;counter-reset:figure-counter-minor;}
+  h1[data-number="79"]{counter-set:figure-counter-major 79;counter-reset:figure-counter-minor;}
+  h1[data-number="80"]{counter-set:figure-counter-major 80;counter-reset:figure-counter-minor;}
+  h1[data-number="81"]{counter-set:figure-counter-major 81;counter-reset:figure-counter-minor;}
+  h1[data-number="82"]{counter-set:figure-counter-major 82;counter-reset:figure-counter-minor;}
+  h1[data-number="83"]{counter-set:figure-counter-major 83;counter-reset:figure-counter-minor;}
+  h1[data-number="84"]{counter-set:figure-counter-major 84;counter-reset:figure-counter-minor;}
+  h1[data-number="85"]{counter-set:figure-counter-major 85;counter-reset:figure-counter-minor;}
+  h1[data-number="86"]{counter-set:figure-counter-major 86;counter-reset:figure-counter-minor;}
+  h1[data-number="87"]{counter-set:figure-counter-major 87;counter-reset:figure-counter-minor;}
+  h1[data-number="88"]{counter-set:figure-counter-major 88;counter-reset:figure-counter-minor;}
+  h1[data-number="89"]{counter-set:figure-counter-major 89;counter-reset:figure-counter-minor;}
+  h1[data-number="90"]{counter-set:figure-counter-major 90;counter-reset:figure-counter-minor;}
+  h1[data-number="91"]{counter-set:figure-counter-major 91;counter-reset:figure-counter-minor;}
+  h1[data-number="92"]{counter-set:figure-counter-major 92;counter-reset:figure-counter-minor;}
+  h1[data-number="93"]{counter-set:figure-counter-major 93;counter-reset:figure-counter-minor;}
+  h1[data-number="94"]{counter-set:figure-counter-major 94;counter-reset:figure-counter-minor;}
+  h1[data-number="95"]{counter-set:figure-counter-major 95;counter-reset:figure-counter-minor;}
+  h1[data-number="96"]{counter-set:figure-counter-major 96;counter-reset:figure-counter-minor;}
+  h1[data-number="97"]{counter-set:figure-counter-major 97;counter-reset:figure-counter-minor;}
+  h1[data-number="98"]{counter-set:figure-counter-major 98;counter-reset:figure-counter-minor;}
+  h1[data-number="99"]{counter-set:figure-counter-major 99;counter-reset:figure-counter-minor;}
+
+
+  </style>
+  <!-- BG custom styling for the wide body variant -->
+  <!-- Gets appended after bg-css.html -->
+
+  <style type="text/css">
+  body {
+      max-width: inherit;
+  }
+  </style>
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
+</head>
+<body>
+<div style="text-align:center"><span><a href="learning-a-new-language.html" rel="prev">Prev</a> | </span><a href="index.html">Contents</a><span style="visibility: hidden"> | <a href="" rel="next">Next</a></span></div><hr>
+<h1 data-number="10" id="use-of-ai"><span class="header-section-number">10</span> Use of AI</h1>
+<p></p>
+<p>As of this writing in 2025, AI is the new hotness<a href="use-of-ai.html#fn42" class="footnote-ref" id="fnref42" role="doc-noteref"><sup>42</sup></a>. Everyone is using it, and no one can stop talking about it.</p>
+<p>The question no one seems to have an answer for is what’s going to happen. <a href="https://en.wikipedia.org/wiki/Sam_Altman">Sam Altman</a><a href="use-of-ai.html#fn43" class="footnote-ref" id="fnref43" role="doc-noteref"><sup>43</sup></a> and others will tell you that AI is any second now going to take over the world and solve everything and humans will be rendered obsolete.</p>
+<p>I like to think that will not happen, and that even if AI starts solving everything, people will still want to use their ingenuity to push the envelope farther than AI is able to.</p>
+<p>What does all that mean for you as a computer science student (as of this writing)?</p>
+<p>Let’s talk about how you should use an AI as a student and at work, because those are two different things.</p>
+<p>But before that, let’s talk about what you’re <em>not</em> supposed to do.</p>
+<h2 data-number="10.1" id="how-not-to-use-ai-as-a-student"><span class="header-section-number">10.1</span> How <em>Not</em> to Use AI as a Student</h2>
+<p></p>
+<p>I’ve mentioned elsewhere that I like to study the book <a href="https://en.wikipedia.org/wiki/Structure_and_Interpretation_of_Computer_Programs">SICP</a><a href="use-of-ai.html#fn44" class="footnote-ref" id="fnref44" role="doc-noteref"><sup>44</sup></a> to improve my skills. And how I give myself a six-hour time limit to solve the problems presented.</p>
+<p>Now, these problems aren’t real-world problems at all. They’re contrived training problems. And—get this—the answers are all freely available on the Internet in a wide variety of places.</p>
+<p>So why do I spend up to six hours? What a waste, right? Why not just clone someone’s repo and declare that it’s implemented so I’m done?</p>
+<p>Or, if not that, why not just copy what my friend made?</p>
+<p>Or, if not that, why not hire someone to write the answers for me?</p>
+<p>Of course, you know the answer. I don’t do that because if I do, I haven’t learned anything. More specifically, <em>I haven’t struggled with the problems</em> so the learning that would come from that is lost.</p>
+<p>I think you see where this is going: just asking AI to solve the problem isn’t going to increase your skills at all. It’s just asking someone else to do the hard work.</p>
+<p>It’s like I went to the gym and asked someone else to lift the weights for me. Sure, I can walk out saying the weights had been lifted successfully, but I gained nothing from the experience.</p>
+<p>I want you to name an activity that, aside from being at the gym, involves lifting weights all day. Answer: there are none (generally speaking for the majority of the population). Then why do we spend time lifting dumbbells at the gym if there are zero other activities that involve it?</p>
+<p>The weights, of course, are just tools we use toward the greater goal of being generally stronger.</p>
+<p><em>School is exactly like this</em>. The programming problems you get in school are dumbbells. They’re not real. They’re designed to give you a workout so that when you get to the job, you have the strength to do the work.</p>
+<p>And because the problems aren’t real, AI can solve them all <em>really</em> easily. There’s tons of training material out there for them to learn from.</p>
+<p><em>But don’t be fooled</em>. Just because AI can solve your school problems doesn’t mean it can solve the real-world problems you’re going to face in your work. (As of now, it can’t.)</p>
+<p>(And if it could solve all those problems, how much do you think devs would earn? There’s a reason being a dev pays well, and it’s because the work is hard. If it was as easy as typing in an AI prompt, it would pay minimum wage. That should clue you in to the fact that if <em>all</em> you can do is prompt AI, you’re not getting a high-paying gig.)</p>
+<p>But that’s not to say you shouldn’t get good at using AI; it’s just that while you’re a student, you have to use it the right way to maximize your skills development.</p>
+<p>The TLDR of this section is this: never ask AI to solve your entire programming project. It probably can do that, but you’ll learn nothing. The goal of the project is not to complete the problem; it’s to get a workout while you complete it.</p>
+<p></p>
+<h2 data-number="10.2" id="how-to-use-ai-as-a-student"><span class="header-section-number">10.2</span> How to Use AI as a Student</h2>
+<p></p>
+<p>First things first: if your school or instructor has banned AI, that’s the rule. And you have to ignore what I’ve written here. Sorry. I’m going to assume it hasn’t done that foolish thing, and proceed.</p>
+<p>So how should you use it? Use it like you’re working with a decent tutor who knows a lot of things kinda well. The AI tutor definitely makes mistakes and gives poor advice from time to time, so you should cast a critical eye on everything you learn from it.</p>
+<p>When you’re stuck on a small part of a project, ask about that. When you can’t remember syntax, ask about that. Ask about the idiomatic way to write a loop that removes elements from the array it’s iterating over. Ask about what a particular operator does or how to use it. When you have questions about the language or library, ask those. Little bite-sized pieces are fine to ask it about. It can be way faster than a standard Internet search.</p>
+<p>When you’ve completed the project (and it works completely), then you can feel free to ask AI for a solution that you can use for comparison. Or, better still, feed your solution into the AI and ask for improvements.</p>
+<p>Keep in mind that some of the “improvements” aren’t going to be improvements at all, and you’ll want to ignore them. Cast that critical eye. <a href="right-tool-for-the-job.html#be-opinionated">Be opinionated</a> and have a rationale for which advice you’re accepting and which you’re rejecting.</p>
+<p>Lastly, there’s another time it’s fine to use AI to solve entire projects: when your instructor says you can. This happens when they’re giving you more real-world practice as opposed to lifting weights. Both are valuable uses of your study time.</p>
+<p></p>
+<h2 data-number="10.3" id="how-to-use-ai-at-work"><span class="header-section-number">10.3</span> How to Use AI at Work</h2>
+<p></p>
+<p>First, a caveat: the last time I was working in production (and I did so for 20 years), AI as we know it today did not exist. That said, I do use it to get things done more quickly today. So that’s my level of “expertise”.</p>
+<p>I’d mentioned earlier that new devs solve problems with logical reasoning, but experts, in addition, recognize patterns. As a more-experienced dev, you have a better understanding of which building blocks make up a problem. You recognize the pieces that you need, and you logically reason about how to assemble them.</p>
+<p>In other words, experienced devs are better at <em>Understand</em> and <em>Plan</em>. (They’re better at all phases, but recall that <em>Understand</em> and <em>Plan</em> is where the battle is.)</p>
+<p>As such, they can leverage AI to help them write the code for those building blocks. They can say things like, “I need to filter those results for anything that matches this regular expression”—and then they ask an AI to code up that building block, they expertly verify that the code is correct and modify it to suit their needs, and then move on.</p>
+<p>Even with technologies they aren’t familiar with, this can help them get the job done. But they still need to rely on their expertise to know when they need to learn more. That is, experienced devs have a nose for dangerous code and know when they need to proceed carefully and gather more knowledge.</p>
+<p>In this regard, AI can be really useful for doing proof-of-concept work and rapid prototyping where the code is often throwaway.</p>
+<blockquote>
+<p><em>“Let us hurry! There is nothing to fear here!”</em><br />
+<em>“That’s what scares me.”</em></p>
+<p>—Satipo and Indiana Jones, <em>Raiders of the Lost Ark</em></p>
+</blockquote>
+<p>Again, as a student, you can’t bring that experience (that you haven’t yet acquired) to bear, and if you just try to use AI like a seasoned dev, you’re going to have buggy, fragile code that you don’t know how to fix. And worst of all, you won’t be developing the skills you need.</p>
+<p>But as you gather more experience, you can definitely rely on AI to write a large amount of boilerplate code for you that you already know the logic behind, anyway.</p>
+<p></p>
+<h2 data-number="10.4" id="ai-and-the-jobs-market"><span class="header-section-number">10.4</span> AI and the Jobs Market</h2>
+<p></p>
+<p>When you read this, I want you to know that I, the author, thought <a href="https://www.yahoo.com/">Yahoo!</a><a href="use-of-ai.html#fn45" class="footnote-ref" id="fnref45" role="doc-noteref"><sup>45</sup></a> was a dumb idea when it first launched. I kinda still do think it was, but it made a bazillion dollars since then, so I was wrong. At least capitalistically.</p>
+<p>One thing old devs have been hearing their entire careers is that we’re on the verge of the “no code” revolution, and that this tool or that tool will finally put coders out of a job because everyone everywhere will be able to produce software.</p>
+<p>Every one of these predictions has something in common in that they were all fantastically wrong.</p>
+<p>But things are only wrong until they aren’t, and LLMs like ChatGPT are definitely novel beasts that don’t play by the previous rules.</p>
+<blockquote>
+<p><strong>I do recognize the stock pumping, though.</strong> All those “no code” companies were talking a big game trying to get big returns for their investors. OpenAI and other AI players also talk that big game.</p>
+<p>That’s not to say they won’t realize those gains; but it is to say it smells familiar.</p>
+</blockquote>
+<p>And LLMs are showing incredibly coding expertise. I am perpetually amazed by what they can do. But can they do it all?</p>
+<p>I have a thought experiment for you. Let’s say there’s an AI so good that I can tell it, “AI, design and implement a corporation that will crush all my competitors and make me the richest person on Earth,” and it will actually successfully do it.</p>
+<p>But the catch is that everyone has access to the same AI and they can all make the same request. Where does that land us? We’re back to square one where we’re on equal footing.</p>
+<p>As a capitalist, though, I don’t like equal footing. I want to get an edge on my competition. So I start thinking, “What can we do that’s slightly different than what the AI is telling my competitors?”</p>
+<p>And just like that, humans are back in the game!</p>
+<p>I think that trend’s going to continue, maybe forever.</p>
+<p>What will happen, I predict, is that the easy boilerplate jobs that exist now will experience a massive tightening. AI can solve lots of those easy problems, and you don’t need a big team of engineers behind them. The more novel problems will still need a lot of human work.</p>
+<p>But maybe not as much work as before. AI can help in a variety of ways, outlined above, so it helps speed things up.</p>
+<p>Going back in time, consider when most programs were written in <a href="https://en.wikipedia.org/wiki/Assembly_language">assembly language</a><a href="use-of-ai.html#fn46" class="footnote-ref" id="fnref46" role="doc-noteref"><sup>46</sup></a> and it took a lot of specialized knowledge to get these error-prone programs written. And then compilers became popular and now no one<a href="use-of-ai.html#fn47" class="footnote-ref" id="fnref47" role="doc-noteref"><sup>47</sup></a> writes in assembly any longer; those jobs are toast, destroyed by the faster, easier coding that compilers afford.</p>
+<p>In short, I think we’re going to keep pushing it, and AI will become a very useful tool, but only with humans at the helm. I think. We shall see.</p>
+<p></p>
+<blockquote>
+<p><em>“And… Always look on the bright side of life…”</em></p>
+<p>—Lead Singer Crucifee, <em>Monty Python’s Life of Brian</em></p>
+</blockquote>
+<h2 data-number="10.5" id="chapter-reflection-8"><span class="header-section-number">10.5</span> Chapter Reflection</h2>
+<ul>
+<li><p>Contrast the useful and non-useful ways students can use AI.</p></li>
+<li><p>What goes wrong if you use AI badly as a student?</p></li>
+<li><p>How do things differ with AI at work versus at school?</p></li>
+<li><p>What are some of the hazards of using AI at work?</p></li>
+</ul>
+<p></p>
+<section id="footnotes" class="footnotes footnotes-end-of-document" role="doc-endnotes">
+<hr />
+<ol>
+<li id="fn1"><p>mailto:beej@beej.us<a href="foreword.html#fnref1" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+<li id="fn2"><p>https://en.wikipedia.org/wiki/Boids<a href="foreword.html#fnref2" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+<li id="fn3"><p>https://beej.us/guide/bglcs/<a href="foreword.html#fnref3" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+<li id="fn4"><p>mailto:beej@beej.us<a href="foreword.html#fnref4" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+<li id="fn5"><p>https://github.com/beejjorgensen/bglcs/issues<a href="foreword.html#fnref5" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+<li id="fn6"><p>https://github.com/beejjorgensen/bglcs<a href="foreword.html#fnref6" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+<li id="fn7"><p>https://en.wikipedia.org/wiki/COBOL<a href="the-main-goal.html#fnref7" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+<li id="fn8"><p>Joke’s on me. There are still tons of COBOL jobs out there.<a href="the-main-goal.html#fnref8" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+<li id="fn9"><p>https://en.wikipedia.org/wiki/List_of_programming_languages<a href="the-main-goal.html#fnref9" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+<li id="fn10"><p>https://en.wikipedia.org/wiki/Mindset#Fixed_and_growth_mindset<a href="growth-mindset.html#fnref10" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+<li id="fn11"><p>Yes, I’m a <em>Galaxy Quest</em> fan.<a href="growth-mindset.html#fnref11" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+<li id="fn12"><p>https://en.wikipedia.org/wiki/Go_(game)<a href="growth-mindset.html#fnref12" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+<li id="fn13"><p>https://www.youtube.com/watch?v=cJsgM-3L38U<a href="growth-mindset.html#fnref13" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+<li id="fn14"><p>https://en.wikipedia.org/wiki/How_to_Solve_It<a href="problem-solving.html#fnref14" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+<li id="fn15"><p>Sometimes they can, actually, but only to write small, throwaway, exploratory proof-of-concept programs.<a href="problem-solving.html#fnref15" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+<li id="fn16"><p>I don’t think AI can solve <em>all</em> problems that get thrown at it, meaning that you’ll still have a job, but they can solve the relatively basic problems that are commonly used in computer science curricula. It’s 2025 now and we’ll see how well this footnote ages.<a href="problem-solving.html#fnref16" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+<li id="fn17"><p>I could stand to be more wise, myself.<a href="problem-solving.html#fnref17" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+<li id="fn18"><p>Once on a programming challenge website I coded up perfect solutions to <em>two</em> problems that weren’t the one I was meant to solve. I misunderstood it twice. Took me three-times longer than it should have to get the actual solution in place.<a href="problem-solving.html#fnref18" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+<li id="fn19"><p>This is actually part of your job description as a dev. People will expect and rely on you to do this in the workplace. So don’t be afraid of doing it; be afraid of <em>not</em> doing it.<a href="problem-solving.html#fnref19" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+<li id="fn20"><p>You didn’t say how to choose who moves first, if it could be played by three people, or that my “X” couldn’t take up more than one square. For example.<a href="problem-solving.html#fnref20" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+<li id="fn21"><p>As of 2025, I worked at Oregon State University. Go Beavs!<a href="problem-solving.html#fnref21" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+<li id="fn22"><p><em>Rubber ducking</em> is sharing ideas with a literal or proxy rubber duck, where the proxy might actually be a person. It helps you clarify your thinking and achieve problem-solving breakthroughs. Also, the Ducks are University of Oregon’s football team, Oregon State’s longtime rivals. Boo Ducks!<a href="problem-solving.html#fnref22" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+<li id="fn23"><p>This very rarely happens to me. When it does I quickly peek out the window to make sure skies are clear and I’m not about to be struck by lightning. And I buy a lottery ticket. It’s inevitably then that my luck runs out.<a href="problem-solving.html#fnref23" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+<li id="fn24"><p>https://en.wikipedia.org/wiki/Pair_programming<a href="problem-solving.html#fnref24" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+<li id="fn25"><p>Make sure your instructor and/or employer allows this.<a href="problem-solving.html#fnref25" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+<li id="fn26"><p>Again, if allowed in your work or school environment.<a href="breaking-down-problems.html#fnref26" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+<li id="fn27"><p>https://en.wikipedia.org/wiki/Shell_script<a href="right-tool-for-the-job.html#fnref27" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+<li id="fn28"><p>https://en.wikipedia.org/wiki/Doing_It_Right_(scuba_diving)<a href="right-tool-for-the-job.html#fnref28" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+<li id="fn29"><p>https://en.wikipedia.org/wiki/Turing_machine<a href="right-tool-for-the-job.html#fnref29" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+<li id="fn30"><p>https://en.wikipedia.org/wiki/Flow_(psychology)<a href="hacks-and-techniques-for-learning.html#fnref30" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+<li id="fn31"><p>https://stackoverflow.com/<a href="hacks-and-techniques-for-learning.html#fnref31" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+<li id="fn32"><p>https://en.wikipedia.org/wiki/Structure_and_Interpretation_of_Computer_Programs<a href="hacks-and-techniques-for-learning.html#fnref32" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+<li id="fn33"><p>https://en.wikipedia.org/wiki/https://en.wikipedia.org/wiki/Grok#In_computer_programmer_culture<a href="hacks-and-techniques-for-learning.html#fnref33" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+<li id="fn34"><p>https://en.wikipedia.org/wiki/Fisher–Yates_shuffle<a href="hacks-and-techniques-for-learning.html#fnref34" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+<li id="fn35"><p>https://en.wikipedia.org/wiki/Integrated_development_environment<a href="debugging.html#fnref35" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+<li id="fn36"><p>https://en.wikipedia.org/wiki/Sentence_diagram<a href="learning-a-new-language.html#fnref36" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+<li id="fn37"><p>https://docs.python.org/3/library/index.html<a href="learning-a-new-language.html#fnref37" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+<li id="fn38"><p>https://en.wikipedia.org/wiki/Internet_Message_Access_Protocol<a href="learning-a-new-language.html#fnref38" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+<li id="fn39"><p>https://en.wikipedia.org/wiki/Health_(game_terminology)#Hit_points<a href="learning-a-new-language.html#fnref39" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+<li id="fn40"><p>https://en.wikipedia.org/wiki/Programming_paradigm<a href="learning-a-new-language.html#fnref40" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+<li id="fn41"><p>https://www.erlang.org/<a href="learning-a-new-language.html#fnref41" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+<li id="fn42"><p>Unlike the expression “new hotness”, which is now tired. “Tired” is also tired, but that’s self-referential so I think it has bottomed out.<a href="use-of-ai.html#fnref42" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+<li id="fn43"><p>https://en.wikipedia.org/wiki/Sam_Altman<a href="use-of-ai.html#fnref43" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+<li id="fn44"><p>https://en.wikipedia.org/wiki/Structure_and_Interpretation_of_Computer_Programs<a href="use-of-ai.html#fnref44" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+<li id="fn45"><p>https://www.yahoo.com/<a href="use-of-ai.html#fnref45" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+<li id="fn46"><p>https://en.wikipedia.org/wiki/Assembly_language<a href="use-of-ai.html#fnref46" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+<li id="fn47"><p>Well, a few people do. You should try it for fun. It’s something else.<a href="use-of-ai.html#fnref47" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+</ol>
+</section>
+</body>
+<hr><div style="text-align:center"><span><a href="learning-a-new-language.html" rel="prev">Prev</a> | </span><a href="index.html">Contents</a><span style="visibility: hidden"> | <a href="" rel="next">Next</a></span></div></body>
+</html>
