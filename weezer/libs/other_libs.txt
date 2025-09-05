@@ -1,0 +1,27 @@
+libm (Math library)
+Flag: -lm
+Contains mathematical functions like sin(), cos(), sqrt(), etc.
+
+libpthread (POSIX threads)
+Flag: -lpthread or sometimes -pthread (also sets compiler flags)
+Provides threading APIs for POSIX threads.
+
+libdl (Dynamic linking loader)
+Flag: -ldl
+Used for dynamic loading of shared libraries (dlopen, dlsym, etc.).
+
+librt (Realtime extensions)
+Flag: -lrt
+Includes POSIX realtime extensions like clocks, timers, and semaphores.
+
+libgcc (GCC runtime support library)
+Flag: usually linked automatically, can be statically linked with -static-libgcc.
+
+libstdc++ (G++ standard C++ library)
+Flag: usually linked automatically when using g++, can be statically linked with -static-libstdc++.
+
+libc (Standard C library)
+Usually linked dynamically by default, static linking requires -static.
+
+libc++ (Clang's standard C++ library alternative to libstdc++)
+Linked using -lc++ instead of -lstdc++.

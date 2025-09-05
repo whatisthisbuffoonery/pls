@@ -1,0 +1,3 @@
+#undef FLAG		//gets rid of a #define
+
+#elif defined	//c99 compatible

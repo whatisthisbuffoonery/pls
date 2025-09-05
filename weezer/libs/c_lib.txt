@@ -1,0 +1,21 @@
+<stdio.h>	Input and output operations (e.g., printf, fgets, fopen)
+<stdlib.h>	General utilities (memory allocation, process control, conversion)
+<string.h>	String handling functions (e.g., strcpy, strlen, strcmp)
+<math.h>	Mathematical functions (e.g., sin, cos, sqrt)
+<time.h>	Time and date utilities
+<assert.h>	Diagnostics and debugging macros
+<ctype.h>	Character classification and conversion (e.g., isalpha)
+<limits.h>	Implementation-specific limits for integral types
+<float.h>	Limits for floating-point types
+<errno.h>	Macros reporting error conditions
+<locale.h>	Localization functions
+<setjmp.h>	Non-local jumps (setjmp and longjmp)
+<signal.h>	Signal handling
+<stdarg.h>	Handling variable argument lists
+<stdbool.h>	Boolean type (since C99)
+<stdint.h>	Fixed-width integer types (since C99)
+<stddef.h>	Common types and macros like size_t
+
+All part of standard c lib
+
+bojio unistd.h, fcntl.h
