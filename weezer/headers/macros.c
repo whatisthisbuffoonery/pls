@@ -60,19 +60,40 @@ char a[] = {
 ...
 #endif
 
+//return values for __has_embed()
+//__STDC_EMBED_NOT_FOUND__	//file aint there
+//__STDC_EMBED_FOUND__		//file found
+//__STDC_EMBED_EMPTY__		//empty file found
+//
+//fuck knows what int values those are. beej doesnt know.
 
+//check for random embed params from tom, harry, and dick:
+#if __has_embed(__FILE__ common_prefix::macro(data))
+    printf("common_prefix::macro(data) is supported!");
+#else
+    printf("common_prefix::macro(data) is NOT supported!");
+#endif
 
+#pragma deez nuts //very prone to third party additions
+//standard pragma stuff:
+#pragma STDC x toggle
+//replace x with:
+FP_CONTRACT	Allow floating point expressions to be contracted into a single operation to avoid rounding errors that might occur from multiple operations.
+FENV_ACCESS	Set to ON if you plan to access the floating point status flags. If OFF, the compiler might perform optimizations that cause the values in the flags to be inconsistent or invalid.
+CX_LIMITED_RANGE	Set to ON to allow the compiler to skip overflow checks when performing complex arithmetic. Defaults to OFF.
+//replace toggle with:
+ON
+OFF
+DEFAULT
+//notice all of those are for math peeps
 
+//to tell # indents to go away
+//the two lines are equivalent:
+#pragma "Unnecessary" quotes
+_Pragma("\"Unnecessary\" quotes")
 
+//this overwrites __LINE__ and __FILE__ (why the fuck)
+#line 420 "some_name"
 
-
-
-
-
-
-
-
-
-
-
-
+//empty '#'s are a thing. idfk.
+#

@@ -23,23 +23,27 @@ typedef struct
 
 int	main(void)
 {
-	t_any a;//simple way
-	a.type = is_int;//optional, this is for if conditions to check
+	t_any a;							//simple way
+	a.type = is_int;					//optional, this is for if conditions to check
 	t_any b;
 	b.type = is_char;
 
 	a.data.i = 5;
 	b.data.c = a.data.i + 48;
 
-	write(1, &b.data.c, 1);//5
+	write(1, &b.data.c, 1);				//5
 	write(1, "\n", 1);
 
-	a.data.c = 49;//overwrite, a.data.i is now 49
-	a.data.i += 7;//teehee
-	write(1, &a.data.c, 1);//8
+	a.data.c = 49;						//overwrite, a.data.i is now 49
+	a.data.i += 7;						//teehee
+	write(1, &a.data.c, 1);				//8
+
+	char *p = (char *)&a.data;			//pointer to raw union
+	write(1, "\n", 1);
+	write(1, p, 1);						//also 8
 	write(1, "\n", 1);
 
-	t_any f = {is_int, .data.i = 50};//actual declaration
-	write(1, &f.data.c, 1);//2
+	t_any f = {is_int, .data.i = 50};	//actual declaration
+	write(1, &f.data.c, 1);				//2
 	write(1, "\n", 1);
 }
